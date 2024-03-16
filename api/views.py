@@ -9,7 +9,8 @@ from .models import Profile, Post, Comment
 class CreateUserView(generics.CreateAPIView):
     serializer_class = serializers.UserSerializer
     # 新規ユーザー作成時はJWT認証を回避する必要があるのでAllowAnyを指定
-    permission_classes = (AllowAny)
+    # NOTE: AllowAnyの後に , を付けないとなぜかエラーになるので削除不可
+    permission_classes = (AllowAny,)
 
 # プロフィールの新規作成、更新用View
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -51,7 +52,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 # コメント作成用のView
 class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
+    queryset = Comment.objects.all()
     serializer_class = serializers.CommentSerializer
 
     def perform_create(self, serializer):
