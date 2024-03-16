@@ -1,3 +1,63 @@
-from django.shortcuts import render
+from rest_framework import generics
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
+from . import serializers
+from .models import Profile, Post, Comment
 
-# Create your views here.
+
+# 新規ユーザー作成用View
+class CreateUserView(generics.CreateAPIView):
+    serializer_class = serializers.UserSerializer
+    # 新規ユーザー作成時はJWT認証を回避する必要があるのでAllowAnyを指定
+    permission_classes = (AllowAny)
+
+# プロフィールの新規作成、更新用View
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = serializers.ProfileSerializer
+
+    # クライアント側からはuserProfileを指定しなくていいようにしているので、サーバー側で指定するようにオーバーライドする
+    def perform_create(self, serializer):
+        '''
+        ログインしているユーザーを識別して、シリアライザーに設定する
+        :params: serializer
+            プロフィール用のシリアライザー
+        '''
+        serializer.save(userProfile=self.request.user)
+
+# ログインユーザーのプロフィールを表示するためのView
+class MyProfileListView(generics.ListAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = serializers.ProfileSerializer
+
+    def get_queryset(self):
+        '''
+        ログインしているユーザーのプロフィールを返す
+        '''
+        return self.queryset.filter(userProfile=self.request.user)
+
+# 投稿作成用のView
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = serializers.PostSerializer
+
+    def perform_create(self, serializer):
+        '''
+        ログインしているユーザーの投稿を作成する
+        :params: serializer
+            投稿用のシリアライザー
+        '''
+        serializer.save(userPost=self.request.user)
+
+# コメント作成用のView
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = serializers.CommentSerializer
+
+    def perform_create(self, serializer):
+        '''
+        ログインしているユーザーのコメントを作成する
+        :params: serializer
+            コメント用のシリアライザー
+        '''
+        serializer.save(userComment=self.request.user)
