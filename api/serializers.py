@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ('id', 'email', 'password')
         # クライアントからパスワードを参照できないように書き込み専用で設定
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True}, 'id': {'read_only': True}}
 
     def create(self, validated_data):
         '''
@@ -40,15 +40,12 @@ class PostSerializer(serializers.ModelSerializer):
     created_on = serializers.DateTimeField(format='%Y-%m-%d', read_only=True)
 
     class Meta:
-        model = Profile
+        model = Post
         fields = ('id', 'title', 'userPost', 'created_on', 'img', 'liked')
         extra_kwargs = {'userPost': {'read_only': True}}
 
 
 class CommentSerializer(serializers.ModelSerializer):
-
-    created_on = serializers.DateTimeField(format='%Y-%m-%d', read_only=True)
-
     class Meta:
         model = Comment
         fields = ('id', 'text', 'userComment', 'post')
