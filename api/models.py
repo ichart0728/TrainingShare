@@ -19,6 +19,23 @@ def upload_avatar_path(instance, filename):
     # /avatars/{ユーザーID+ニックネーム.拡張子}
     return '/'.join(['avatars', str(instance.userProfile.id)+str(instance.nickName)+str('.')+str(ext)])
 
+def upload_post_path(instance, filename):
+    '''
+    投稿画像用のパスを生成する
+    :params: instance
+        投稿のインスタンス
+    :params: filename
+        ユーザーがアップロードした画像のファイル名
+
+    :return:
+        プロフィール画像アップロード用のパス
+    '''
+    # 拡張子を取得
+    ext = filename.split('.')[-1]
+    # /avatars/{ユーザーID+ニックネーム.拡張子}
+    return '/'.join(['posts', str(instance.userPost.id)+str(instance.title)+str('.')+str(ext)])
+
+
 # 通常はユーザー名とパスワードで認証を行うが、メールアドレスを使いたいのでオーバーライドする
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None):
@@ -86,7 +103,21 @@ class Profile(models.Model):
         on_delete=models.CASCADE
     )
     created_on = models.DateTimeField(auto_now_add=True)
-    img = models.ImageField(black=True, null=True, upload_to=upload_avatar_path)
+    img = models.ImageField(blank=True, null=True, upload_to=upload_avatar_path)
 
     def __str__(self):
         return self.nickName
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    userPost = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='userPost',
+        on_delete=models.CASCADE
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
+    img = models.ImageField(blank=True, null=True, upload_to=upload_post_path)
+    liked = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked', blank=True)
+
+    def __str__(self):
+        return self.title
