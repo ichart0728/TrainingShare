@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
+import uuid
 
 
 def upload_avatar_path(instance, filename):
@@ -38,7 +39,7 @@ def upload_post_path(instance, filename):
 
 # 通常はユーザー名とパスワードで認証を行うが、メールアドレスを使いたいのでオーバーライドする
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email, password=None, **extra_fields):
         '''
         ユーザーモデルのオブジェクトを作成する
         :params: email
@@ -52,7 +53,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('email is must')
         # ユーザーが入力したEmailアドレスを正規化
-        user = self.model(email=self.normalize_email(email))
+        user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
 
@@ -81,6 +82,7 @@ class UserManager(BaseUserManager):
 
 # ユーザーモデル定義
 class User(AbstractBaseUser, PermissionsMixin):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # 同一メーアドレスのユーザーは許可しない
     email = models.EmailField(max_length=50, unique=True)
     is_active = models.BooleanField(default=True)
@@ -95,6 +97,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # プロフィールモデル定義
 class Profile(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nickName = models.CharField(max_length=20)
     # ユーザーとプロフィールを1:1で紐づける
     # ユーザーが削除されたらプロフィールも削除されるように設定
@@ -110,7 +113,10 @@ class Profile(models.Model):
 
 
 class Post(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=100)
+    # ユーザーとプ投稿を1:Nで紐づける
+    # ユーザーが削除されたら投稿も削除されるように設定
     userPost = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='userPost',
         on_delete=models.CASCADE
@@ -123,6 +129,7 @@ class Post(models.Model):
         return self.title
 
 class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.CharField(max_length=100)
     userComment = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='userComment',
