@@ -2,7 +2,7 @@ import React from "react";
 import { AppDispatch } from "../../app/store";
 import { useSelector, useDispatch } from "react-redux";
 import styles from "./Auth.module.css";
-import ReactModal, { Styles } from "react-modal";
+import Modal from "react-modal";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, CircularProgress } from "@material-ui/core";
@@ -26,7 +26,7 @@ import {
   fetchAsyncCreateProf,
 } from "./authSlice";
 
-const customStyles: ReactModal.Styles = {
+const customStyles: Modal.Styles = {
   overlay: {
     backgroundColor: "#777777",
   },
@@ -43,7 +43,7 @@ const customStyles: ReactModal.Styles = {
 };
 
 const Auth: React.FC = () => {
-  ReactModal.setAppElement("#root");
+  Modal.setAppElement("#root");
   /*SelectorでStoreから状態を取得*/
   const openSignIn = useSelector(selectOpenSignIn);
   const openSignUp = useSelector(selectOpenSignUp);
@@ -53,7 +53,7 @@ const Auth: React.FC = () => {
 
   return (
     <>
-      <ReactModal
+      <Modal
         /*サインアップ用モーダルの雛形を作成*/
         /*モーダルの状態*/
         isOpen={openSignUp}
@@ -179,9 +179,9 @@ const Auth: React.FC = () => {
             </div>
           )}
         </Formik>
-      </ReactModal>
+      </Modal>
 
-      <ReactModal
+      <Modal
         /*サインイン用モーダルの雛形を作成*/
         isOpen={openSignIn}
         onRequestClose={async () => {
@@ -223,7 +223,7 @@ const Auth: React.FC = () => {
             <div>
               <form onSubmit={handleSubmit}>
                 <div className={styles.auth_signUp}>
-                  <h1 className={styles.auth_title}>SNS clone</h1>
+                  <h1 className={styles.auth_title}>Training Share</h1>
                   <br />
                   <div className={styles.auth_progress}>
                     {isLoadingAuth && <CircularProgress />}
@@ -281,7 +281,7 @@ const Auth: React.FC = () => {
             </div>
           )}
         </Formik>
-      </ReactModal>
+      </Modal>
     </>
   );
 };

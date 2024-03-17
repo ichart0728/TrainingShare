@@ -12,6 +12,15 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+import os
+import environ
+
+env = environ.Env()
+env.read_env('.env')
+
+# SECRET_KEY = env('SECRET_KEY')
+# DEBUG = env('DEBUG')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -102,11 +111,14 @@ SIMPLE_JWT = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': env.get_value('DATABASE_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME': env.get_value('DATABASE_DB', default=os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER': env.get_value('DATABASE_USER', default='django_user'),
+        'PASSWORD': env.get_value('DATABASE_PASSWORD', default='password'),
+        'HOST': env.get_value('DATABASE_HOST', default='localhost'),
+        'PORT': env.get_value('DATABASE_PORT', default='5432'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
