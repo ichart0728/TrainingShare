@@ -73,7 +73,6 @@ export const fetchAsyncGetMyProf = createAsyncThunk("profile/get", async () => {
       Authorization: `JWT ${localStorage.localJWT}`,
     },
   });
-  /*バックエンドでqueryで取得しているのでリスト形式になっている*/
   return res.data[0];
 });
 
@@ -116,7 +115,7 @@ export const authSlice = createSlice({
         img: "",
       },
     ],
-  }, // The `reducers` field lets us define reducers and generate associated actions
+  }, // The 'reducers' field lets us define reducers and generate associated actions
   reducers: {
     /*ローディグ管理の制御*/
     fetchCredStart(state) {
