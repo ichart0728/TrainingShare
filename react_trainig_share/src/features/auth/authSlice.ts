@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import axios from "axios";
-import { PROPS_AUTHEN, PROPS_PROFILE, PROPS_NICKNAME } from "../tyeps";
+import { PROPS_AUTHEN, PROPS_PROFILE, PROPS_NICKNAME } from "../types";
 
 const apiUrl = process.env.REACT_APP_DEV_API_URL;
 
@@ -99,18 +99,18 @@ export const authSlice = createSlice({
     isLoadingAuth: false,
     /*ログインユーザーの状態*/
     myprofile: {
-      id: 0,
+      id: "",
       nickName: "",
-      userProfile: 0,
+      userProfile: "",
       created_on: "",
       img: "",
     },
     /*プロフィール一覧格納用*/
     profiles: [
       {
-        id: 0,
+        id: "",
         nickName: "",
-        userProfile: 0,
+        userProfile: "",
         created_on: "",
         img: "",
       },
@@ -190,7 +190,7 @@ export const {
   editNickname,
 } = authSlice.actions;
 
-/* ストアから状態を取得*/
+/* ストアから状態を取得してエクスポート*/
 export const selectIsLoadingAuth = (state: RootState) =>
   state.auth.isLoadingAuth;
 export const selectOpenSignIn = (state: RootState) => state.auth.openSignIn;
