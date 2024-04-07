@@ -43,6 +43,7 @@ export const profileSlice = createSlice({
       userProfile: "",
       created_on: "",
       img: "",
+      userPosts: [],
     },
   },
   reducers: {

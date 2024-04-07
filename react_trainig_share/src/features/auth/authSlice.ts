@@ -115,6 +115,14 @@ export const authSlice = createSlice({
         img: "",
       },
     ],
+    profile: {
+      id: "",
+      nickName: "",
+      userProfile: "",
+      created_on: "",
+      img: "",
+      userPosts: [],
+    },
   }, // The 'reducers' field lets us define reducers and generate associated actions
   reducers: {
     /*ローディグ管理の制御*/
@@ -148,6 +156,16 @@ export const authSlice = createSlice({
     /*プロフィールのニックネーム編集制御*/
     editNickname(state, action) {
       state.myprofile.nickName = action.payload;
+    },
+    resetProfile(state) {
+      state.profile = {
+        id: "",
+        nickName: "",
+        userProfile: "",
+        created_on: "",
+        img: "",
+        userPosts: [],
+      };
     },
   },
   /*各reducersの後処理を定義*/
@@ -188,6 +206,7 @@ export const {
   setOpenProfile,
   resetOpenProfile,
   editNickname,
+  resetProfile,
 } = authSlice.actions;
 
 /* ストアから状態を取得してエクスポート*/

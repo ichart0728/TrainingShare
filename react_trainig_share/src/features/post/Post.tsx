@@ -4,6 +4,7 @@ import styles from "./Post.module.css";
 import { makeStyles } from "@material-ui/core/styles";
 import { Avatar, Divider, Checkbox } from "@material-ui/core";
 import { Favorite, FavoriteBorder } from "@material-ui/icons";
+import { useNavigate } from "react-router-dom";
 
 import AvatarGroup from "@material-ui/lab/AvatarGroup";
 
@@ -85,11 +86,16 @@ const Post: React.FC<PROPS_POST> = ({
     await dispatch(fetchPostEnd());
   };
 
+  const navigate = useNavigate();
+
   const handleProfileClick = async (userId: string) => {
     await dispatch(fetchPostStart());
-    await dispatch(fetchAsyncGetProf(userId));
-    await dispatch(fetchAsyncGetUserPosts(userId));
+    await Promise.all([
+      dispatch(fetchAsyncGetProf(userId)),
+      dispatch(fetchAsyncGetUserPosts(userId)),
+    ]);
     await dispatch(fetchPostEnd());
+    navigate(`/profile/${userId}`);
   };
 
   // タイトル(投稿)が存在する場合のみ表示
