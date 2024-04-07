@@ -14,6 +14,8 @@ router.register('comment', views.CommentViewSet)
 urlpatterns = [
     path('register/', views.CreateUserView.as_view(), name='register'),
     path('myprofile/', views.MyProfileListView.as_view(), name='myprofile'),
-    path('profile/<int:pk>/', views.ProfileListView.as_view(), name='profile'),
+    path('profile/<uuid:pk>', views.ProfileListView.as_view(), name='profile'),
+    path('post/<uuid:pk>', views.PostListView.as_view(), name='post'),
     path('',include(router.urls))
 ]
+
