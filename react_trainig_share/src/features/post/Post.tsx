@@ -20,6 +20,8 @@ import {
   fetchAsyncPatchLiked,
 } from "./postSlice";
 
+import { fetchAsyncGetProf } from "../profile/profileSlice";
+
 import { PROPS_POST } from "../types";
 
 // https://v4.mui.com/components/avatars/#sizes
@@ -80,13 +82,31 @@ const Post: React.FC<PROPS_POST> = ({
     await dispatch(fetchPostEnd());
   };
 
+  const handleProfileClick = async (userId: string) => {
+    const packet = {
+      id: postId,
+      title: title,
+      current: liked,
+      // ログインユーザーのID
+      new: loginId,
+    };
+    await dispatch(fetchPostStart());
+    await dispatch(fetchAsyncGetProf(userId));
+    await dispatch(fetchPostEnd());
+  };
+
   // タイトル(投稿)が存在する場合のみ表示
   if (title) {
     return (
       <div className={styles.post}>
         <div className={styles.post_header}>
           <Avatar className={styles.post_avatar} src={prof[0]?.img} />
-          <h3>{prof[0]?.nickName}</h3>
+          <h3
+            onClick={() => handleProfileClick(prof[0]?.id)}
+            style={{ cursor: "pointer" }}
+          >
+            {prof[0]?.nickName}
+          </h3>
         </div>
         <img className={styles.post_image} src={imageUrl} alt="" />
 
@@ -105,8 +125,6 @@ const Post: React.FC<PROPS_POST> = ({
               <Avatar
                 className={styles.post_avatarGroup}
                 key={like}
-                // 全ユーザーのプロフィール情報を取得し、この投稿にいいねしているユーザーのプロフィール画像を表示
-                // FIXME:全てのプロフィール情報を取得している前提の処理なので、必要最小限のデータだけ取得・表示するようにAPI含めて修正
                 src={profiles.find((prof) => prof.userProfile === like)?.img}
               />
             ))}
@@ -120,6 +138,7 @@ const Post: React.FC<PROPS_POST> = ({
               <Avatar
                 src={
                   // 全ユーザーのプロフィール情報からコメントをしたユーザーに合致するデータを見つけて、そのユーザーのプロフィール画像を表示
+
                   // FIXME
                   profiles.find(
                     (prof) => prof.userProfile === comment.userComment

@@ -5,6 +5,7 @@ import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
 
 const apiUrlPost = `${process.env.REACT_APP_DEV_API_URL}api/post/`;
 const apiUrlComment = `${process.env.REACT_APP_DEV_API_URL}api/comment/`;
+const apiUrlProfile = `${process.env.REACT_APP_DEV_API_URL}api/profile/`;
 
 /*投稿の取得*/
 export const fetchAsyncGetPosts = createAsyncThunk("post/get", async () => {
@@ -126,6 +127,13 @@ export const postSlice = createSlice({
         post: "",
       },
     ],
+    profile: {
+      id: "",
+      nickName: "",
+      userProfile: "",
+      created_on: "",
+      img: "",
+    },
   },
   reducers: {
     /*ローディグ管理の制御*/
