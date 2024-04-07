@@ -139,3 +139,18 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
+class Follow(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    follower = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='following',
+        on_delete=models.CASCADE
+    )
+    following = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='followers',
+        on_delete=models.CASCADE
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.follower.email} follows {self.following.email}"
