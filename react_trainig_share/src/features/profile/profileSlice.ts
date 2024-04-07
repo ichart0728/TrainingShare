@@ -4,7 +4,6 @@ import axios from "axios";
 import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
 
 const apiUrlPost = `${process.env.REACT_APP_DEV_API_URL}api/post/`;
-const apiUrlComment = `${process.env.REACT_APP_DEV_API_URL}api/comment/`;
 const apiUrlProfile = `${process.env.REACT_APP_DEV_API_URL}api/profile/`;
 
 /*プロフィール情報取得*/
@@ -12,6 +11,19 @@ export const fetchAsyncGetProf = createAsyncThunk(
   "profile/get",
   async (userId: string) => {
     const res = await axios.get(`${apiUrlProfile}${userId}`, {
+      headers: {
+        Authorization: `JWT ${localStorage.localJWT}`,
+      },
+    });
+    return res.data;
+  }
+);
+
+/*指定したユーザーの投稿一覧取得*/
+export const fetchAsyncGetUserPosts = createAsyncThunk(
+  "profile/getUserPosts",
+  async (userId: string) => {
+    const res = await axios.get(`${apiUrlPost}${userId}`, {
       headers: {
         Authorization: `JWT ${localStorage.localJWT}`,
       },
@@ -48,7 +60,14 @@ export const profileSlice = createSlice({
       /*取得したプロフィール情報をセット*/
       return {
         ...state,
-        profile: action.payload,
+        profile: { ...state.profile, ...action.payload },
+      };
+    });
+    builder.addCase(fetchAsyncGetUserPosts.fulfilled, (state, action) => {
+      /*取得したプロフィール情報をセット*/
+      return {
+        ...state,
+        profile: { ...state.profile, userPosts: action.payload },
       };
     });
   },

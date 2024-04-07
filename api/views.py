@@ -61,6 +61,17 @@ class PostViewSet(viewsets.ModelViewSet):
         '''
         serializer.save(userPost=self.request.user)
 
+# 指定したUserの投稿一覧
+class PostListView(generics.ListAPIView):
+    queryset = Post.objects.all()
+    serializer_class = serializers.PostSerializer
+
+    def get_queryset(self):
+        '''
+        指定したUserの投稿一覧を返す
+        '''
+        return self.queryset.filter(userPost=self.kwargs['pk'])
+
 # コメント作成用のView
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()

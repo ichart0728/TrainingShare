@@ -20,7 +20,10 @@ import {
   fetchAsyncPatchLiked,
 } from "./postSlice";
 
-import { fetchAsyncGetProf } from "../profile/profileSlice";
+import {
+  fetchAsyncGetProf,
+  fetchAsyncGetUserPosts,
+} from "../profile/profileSlice";
 
 import { PROPS_POST } from "../types";
 
@@ -83,15 +86,9 @@ const Post: React.FC<PROPS_POST> = ({
   };
 
   const handleProfileClick = async (userId: string) => {
-    const packet = {
-      id: postId,
-      title: title,
-      current: liked,
-      // ログインユーザーのID
-      new: loginId,
-    };
     await dispatch(fetchPostStart());
     await dispatch(fetchAsyncGetProf(userId));
+    await dispatch(fetchAsyncGetUserPosts(userId));
     await dispatch(fetchPostEnd());
   };
 
@@ -102,7 +99,7 @@ const Post: React.FC<PROPS_POST> = ({
         <div className={styles.post_header}>
           <Avatar className={styles.post_avatar} src={prof[0]?.img} />
           <h3
-            onClick={() => handleProfileClick(prof[0]?.id)}
+            onClick={() => handleProfileClick(prof[0]?.userProfile)}
             style={{ cursor: "pointer" }}
           >
             {prof[0]?.nickName}
