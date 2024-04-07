@@ -37,6 +37,17 @@ class MyProfileListView(generics.ListAPIView):
         '''
         return self.queryset.filter(userProfile=self.request.user)
 
+# 指定したUserのプロフィールを表示するためのView
+class ProfileListView(generics.ListAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = serializers.ProfileSerializer
+
+    def get_queryset(self):
+        '''
+        指定したUserのプロフィールを返す
+        '''
+        return self.queryset.filter(userProfile=self.kwargs['pk'])
+
 # 投稿作成用のView
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
