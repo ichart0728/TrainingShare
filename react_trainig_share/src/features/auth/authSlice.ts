@@ -67,14 +67,17 @@ export const fetchAsyncUpdateProf = createAsyncThunk(
 );
 
 /*プロフィール取得*/
-export const fetchAsyncGetMyProf = createAsyncThunk("profile/get", async () => {
+export const fetchAsyncGetMyProf = createAsyncThunk(
+  "myprofile/get",
+  async () => {
   const res = await axios.get(`${apiUrl}api/myprofile/`, {
     headers: {
       Authorization: `JWT ${localStorage.localJWT}`,
     },
   });
   return res.data[0];
-});
+  }
+);
 
 /*プロフィール一覧取得*/
 export const fetchAsyncGetProfs = createAsyncThunk("profiles/get", async () => {
