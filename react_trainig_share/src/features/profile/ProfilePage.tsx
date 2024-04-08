@@ -8,7 +8,7 @@ import Header from "../core/Header"; // Header コンポーネントをインポ
 const ProfilePage = () => {
   const profile = useSelector((state: RootState) => state.profile.profile);
   const posts = useSelector(
-    (state: RootState) => state.profile.profile.userPosts || []
+    (state: RootState) => state.profile.userPosts || []
   );
 
   return (
