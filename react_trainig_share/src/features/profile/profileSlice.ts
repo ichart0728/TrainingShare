@@ -15,7 +15,8 @@ export const fetchAsyncGetProf = createAsyncThunk(
         Authorization: `JWT ${localStorage.localJWT}`,
       },
     });
-    return res.data;
+    /*API側からリスト形式で返ってくるので配列の0番目を取得する*/
+    return res.data[0];
   }
 );
 
@@ -43,8 +44,8 @@ export const profileSlice = createSlice({
       userProfile: "",
       created_on: "",
       img: "",
-      userPosts: [],
     },
+    userPosts: [],
   },
   reducers: {
     /*ローディグ管理の制御*/
@@ -59,17 +60,18 @@ export const profileSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchAsyncGetProf.fulfilled, (state, action) => {
       /*取得したプロフィール情報をセット*/
-      return {
-        ...state,
-        profile: { ...state.profile, ...action.payload },
+      state.profile = {
+        ...state.profile,
+        ...action.payload,
       };
     });
     builder.addCase(fetchAsyncGetUserPosts.fulfilled, (state, action) => {
       /*取得したプロフィール情報をセット*/
-      return {
-        ...state,
-        profile: { ...state.profile, userPosts: action.payload },
-      };
+      state.userPosts = action.payload;
+      // return {
+      //   ...state,
+      //   profile: { ...state.profile, userPosts: action.payload },
+      // };
     });
   },
 });
@@ -79,9 +81,4 @@ export const { fetchPostStart, fetchPostEnd } = profileSlice.actions;
 /* ストアから状態を取得してエクスポート*/
 export const selectIsLoadingPost = (state: RootState) =>
   state.profile.isLoadingProfile;
-// export const selectOpenNewPost = (state: RootState) =>
-// state.profile.openNewPost;
-// export const selectPosts = (state: RootState) => state.profile.posts;
-// export const selectComments = (state: RootState) => state.profile.comments;
-
 export default profileSlice.reducer;
