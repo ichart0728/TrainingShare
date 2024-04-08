@@ -88,14 +88,14 @@ const Post: React.FC<PROPS_POST> = ({
 
   const navigate = useNavigate();
 
-  const handleProfileClick = async (userId: string) => {
+  const handleProfileClick = async (userId: string, nickName: string) => {
     await dispatch(fetchPostStart());
     await Promise.all([
       dispatch(fetchAsyncGetProf(userId)),
       dispatch(fetchAsyncGetUserPosts(userId)),
     ]);
     await dispatch(fetchPostEnd());
-    navigate(`/profile/${userId}`);
+    navigate(`/profile/${nickName}`);
   };
 
   // タイトル(投稿)が存在する場合のみ表示
@@ -105,7 +105,9 @@ const Post: React.FC<PROPS_POST> = ({
         <div className={styles.post_header}>
           <Avatar className={styles.post_avatar} src={prof[0]?.img} />
           <h3
-            onClick={() => handleProfileClick(prof[0]?.userProfile)}
+            onClick={() =>
+              handleProfileClick(prof[0]?.userProfile, prof[0]?.nickName)
+            }
             style={{ cursor: "pointer" }}
           >
             {prof[0]?.nickName}
