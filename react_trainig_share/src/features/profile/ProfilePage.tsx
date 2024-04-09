@@ -4,12 +4,20 @@ import { Avatar, Grid, Typography } from "@material-ui/core";
 import PostCard from "../post/PostCard";
 import styles from "./ProfilePage.module.css"; // CSSモジュールのインポート
 import Header from "../core/Header"; // Header コンポーネントをインポート
+import React, { useState } from "react";
 
 const ProfilePage = () => {
   const profile = useSelector((state: RootState) => state.profile.profile);
   const posts = useSelector(
     (state: RootState) => state.profile.userPosts || []
   );
+  // フォロー状態のローカルステート（デフォルトは未フォロー）
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  // フォロー状態を切り替えるハンドラ
+  const handleFollowClick = () => {
+    setIsFollowing(!isFollowing);
+  };
 
   return (
     <div>
@@ -35,6 +43,13 @@ const ProfilePage = () => {
                   >
                     フォロワー数: 10
                   </Typography>
+                </div>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <div className={styles.followButton}>
+                  <button onClick={handleFollowClick}>
+                    {isFollowing ? "Following" : "Follow"}
+                  </button>
                 </div>
               </Grid>
               <Grid item xs={12} className={styles.postsContainer}>
