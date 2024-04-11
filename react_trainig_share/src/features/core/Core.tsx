@@ -24,7 +24,8 @@ import {
 import Post from "../post/Post";
 import EditProfile from "./EditProfile";
 import NewPost from "./NewPost";
-import Header from "./Header"; // Header コンポーネントをインポート
+import Sidebar from "./Sidebar";
+
 // 不要になったimport文は削除
 
 const Core: React.FC = () => {
@@ -55,17 +56,20 @@ const Core: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <div>
-      <Auth />
-      <EditProfile />
-      <NewPost />
-      <Auth />
-      <Header /> {/* Header コンポーネントの使用 */}
+    <div className={styles.coreContainer}>
       {profile?.nickName && (
-        <>
-          {/* https://v4.mui.com/fr/customization/breakpoints/ */}
+        <div className={styles.coreSidebar}>
+          <Sidebar />
+        </div>
+      )}
+      <div className={styles.coreMainContent}>
+        <EditProfile />
+        <Auth />
+        <NewPost />
+        {/* メインコンテンツ */}
+        {profile?.nickName && (
           <div className={styles.core_posts}>
-            {/*最新の投稿を左上に表示させたいのでreverse*/}
+            {/* 投稿一覧 */}
             <Grid container spacing={4}>
               {posts
                 .slice(0)
@@ -84,10 +88,9 @@ const Core: React.FC = () => {
                 ))}
             </Grid>
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };
-
 export default Core;

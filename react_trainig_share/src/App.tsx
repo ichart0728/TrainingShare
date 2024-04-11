@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import styles from "./App.module.css";
 import Core from "./features/core/Core";
-import ProfilePage from "./features/profile/ProfilePage"; // ProfilePageコンポーネントをインポート
+import ProfilePage from "./features/profile/ProfilePage";
+import Record from "./features/record/Record";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Core />} />{" "}
           {/* Coreコンポーネントをデフォルトページとして表示 */}
           <Route path="/profile/:userId" element={<ProfilePage />} />{" "}
+          <Route path="/record" element={<Record />} />{" "}
           {/* プロフィールページへのルーティングを追加 */}
         </Routes>
       </div>
