@@ -1,53 +1,69 @@
 .core_title {
-    font-family: "Roboto", cursive;
-    font-weight: normal;
-    text-align: center;
+  font-family: "Roboto", cursive;
+  font-weight: normal;
+  text-align: center;
 }
 
 .core_signUp {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .core_text {
-    color: rgb(6, 153, 211);
-    text-align: center;
-    cursor: pointer;
+  color: rgb(6, 153, 211);
+  text-align: center;
+  cursor: pointer;
 }
 
 .core_header {
-    position: sticky;
-    top: 0;
-    background-color: white;
-    padding: 20px;
-    border-bottom: 1px solid lightgray;
-    object-fit: contain;
-    display: flex;
-    z-index: 1;
-    justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  padding: 20px;
+  border-bottom: 1px solid lightgray;
+  object-fit: contain;
+  display: flex;
+  z-index: 1;
+  justify-content: space-between;
 }
 
 .core_btnModal {
-    background-color: transparent;
-    color: gray;
-    padding-top: 3px;
-    font-size: 32px;
-    border: none;
-    outline: none;
-    cursor: pointer;
+  background-color: transparent;
+  color: gray;
+  padding-top: 3px;
+  font-size: 32px;
+  border: none;
+  outline: none;
+  cursor: pointer;
 }
 
 .core_logout {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .core_posts {
-    padding: 20px;
+  padding: 20px;
 }
 
 .core_progress {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+} /* Core.module.css */
+
+.coreContainer {
+  display: flex; /* Flexboxを使ってサイドバーとコンテンツ領域を並べる */
 }
+
+.coreSidebar {
+  width: 240px; /* サイドバーの幅を指定する */
+  flex-shrink: 0; /* サイドバーの幅が縮まないようにする */
+}
+
+.coreMainContent {
+  flex-grow: 1; /* メインコンテンツが残りのスペースを埋めるようにする */
+  padding: 20px; /* 内側の余白を追加する */
+}
+
+/* その他のスタイル */

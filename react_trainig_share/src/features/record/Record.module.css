@@ -19,17 +19,3 @@
 .followButton button:hover {
   background-color: #0056b3;
 }
-
-.profileSidebar {
-  width: 240px; /* サイドバーの幅を指定する */
-  flex-shrink: 0; /* サイドバーの幅が縮まないようにする */
-}
-
-.profilePage {
-  display: flex;
-}
-
-.profileContent {
-  flex-grow: 1; /* サイドバーの横にメインコンテンツを表示するために追加 */
-  /* 他のスタイル */
-}
