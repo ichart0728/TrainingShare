@@ -19,6 +19,7 @@ import {
 } from "@material-ui/core";
 import HomeIcon from "@material-ui/icons/Home";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import FitnessCenter from "@material-ui/icons/FitnessCenter";
 import styles from "./Sidebar.module.css";
 import { useNavigate } from "react-router-dom";
 import { setUserProfileId } from "../profile/profileSlice";
@@ -36,6 +37,11 @@ const Sidebar = () => {
     dispatch(setUserProfileId(myprofile.userProfile));
     navigate(`profile/${myprofile.nickName}`);
   };
+
+  const handleWorkoutClick = () => {
+    navigate("/workout");
+  };
+
   const handleLogoutClick = () => {
     const confirmLogout = window.confirm("ログアウトしますか？");
     if (confirmLogout) {
@@ -63,6 +69,16 @@ const Sidebar = () => {
           </ListItemIcon>
           <ListItemText primary="Home" />
         </ListItem>
+
+        <ListItem button key="Workout" onClick={handleWorkoutClick}>
+          <ListItemIcon>
+            <div className={styles.iconWrapper}>
+              <FitnessCenter className={(styles.icon, "icon")} />
+            </div>
+          </ListItemIcon>
+          <ListItemText primary="Workout" />
+        </ListItem>
+
         <ListItem button key="Profile" onClick={handleMyProfileClick}>
           <ListItemIcon>
             <div className={styles.iconWrapper}>
@@ -84,13 +100,13 @@ const Sidebar = () => {
           </ListItemIcon>
           <ListItemText primary="Profile" />
         </ListItem>
+
         <ListItem button key="Logout" onClick={handleLogoutClick}>
           <ListItemIcon>
             <div className={styles.iconWrapper}>
               <ExitToAppIcon className={(styles.icon, "icon")} />
             </div>
           </ListItemIcon>
-
           <ListItemText primary="Logout" />
         </ListItem>
       </List>

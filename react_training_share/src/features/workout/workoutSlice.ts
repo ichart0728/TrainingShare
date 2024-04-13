@@ -18,12 +18,12 @@ export const fetchAsyncGetTrainingMenu = createAsyncThunk(
   }
 );
 
-export const recordSlice = createSlice({
-  name: "record",
+export const workoutSlice = createSlice({
+  name: "workout",
   initialState: {
     /*投稿やコメントをfetchしている時のローディング制御*/
     isLoadingMenu: false,
-    record: [
+    workout: [
       {
         id: "",
         training_menu: "",
@@ -45,17 +45,17 @@ export const recordSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchAsyncGetTrainingMenu.fulfilled, (state, action) => {
       /*取得したトレーニングメニュー情報をセット*/
-      state.record = {
-        ...state.record,
+      state.workout = {
+        ...state.workout,
         ...action.payload,
       };
     });
   },
 });
 
-export const { fetchPostStart, fetchPostEnd } = recordSlice.actions;
+export const { fetchPostStart, fetchPostEnd } = workoutSlice.actions;
 
 /* ストアから状態を取得してエクスポート*/
 export const selectIsLoadingPost = (state: RootState) =>
   state.profile.isLoadingProfile;
-export default recordSlice.reducer;
+export default workoutSlice.reducer;
