@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./Post.module.css";
 import { makeStyles } from "@material-ui/core/styles";
-import { Avatar, Checkbox } from "@material-ui/core";
+import { Avatar, Divider, Checkbox } from "@material-ui/core";
 import { Favorite, FavoriteBorder } from "@material-ui/icons";
 import { useNavigate } from "react-router-dom";
 import AvatarGroup from "@material-ui/lab/AvatarGroup";
@@ -45,7 +45,6 @@ const Post: React.FC<PROPS_POST> = ({
   const prof = profiles.filter((prof) => prof.userProfile === userPost);
 
   const postComment = async (e: React.MouseEvent<HTMLElement>) => {
-// 投稿した時(フォームのデータを送信した時)のリフレッシュを無効化
     e.preventDefault();
     const packet = { text: text, post: postId };
     await dispatch(fetchPostStart());
@@ -59,7 +58,6 @@ const Post: React.FC<PROPS_POST> = ({
       id: postId,
       title: title,
       current: liked,
-// ログインユーザーのID
       new: loginId,
     };
     await dispatch(fetchPostStart());
@@ -74,8 +72,10 @@ const Post: React.FC<PROPS_POST> = ({
     navigate(`/profile/${nickName}`);
   };
 
-  // タイトル(投稿)が存在する場合のみ表示
-  if (title) {
+  const toggleCommentsVisibility = () => {
+    setShowAllComments(!showAllComments);
+  };
+
   return (
     <div className={styles.post}>
       <div className={styles.post_header}>
@@ -90,7 +90,7 @@ const Post: React.FC<PROPS_POST> = ({
         </h3>
       </div>
       <img className={styles.post_image} src={imageUrl} alt="" />
-      <div className={styles.post_comments}>
+      <div className={styles.post_content}>
         <div className={styles.post_info}>
           <Checkbox
             className={styles.post_checkBox}
@@ -111,16 +111,16 @@ const Post: React.FC<PROPS_POST> = ({
             ))}
           </AvatarGroup>
         </div>
-
-        {commentsOnPost.length > 0 && !showAllComments && (
+        {!showAllComments && (
           <p
             onClick={toggleCommentsVisibility}
-            className={styles.comments_visibility}
+            style={{ color: "gray", cursor: "pointer" }}
           >
             View all comments
           </p>
         )}
       </div>
+
       {showAllComments && (
         <div>
           <div className={styles.post_comments}>
@@ -128,9 +128,6 @@ const Post: React.FC<PROPS_POST> = ({
               <div key={comment.id} className={styles.post_comment}>
                 <Avatar
                   src={
-// 全ユーザーのプロフィール情報からコメントをしたユーザーに合致するデータを見つけて、そのユーザーのプロフィール画像を表示
-
-                  // FIXME
                     profiles.find(
                       (prof) => prof.userProfile === comment.userComment
                     )?.img
@@ -140,7 +137,6 @@ const Post: React.FC<PROPS_POST> = ({
                 <p>
                   <strong>
                     {
-// FIXME
                       profiles.find(
                         (prof) => prof.userProfile === comment.userComment
                       )?.nickName
@@ -152,31 +148,30 @@ const Post: React.FC<PROPS_POST> = ({
             ))}
             <p
               onClick={toggleCommentsVisibility}
-              className={styles.comments_visibility}
+              style={{ color: "gray", cursor: "pointer" }}
             >
               Hide all comments
             </p>
           </div>
+          <form className={styles.post_commentBox}>
+            <input
+              className={styles.post_input}
+              type="text"
+              placeholder="add a comment"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+            <button
+              disabled={!text.length}
+              className={styles.post_button}
+              type="submit"
+              onClick={postComment}
+            >
+              Post
+            </button>
+          </form>
         </div>
       )}
-      <form className={styles.post_commentBox}>
-        <input
-          className={styles.post_input}
-          type="text"
-          placeholder="add a comment"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-        <button
-          // テキストが入力されていない場合は、ボタンを無効化
-          disabled={!text.length}
-          className={styles.post_button}
-          type="submit"
-          onClick={postComment}
-        >
-          Post
-        </button>
-      </form>
     </div>
   );
 };
