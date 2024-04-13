@@ -61,20 +61,24 @@ export const profileSlice = createSlice({
   },
   /*各reducersの後処理を定義*/
   extraReducers: (builder) => {
+    builder.addCase(fetchAsyncGetProf.pending, (state) => {
+      state.isLoadingProfile = true;
+    });
     builder.addCase(fetchAsyncGetProf.fulfilled, (state, action) => {
       /*取得したプロフィール情報をセット*/
       state.profile = {
         ...state.profile,
         ...action.payload,
       };
+      state.isLoadingProfile = false;
+    });
+    builder.addCase(fetchAsyncGetUserPosts.pending, (state) => {
+      state.isLoadingProfile = true;
     });
     builder.addCase(fetchAsyncGetUserPosts.fulfilled, (state, action) => {
       /*取得したプロフィール情報をセット*/
       state.userPosts = action.payload;
-      // return {
-      //   ...state,
-      //   profile: { ...state.profile, userPosts: action.payload },
-      // };
+      state.isLoadingProfile = false;
     });
   },
 });
