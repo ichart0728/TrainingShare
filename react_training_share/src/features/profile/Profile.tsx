@@ -6,6 +6,7 @@ import styles from "./Profile.module.css"; // CSSモジュールのインポー�
 import React, { useEffect, useState } from "react";
 import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "./profileSlice";
 import { AppDispatch } from "../../app/store";
+import { CircularProgress } from "@material-ui/core";
 
 const Profile = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -16,8 +17,13 @@ const Profile = () => {
       dispatch(fetchAsyncGetUserPosts(profileId));
     }
   }, [profileId, dispatch]);
+
   const profile = useSelector((state: RootState) => state.profile.profile);
   const myprofile = useSelector((state: RootState) => state.auth.myprofile);
+  const isLoading = useSelector(
+    (state: RootState) => state.profile.isLoadingProfile
+  );
+
   const posts = useSelector(
     (state: RootState) => state.profile.userPosts || []
   );
@@ -28,7 +34,9 @@ const Profile = () => {
   const handleFollowClick = () => {
     setIsFollowing(!isFollowing);
   };
-
+  if (isLoading) {
+    return <CircularProgress />; // ローディングインジケーターを表示
+  }
   return (
     <div className={styles.Profile}>
       <div className={styles.profileContent}>
