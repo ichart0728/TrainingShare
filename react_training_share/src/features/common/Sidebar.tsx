@@ -19,8 +19,7 @@ import {
 } from "@material-ui/core";
 import HomeIcon from "@material-ui/icons/Home";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import styles from "./Sidebar.module.css"; // CSSモジュールのインポート
-
+import styles from "./Sidebar.module.css";
 import { useNavigate } from "react-router-dom";
 import { setUserProfileId } from "../profile/profileSlice";
 
@@ -56,36 +55,42 @@ const Sidebar = () => {
         <h1 className={styles.sidebar_title}>Training Share</h1>
       </div>
       <List className={styles.drawerContent}>
-        {/* Repeat ListItem for each icon */}
         <ListItem button key="Home" onClick={handleHomeClick}>
           <ListItemIcon>
-            <HomeIcon className={(styles.icon, "icon")} />
+            <div className={styles.iconWrapper}>
+              <HomeIcon className={(styles.icon, "icon")} />
+            </div>
           </ListItemIcon>
           <ListItemText primary="Home" />
         </ListItem>
         <ListItem button key="Profile" onClick={handleMyProfileClick}>
           <ListItemIcon>
-            <StyledBadge
-              overlap="circular"
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              variant="dot"
-            >
-              <Avatar
-                className={styles.avatar}
-                alt="who?"
-                src={myprofile.img}
-              />
-            </StyledBadge>
+            <div className={styles.iconWrapper}>
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                variant="dot"
+              >
+                <Avatar
+                  className={styles.avatar}
+                  alt="who?"
+                  src={myprofile.img}
+                />
+              </StyledBadge>
+            </div>
           </ListItemIcon>
           <ListItemText primary="Profile" />
         </ListItem>
         <ListItem button key="Logout" onClick={handleLogoutClick}>
           <ListItemIcon>
-            <ExitToAppIcon className={(styles.icon, "icon")} />
+            <div className={styles.iconWrapper}>
+              <ExitToAppIcon className={(styles.icon, "icon")} />
+            </div>
           </ListItemIcon>
+
           <ListItemText primary="Logout" />
         </ListItem>
       </List>
