@@ -10,7 +10,6 @@ import {
   Select,
 } from "@material-ui/core";
 import styles from "./Record.module.css"; // CSSモジュールのインポート
-import Header from "../core/Header"; // Header コンポーネントをインポート
 import React, { useState } from "react";
 
 const TrainingRecordScreen = () => {
@@ -54,7 +53,6 @@ const TrainingRecordScreen = () => {
 
   return (
     <div>
-      <Header /> {/* Header コンポーネントの使用 */}
       <div>
         <h1>トレーニング記録画面</h1>
         <Button variant="contained" color="primary" onClick={handleOpenModal}>

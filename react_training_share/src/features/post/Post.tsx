@@ -21,10 +21,7 @@ import {
   fetchAsyncPatchLiked,
 } from "./postSlice";
 
-import {
-  fetchAsyncGetProf,
-  fetchAsyncGetUserPosts,
-} from "../profile/profileSlice";
+import { setUserProfileId } from "../profile/profileSlice";
 
 import { PROPS_POST } from "../types";
 
@@ -88,13 +85,24 @@ const Post: React.FC<PROPS_POST> = ({
 
   const navigate = useNavigate();
 
+  // const handleProfileClick = async (userId: string, nickName: string) => {
+  //   await dispatch(fetchPostStart());
+  //   await Promise.all([
+  //     dispatch(fetchAsyncGetProf(userId)),
+  //     dispatch(fetchAsyncGetUserPosts(userId)),
+  //   ]);
+  //   await dispatch(fetchPostEnd());
+  //   navigate(`/profile/${nickName}`);
+  // };
   const handleProfileClick = async (userId: string, nickName: string) => {
-    await dispatch(fetchPostStart());
-    await Promise.all([
-      dispatch(fetchAsyncGetProf(userId)),
-      dispatch(fetchAsyncGetUserPosts(userId)),
-    ]);
-    await dispatch(fetchPostEnd());
+    // store
+    // await dispatch(fetchPostStart());
+    // await Promise.all([
+    //   dispatch(fetchAsyncGetProf(userId)),
+    //   dispatch(fetchAsyncGetUserPosts(userId)),
+    // ]);
+    // await dispatch(fetchPostEnd());
+    dispatch(setUserProfileId(userId));
     navigate(`/profile/${nickName}`);
   };
 

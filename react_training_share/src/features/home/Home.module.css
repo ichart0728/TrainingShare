@@ -50,7 +50,7 @@
   margin-top: 15px;
   display: flex;
   justify-content: center;
-} /* Core.module.css */
+} /* Home.module.css */
 
 .coreContainer {
   display: flex; /* Flexboxを使ってサイドバーとコンテンツ領域を並べる */

@@ -204,5 +204,5 @@ bower_components
 psd
 thumb
 sketch
-
+react_training_share/cache
 # End of https://www.toptal.com/developers/gitignore/api/react,django

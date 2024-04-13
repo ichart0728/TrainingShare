@@ -1,13 +1,23 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
 import { Avatar, Grid, Typography } from "@material-ui/core";
 import PostCard from "../post/PostCard";
-import styles from "./ProfilePage.module.css"; // CSSモジュールのインポート
-import Sidebar from "../core/Sidebar";
-import React, { useState } from "react";
+import styles from "./Profile.module.css"; // CSSモジュールのインポート
+import React, { useEffect, useState } from "react";
+import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "./profileSlice";
+import { AppDispatch } from "../../app/store";
 
-const ProfilePage = () => {
+const Profile = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const profileId = useSelector((state: RootState) => state.profile.profile.id);
+  useEffect(() => {
+    if (profileId) {
+      dispatch(fetchAsyncGetProf(profileId));
+      dispatch(fetchAsyncGetUserPosts(profileId));
+    }
+  }, [profileId, dispatch]);
   const profile = useSelector((state: RootState) => state.profile.profile);
+  const myprofile = useSelector((state: RootState) => state.auth.myprofile);
   const posts = useSelector(
     (state: RootState) => state.profile.userPosts || []
   );
@@ -20,14 +30,8 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className={styles.profilePage}>
-      {profile?.nickName && (
-        <div className={styles.profileSidebar}>
-          <Sidebar />
-        </div>
-      )}{" "}
+    <div className={styles.Profile}>
       <div className={styles.profileContent}>
-        {" "}
         {/* メインコンテンツのラッパー */}
         {profile?.nickName && (
           <>
@@ -52,13 +56,15 @@ const ProfilePage = () => {
                     </Typography>
                   </div>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <div className={styles.followButton}>
-                    <button onClick={handleFollowClick}>
-                      {isFollowing ? "Following" : "Follow"}
-                    </button>
-                  </div>
-                </Grid>
+                {myprofile.id != profile.id && (
+                  <Grid item xs={12} sm={6}>
+                    <div className={styles.followButton}>
+                      <button onClick={handleFollowClick}>
+                        {isFollowing ? "Following" : "Follow"}
+                      </button>
+                    </div>
+                  </Grid>
+                )}
                 <Grid item xs={12} className={styles.postsContainer}>
                   <Typography variant="h6" align="center">
                     投稿一覧
@@ -76,4 +82,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default Profile;

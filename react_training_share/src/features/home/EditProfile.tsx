@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import styles from "./Core.module.css";
+import styles from "./Home.module.css";
 
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
@@ -9,7 +9,7 @@ import { File } from "../types";
 
 import {
   editNickname,
-  selectProfile,
+  selectMyProfile,
   selectOpenProfile,
   resetOpenProfile,
   fetchCredStart,
@@ -37,7 +37,7 @@ const customStyles = {
 const EditProfile: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const openProfile = useSelector(selectOpenProfile);
-  const profile = useSelector(selectProfile);
+  const profile = useSelector(selectMyProfile);
   const [image, setImage] = useState<File | null>(null);
 
   // プロフィールの更新処理

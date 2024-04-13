@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import axios from "axios";
 import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
@@ -55,6 +55,9 @@ export const profileSlice = createSlice({
     fetchPostEnd(state) {
       state.isLoadingProfile = false;
     },
+    setUserProfileId: (state, action: PayloadAction<string>) => {
+      state.profile.id = action.payload;
+    },
   },
   /*各reducersの後処理を定義*/
   extraReducers: (builder) => {
@@ -76,7 +79,8 @@ export const profileSlice = createSlice({
   },
 });
 
-export const { fetchPostStart, fetchPostEnd } = profileSlice.actions;
+export const { fetchPostStart, fetchPostEnd, setUserProfileId } =
+  profileSlice.actions;
 
 /* ストアから状態を取得してエクスポート*/
 export const selectIsLoadingPost = (state: RootState) =>
