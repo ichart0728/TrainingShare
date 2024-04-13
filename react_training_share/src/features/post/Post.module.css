@@ -1,73 +1,95 @@
 .post {
-    background-color: white;
-    max-width: 100%;
-    border: 1px solid lightgray;
-    margin-bottom: 10px;
+  background-color: white;
+  max-width: 100%;
+  border: 1px solid lightgray;
+  margin-bottom: 10px;
 }
 
 .post_header {
-    display: flex;
-    align-items: center;
-    padding: 15px;
+  display: flex;
+  align-items: center;
+  padding: 15px;
 }
 
 .post_avatar {
-    margin-right: 10px;
-    z-index: 0;
+  margin-right: 10px;
+  z-index: 0;
 }
 
 .post_image {
-    width: 100%;
-    height: 280px;
-    object-fit: contain;
+  width: 100%;
+  height: 280px;
+  object-fit: contain;
 }
 
 .post_text {
-    font-weight: normal;
-    padding: 20px;
-    word-break: break-all;
+  font-weight: normal;
+  padding: 20px;
+  word-break: break-all;
 }
 
 .post_checkBox {
-    z-index: 0;
+  z-index: 0;
 }
 
 .post_avatarGroup {
-    z-index: 0 !important;
+  z-index: 0 !important;
 }
 
 .post_comments {
-    padding: 20px;
+  padding: 20px;
 }
 
 .post_comment {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-    word-break: break-all;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  word-break: break-all;
 }
 
 .post_commentBox {
-    display: flex;
-    margin-top: 10px;
+  display: flex;
+  margin-top: 10px;
 }
 
 .post_input {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-top: 1px solid lightgray;
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-top: 1px solid lightgray;
 }
 
 .post_button {
-    flex: 0;
-    border: none;
-    color: #4682b4;
-    background-color: transparent;
-    border-top: 1px solid lightgray;
-    cursor: pointer;
+  flex: 0;
+  border: none;
+  color: #4682b4;
+  background-color: transparent;
+  border-top: 1px solid lightgray;
+  cursor: pointer;
 }
 
 .post_strong {
-    margin-right: 5px;
+  margin-right: 5px;
+}
+
+.comments_visibility {
+  color: gray;
+  cursor: pointer;
+}
+/* Post.module.css */
+.post_info {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 要素間の隙間を設定 */
+}
+
+.post_nickName {
+  font-weight: bold; /* ニックネームを強調表示 */
+}
+.post_avatar {
+  width: 100%; /* 親要素の幅に合わせる */
+  height: 100%; /* 親要素の高さに合わせる */
+  max-width: 100%; /* 親要素の幅の100%を最大幅とする */
+  max-height: 100%; /* 親要素の高さの100%を最大高さとする */
+  object-fit: contain; /* 余白を残してアスペクト比を保持 */
 }
