@@ -38,14 +38,17 @@ const Sidebar = () => {
     navigate(`profile/${myprofile.nickName}`);
   };
   const handleLogoutClick = () => {
-    // ログアウトしたらJWTトークンを削除
-    localStorage.removeItem("localJWT");
-    // dispatchでstoreを初期化
-    dispatch(editNickname(""));
-    dispatch(resetOpenProfile());
-    dispatch(resetOpenNewPost());
-    dispatch(setOpenSignIn());
-    navigate("/");
+    const confirmLogout = window.confirm("ログアウトしますか？");
+    if (confirmLogout) {
+      // ログアウトしたらJWTトークンを削除
+      localStorage.removeItem("localJWT");
+      // dispatchでstoreを初期化
+      dispatch(editNickname(""));
+      dispatch(resetOpenProfile());
+      dispatch(resetOpenNewPost());
+      dispatch(setOpenSignIn());
+      navigate("/");
+    }
   };
   return (
     <Drawer className={styles.drawer} variant="permanent" anchor="left">
@@ -85,7 +88,6 @@ const Sidebar = () => {
           </ListItemIcon>
           <ListItemText primary="Logout" />
         </ListItem>
-        {/* ... other list items */}
       </List>
     </Drawer>
   );
