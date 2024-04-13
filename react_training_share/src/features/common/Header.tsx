@@ -1,10 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { Avatar, Button, CircularProgress } from "@material-ui/core";
-import StyledBadge from "./StyledBadge";
+import StyledBadge from "../home/StyledBadge";
 import {
   editNickname,
-  selectProfile,
+  selectMyProfile,
   selectIsLoadingAuth,
   setOpenSignIn,
   resetOpenSignIn,
@@ -23,7 +23,7 @@ import {
 
 const Header = () => {
   const dispatch: AppDispatch = useDispatch();
-  const profile = useSelector(selectProfile);
+  const profile = useSelector(selectMyProfile);
   const isLoadingPost = useSelector(selectIsLoadingPost);
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
   return (

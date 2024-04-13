@@ -1,23 +1,14 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../app/store";
-import StyledBadge from "./StyledBadge";
+import StyledBadge from "../home/StyledBadge";
 import {
   editNickname,
-  selectProfile,
-  selectIsLoadingAuth,
+  selectMyProfile,
   setOpenSignIn,
-  resetOpenSignIn,
-  setOpenSignUp,
-  resetOpenSignUp,
-  setOpenProfile,
   resetOpenProfile,
 } from "../auth/authSlice";
-import {
-  selectIsLoadingPost,
-  setOpenNewPost,
-  resetOpenNewPost,
-} from "../post/postSlice";
+import { resetOpenNewPost } from "../post/postSlice";
 import {
   Avatar,
   Drawer,
@@ -31,18 +22,22 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import styles from "./Sidebar.module.css"; // CSSモジュールのインポート
 
 import { useNavigate } from "react-router-dom";
+import { setUserProfileId } from "../profile/profileSlice";
 
 const Sidebar = () => {
   const dispatch: AppDispatch = useDispatch();
-  const profile = useSelector(selectProfile);
-  const isLoadingPost = useSelector(selectIsLoadingPost);
-  const isLoadingAuth = useSelector(selectIsLoadingAuth);
+  const myprofile = useSelector(selectMyProfile);
   const navigate = useNavigate();
 
   const handleHomeClick = () => {
     navigate("/");
   };
-  const handleLogout = () => {
+
+  const handleMyProfileClick = () => {
+    dispatch(setUserProfileId(myprofile.userProfile));
+    navigate(`profile/${myprofile.nickName}`);
+  };
+  const handleLogoutClick = () => {
     // ログアウトしたらJWTトークンを削除
     localStorage.removeItem("localJWT");
     // dispatchでstoreを初期化
@@ -50,6 +45,7 @@ const Sidebar = () => {
     dispatch(resetOpenProfile());
     dispatch(resetOpenNewPost());
     dispatch(setOpenSignIn());
+    navigate("/");
   };
   return (
     <Drawer className={styles.drawer} variant="permanent" anchor="left">
@@ -64,7 +60,7 @@ const Sidebar = () => {
           </ListItemIcon>
           <ListItemText primary="Home" />
         </ListItem>
-        <ListItem button key="Profile">
+        <ListItem button key="Profile" onClick={handleMyProfileClick}>
           <ListItemIcon>
             <StyledBadge
               overlap="circular"
@@ -74,12 +70,16 @@ const Sidebar = () => {
               }}
               variant="dot"
             >
-              <Avatar className={styles.avatar} alt="who?" src={profile.img} />
+              <Avatar
+                className={styles.avatar}
+                alt="who?"
+                src={myprofile.img}
+              />
             </StyledBadge>
           </ListItemIcon>
           <ListItemText primary="Profile" />
         </ListItem>
-        <ListItem button key="Logout" onClick={handleLogout}>
+        <ListItem button key="Logout" onClick={handleLogoutClick}>
           <ListItemIcon>
             <ExitToAppIcon className={(styles.icon, "icon")} />
           </ListItemIcon>

@@ -1,4 +1,4 @@
-/* ProfilePage.module.css の追記 */
+/* Profile.module.css の追記 */
 .followButton {
   display: flex;
   justify-content: center;
@@ -25,7 +25,7 @@
   flex-shrink: 0; /* サイドバーの幅が縮まないようにする */
 }
 
-.profilePage {
+.Profile {
   display: flex;
 }
 

@@ -3,7 +3,7 @@ import Modal from "react-modal";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 
-import styles from "./Core.module.css";
+import styles from "./Home.module.css";
 
 import { File } from "../types";
 
