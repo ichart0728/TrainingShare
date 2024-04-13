@@ -4,7 +4,7 @@ import { RootState } from "./app/store";
 
 import Sidebar from "./features/common/Sidebar";
 import Home from "./features/home/Home";
-// import RecordTraining from "./pages/RecordTraining";
+import Workout from "./features/workout/Workout";
 import Profile from "./features/profile/Profile";
 // import Graph from "./pages/Graph";
 
@@ -19,7 +19,7 @@ function App() {
         <main style={{ flexGrow: 1, padding: "20px" }}>
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* <Route path="/record-training" element={<RecordTraining />} /> */}
+            <Route path="/workout" element={<Workout />} />
             <Route path="/profile/:nickname" element={<Profile />} />
             {/* <Route path="/graph" element={<Graph />} /> */}
           </Routes>

@@ -9,10 +9,10 @@ import {
   InputLabel,
   Select,
 } from "@material-ui/core";
-import styles from "./Record.module.css"; // CSSモジュールのインポート
+import styles from "./Workout.module.css"; // CSSモジュールのインポート
 import React, { useState } from "react";
 
-const TrainingRecordScreen = () => {
+const Workout = () => {
   // const selectedTrainingMenu = useSelector(
   //   (state: RootState) => state.menu.menu
   // );
@@ -54,9 +54,9 @@ const TrainingRecordScreen = () => {
   return (
     <div>
       <div>
-        <h1>トレーニング記録画面</h1>
+        <h1>Workout</h1>
         <Button variant="contained" color="primary" onClick={handleOpenModal}>
-          トレーニングを追加する
+          Add Training Menu
         </Button>
         {trainingMenu.map((menu, index) => (
           <div key={index}>
@@ -138,4 +138,4 @@ const TrainingRecordScreen = () => {
   );
 };
 
-export default TrainingRecordScreen;
+export default Workout;
