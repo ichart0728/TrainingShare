@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
-import { Avatar, Grid, Typography } from "@material-ui/core";
+import { Avatar, Button, Grid, Typography } from "@material-ui/core";
 import PostCard from "../post/PostCard";
 import styles from "./Profile.module.css"; // CSSモジュールのインポート
 import React, { useEffect, useState } from "react";
@@ -67,9 +67,13 @@ const Profile = () => {
                 {myprofile.id != profile.id && (
                   <Grid item xs={12} sm={6}>
                     <div className={styles.followButton}>
-                      <button onClick={handleFollowClick}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleFollowClick}
+                      >
                         {isFollowing ? "Following" : "Follow"}
-                      </button>
+                      </Button>
                     </div>
                   </Grid>
                 )}

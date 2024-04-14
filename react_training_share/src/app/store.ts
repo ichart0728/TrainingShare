@@ -4,13 +4,14 @@ import authReducer from "../features/auth/authSlice";
 import postReducer from "../features/post/postSlice";
 import profileReducer from "../features/profile/profileSlice";
 import workoutReducer from "../features/workout/workoutSlice";
+import workoutPopupReducer from "../features/workout/workoutPopupSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     post: postReducer,
     profile: profileReducer,
-    workout: workoutReducer,
+    selectedWorkout: workoutPopupReducer,
   },
 });
 

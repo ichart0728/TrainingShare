@@ -18,6 +18,14 @@ export const fetchAsyncGetTrainingMenu = createAsyncThunk(
   }
 );
 
+// state.SelectedWorkoutを初期化
+export const ResetSelectedWorkout = createAsyncThunk(
+  "ResetSelectedWorkout",
+  async () => {
+    return { selectedWorkout: [{ Menu: "" }] };
+  }
+);
+
 export const workoutSlice = createSlice({
   name: "workout",
   initialState: {
@@ -32,15 +40,7 @@ export const workoutSlice = createSlice({
     ],
     userPosts: [],
   },
-  reducers: {
-    /*ローディグ管理の制御*/
-    fetchPostStart(state) {
-      state.isLoadingMenu = true;
-    },
-    fetchPostEnd(state) {
-      state.isLoadingMenu = false;
-    },
-  },
+  reducers: {},
   /*各reducersの後処理を定義*/
   extraReducers: (builder) => {
     builder.addCase(fetchAsyncGetTrainingMenu.fulfilled, (state, action) => {
@@ -50,10 +50,15 @@ export const workoutSlice = createSlice({
         ...action.payload,
       };
     });
+    // builder.addCase(ResetSelectedWorkout.fulfilled, (state, action) => {
+    //   /*取得したトレーニングメニュー情報をセット*/
+    //   state.selectedWorkout = {
+    //     ...state.workout,
+    //     ...action.payload,
+    //   };
+    // });
   },
 });
-
-export const { fetchPostStart, fetchPostEnd } = workoutSlice.actions;
 
 /* ストアから状態を取得してエクスポート*/
 export const selectIsLoadingPost = (state: RootState) =>
