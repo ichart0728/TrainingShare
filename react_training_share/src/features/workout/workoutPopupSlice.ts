@@ -1,30 +1,27 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../../app/store";
-import axios from "axios";
-import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
 
-const apiUrlMenu = `${process.env.REACT_APP_DEV_API_URL}api/menu/`;
+interface Workout {
+  id: number;
+  name: string;
+}
+
+interface WorkoutState {
+  selectedWorkouts: Workout[];
+}
+
+const initialState: WorkoutState = {
+  selectedWorkouts: [],
+};
 
 export const workoutPopupSlice = createSlice({
-  name: "workout",
-  initialState: {
-    isLoadingMenu: false,
-    selectedWorkout: [{ Menu: "" }],
-  },
+  name: "workoutPopup",
+  initialState,
   reducers: {
-    setSelectedWorkout: (state, action: PayloadAction<string>) => {
-      // 既存のselectedWorkoutに新しい選択メニューを追加
-      state.selectedWorkout.push({ Menu: action.payload });
-    },
-    fetchPostStart: (state) => {
-      state.isLoadingMenu = true;
-    },
-    fetchPostEnd: (state) => {
-      state.isLoadingMenu = false;
+    setselectedWorkouts: (state, action: PayloadAction<Workout>) => {
+      state.selectedWorkouts.push(action.payload);
     },
   },
 });
 
-export const { setSelectedWorkout } = workoutPopupSlice.actions;
-
+export const { setselectedWorkouts } = workoutPopupSlice.actions;
 export default workoutPopupSlice.reducer;

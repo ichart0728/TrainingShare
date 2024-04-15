@@ -1,66 +1,111 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+// import { createSlice } from "@reduxjs/toolkit";
+
+// interface Workout {
+//   id: string;
+//   training_menu: string;
+//   target: string;
+// }
+
+// interface WorkoutState {
+//   selectedWorkouts: Workout[];
+// }
+
+// const initialState: WorkoutState = {
+//   selectedWorkouts: [],
+// };
+
+// export const workoutSlice = createSlice({
+//   name: "selectedWorkouts",
+//   initialState,
+//   reducers: {
+//     resetselectedWorkouts: (state) => {
+//       state.selectedWorkouts = [];
+//     },
+//   },
+// });
+
+// export type { Workout };
+// export const { resetselectedWorkouts } = workoutSlice.actions;
+// export default workoutSlice.reducer;
+
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import axios from "axios";
-import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
 
-const apiUrlMenu = `${process.env.REACT_APP_DEV_API_URL}api/menu/`;
+interface Workout {
+  id: string;
+  name: string;
+  sets: Array<{ weight: number; reps: number }>;
+}
 
-/*プロフィール情報取得*/
-export const fetchAsyncGetTrainingMenu = createAsyncThunk(
-  "training_menu/get",
-  async (userId: string) => {
-    const res = await axios.get(apiUrlMenu, {
-      headers: {
-        Authorization: `JWT ${localStorage.localJWT}`,
-      },
-    });
-    return res.data;
-  }
-);
+interface WorkoutState {
+  workouts: Workout[];
+  totalVolume: number;
+  timer: number;
+  isActive: boolean;
+  isPaused: boolean;
+}
 
-// state.SelectedWorkoutを初期化
-export const ResetSelectedWorkout = createAsyncThunk(
-  "ResetSelectedWorkout",
-  async () => {
-    return { selectedWorkout: [{ Menu: "" }] };
-  }
-);
+const initialState: WorkoutState = {
+  workouts: [],
+  totalVolume: 0,
+  timer: 0,
+  isActive: false,
+  isPaused: false,
+};
 
 export const workoutSlice = createSlice({
   name: "workout",
-  initialState: {
-    /*投稿やコメントをfetchしている時のローディング制御*/
-    isLoadingMenu: false,
-    workout: [
-      {
-        id: "",
-        training_menu: "",
-        target: "",
-      },
-    ],
-    userPosts: [],
-  },
-  reducers: {},
-  /*各reducersの後処理を定義*/
-  extraReducers: (builder) => {
-    builder.addCase(fetchAsyncGetTrainingMenu.fulfilled, (state, action) => {
-      /*取得したトレーニングメニュー情報をセット*/
-      state.workout = {
-        ...state.workout,
-        ...action.payload,
-      };
-    });
-    // builder.addCase(ResetSelectedWorkout.fulfilled, (state, action) => {
-    //   /*取得したトレーニングメニュー情報をセット*/
-    //   state.selectedWorkout = {
-    //     ...state.workout,
-    //     ...action.payload,
-    //   };
-    // });
+  initialState,
+  reducers: {
+    addWorkout: (state, action: PayloadAction<Workout>) => {
+      state.workouts.push(action.payload);
+    },
+    removeWorkout: (state, action: PayloadAction<string>) => {
+      state.workouts = state.workouts.filter(
+        (workout) => workout.id !== action.payload
+      );
+    },
+    updateVolume: (state) => {
+      state.totalVolume = state.workouts.reduce((total, workout) => {
+        return (
+          total +
+          workout.sets.reduce((setTotal, set) => {
+            return setTotal + set.weight * set.reps;
+          }, 0)
+        );
+      }, 0);
+    },
+    startTimer: (state) => {
+      state.isActive = true;
+      state.isPaused = false;
+    },
+    pauseTimer: (state) => {
+      state.isPaused = !state.isPaused;
+    },
+    stopTimer: (state) => {
+      state.isActive = false;
+      state.timer = 0;
+    },
+    incrementTimer: (state) => {
+      if (state.isActive && !state.isPaused) {
+        state.timer += 1;
+      }
+    },
   },
 });
 
-/* ストアから状態を取得してエクスポート*/
-export const selectIsLoadingPost = (state: RootState) =>
-  state.profile.isLoadingProfile;
+export const {
+  addWorkout,
+  removeWorkout,
+  updateVolume,
+  startTimer,
+  pauseTimer,
+  stopTimer,
+  incrementTimer,
+} = workoutSlice.actions;
 export default workoutSlice.reducer;
+
+export const selectWorkouts = (state: RootState) => state.workout.workouts;
+export const selectTotalVolume = (state: RootState) =>
+  state.workout.totalVolume;
+export const selectTimer = (state: RootState) => state.workout.timer;
