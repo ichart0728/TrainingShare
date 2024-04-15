@@ -1,8 +1,15 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
-import { Avatar, Button, Grid, Typography } from "@material-ui/core";
+import {
+  Avatar,
+  Button,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@material-ui/core";
 import PostCard from "../post/PostCard";
-import styles from "./Profile.module.css"; // CSSモジュールのインポート
+import styles from "./Profile.module.css";
 import React, { useEffect, useState } from "react";
 import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "./profileSlice";
 import { AppDispatch } from "../../app/store";
@@ -11,6 +18,9 @@ import { CircularProgress } from "@material-ui/core";
 const Profile = () => {
   const dispatch: AppDispatch = useDispatch();
   const profileId = useSelector((state: RootState) => state.profile.profile.id);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   useEffect(() => {
     if (profileId) {
       dispatch(fetchAsyncGetProf(profileId));
@@ -27,69 +37,54 @@ const Profile = () => {
   const posts = useSelector(
     (state: RootState) => state.profile.userPosts || []
   );
-  // フォロー状態のローカルステート（デフォルトは未フォロー）
   const [isFollowing, setIsFollowing] = useState(false);
 
-  // フォロー状態を切り替えるハンドラ
   const handleFollowClick = () => {
     setIsFollowing(!isFollowing);
   };
+
   if (isLoading) {
-    return <CircularProgress />; // ローディングインジケーターを表示
+    return <CircularProgress />;
   }
+
   return (
-    <div className={styles.Profile}>
-      <div className={styles.profileContent}>
-        {/* メインコンテンツのラッパー */}
-        {profile?.nickName && (
-          <>
-            {/* https://v4.mui.com/fr/customization/breakpoints/ */}
-            <div className={styles.profileContainer}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Avatar src={profile.img} className={styles.profileAvatar} />
-                  <div className={styles.profileInfo}>
-                    <Typography variant="h6">{profile.nickName}</Typography>
-                    <Typography
-                      variant="body1"
-                      className={styles.typographyCustom}
-                    >
-                      フォロー数: 10
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      className={styles.typographyCustom}
-                    >
-                      フォロワー数: 10
-                    </Typography>
-                  </div>
-                </Grid>
-                {myprofile.id != profile.id && (
-                  <Grid item xs={12} sm={6}>
-                    <div className={styles.followButton}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleFollowClick}
-                      >
-                        {isFollowing ? "Following" : "Follow"}
-                      </Button>
-                    </div>
-                  </Grid>
-                )}
-                <Grid item xs={12} className={styles.postsContainer}>
-                  <Typography variant="h6" align="center">
-                    投稿一覧
-                  </Typography>
-                  {posts.map((post: any) => (
-                    <PostCard key={post.id} post={post} />
-                  ))}
-                </Grid>
-              </Grid>
+    <div className={styles.profileContainer}>
+      {profile?.nickName && (
+        <>
+          <div className={styles.profileHeader}>
+            <Avatar src={profile.img} className={styles.profileAvatar} />
+            <div className={styles.profileInfo}>
+              <Typography variant="h6">{profile.nickName}</Typography>
+              <Typography variant="body1" className={styles.followCount}>
+                フォロー数: 10
+              </Typography>
+              <Typography variant="body1" className={styles.followerCount}>
+                フォロワー数: 10
+              </Typography>
+              {myprofile.id !== profile.id && (
+                <div className={styles.followButton}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleFollowClick}
+                  >
+                    {isFollowing ? "Following" : "Follow"}
+                  </Button>
+                </div>
+              )}
             </div>
-          </>
-        )}
-      </div>
+          </div>
+          <div className={styles.postsContainer}>
+            <Grid container spacing={2}>
+              {posts.map((post: any) => (
+                <Grid item xs={12} sm={6} md={4} key={post.id}>
+                  <PostCard post={post} />
+                </Grid>
+              ))}
+            </Grid>
+          </div>
+        </>
+      )}
     </div>
   );
 };
