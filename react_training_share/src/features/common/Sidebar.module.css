@@ -1,50 +1,61 @@
-.sidebar_title {
-  font-family: "Roboto", cursive;
-  font-weight: normal;
-  text-align: center;
-}
-
 .drawer {
-  width: 240px;
-  flex-shrink: 0;
-}
-
-.drawerHeader {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  justify-content: center;
-  background: #fff;
-  color: #000; /* Light text */
+  width: 240px; /* Default width for larger screens */
 }
 
 .drawerContent {
-  background: #fff; /* Dark background */
-  color: #000; /* Light text */
-  height: 100%;
+  width: 240px; /* Default width for larger screens */
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
-/* You would add styles for your list items here, similar to the Instagram style */
-.listItem {
-  padding: 8px 16px;
-  color: #fff; /* Light text */
+.menuButtonWrapper {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1200;
 }
 
-.icon {
-  color: #fff;
+.menuButton {
+  padding: 8px;
 }
 
-.avatar {
-  height: 24px;
-  width: 24px;
+@media (max-width: 768px) {
+  .drawer {
+    width: 0;
+    flex-shrink: 0;
+  }
+
+  .drawerContent {
+    width: 80px; /* Adjust width for smaller screens */
+  }
+
+  .menuButton {
+    display: block; /* Show menu button on smaller screens */
+  }
+
+  .listItemText {
+    display: none; /* Hide ListItemText on smaller screens */
+  }
+
+  .sidebar_title {
+    display: none;
+  }
 }
 
 .iconWrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
+}
+
+.icon {
+  font-size: 32px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
 }
