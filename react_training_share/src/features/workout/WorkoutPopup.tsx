@@ -3,15 +3,15 @@ import { RootState } from "../../app/store";
 import {
   Modal,
   Button,
-  TextField,
-  MenuItem,
   FormControl,
-  InputLabel,
-  Select,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Typography,
 } from "@material-ui/core";
 import styles from "./WorkoutPopup.module.css";
 import React, { useState } from "react";
-import { setSelectedWorkout } from "./workoutPopupSlice";
+import { setselectedWorkouts } from "./workoutPopupSlice";
 
 const WorkoutPopup = ({
   open,
@@ -21,51 +21,65 @@ const WorkoutPopup = ({
   onClose: () => void;
 }) => {
   const dispatch = useDispatch();
-  const [selectedMenu, setSelectedMenu] = useState("");
-
+  const [selectedMenus, setSelectedMenus] = useState<any[]>([]);
   const trainingOptions = [
-    { Name: "スクワット" },
-    { Name: "ベンチプレス" },
-    { Name: "デッドリフト" },
-    { Name: "プルアップ" },
-    // { id: 1, Name: "スクワット" },
-    // { id: 2, Name: "ベンチプレス" },
-    // { id: 3, Name: "デッドリフト" },
-    // { id: 4, Name: "プルアップ" },
+    { id: 1, Name: "スクワット" },
+    { id: 2, Name: "ベンチプレス" },
+    { id: 3, Name: "デッドリフト" },
+    { id: 4, Name: "プルアップ" },
   ];
 
-  const handleMenuChange = (
-    event: React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => {
-    setSelectedMenu(event.target.value as string);
+  const handleToggle = (id: number, name: string) => {
+    const currentIndex = selectedMenus.findIndex((menu) => menu.id === id);
+    const newChecked = [...selectedMenus];
+
+    if (currentIndex === -1) {
+      newChecked.push({ id, name });
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setSelectedMenus(newChecked);
   };
 
   const handleAddTraining = () => {
-    dispatch(setSelectedWorkout(selectedMenu));
+    selectedMenus.forEach((menu) => {
+      dispatch(setselectedWorkouts(menu));
+    });
     onClose();
   };
 
   return (
     <div className={styles.popupContainer}>
-      <h2>Add Training Menu</h2>
-      <FormControl fullWidth>
-        <InputLabel>Menu</InputLabel>
-        <Select value={selectedMenu} onChange={handleMenuChange}>
-          {trainingOptions.map((option, index) => (
-            <MenuItem key={index} value={option.Name}>
-              {option.Name}
-            </MenuItem>
+      <Typography variant="h6" gutterBottom>
+        Add Training Menu
+      </Typography>
+      <FormControl component="fieldset" className={styles.formControl}>
+        <FormGroup>
+          {trainingOptions.map((option) => (
+            <FormControlLabel
+              key={option.id}
+              control={
+                <Checkbox
+                  checked={selectedMenus.some((menu) => menu.id === option.id)}
+                  onChange={() => handleToggle(option.id, option.Name)}
+                />
+              }
+              label={option.Name}
+            />
           ))}
-        </Select>
+        </FormGroup>
       </FormControl>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleAddTraining}
-        disabled={!selectedMenu}
-      >
-        Add
-      </Button>
+      <div className={styles.buttonContainer}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddTraining}
+          disabled={selectedMenus.length === 0}
+        >
+          Add
+        </Button>
+      </div>
     </div>
   );
 };

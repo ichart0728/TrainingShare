@@ -1,20 +1,33 @@
-/* WorkoutPopup.module.css */
 .popupContainer {
   background-color: white;
-  padding: 20px;
+  padding: 24px;
+  border-radius: 8px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 300px; /* 固定幅 */
-  height: 400px; /* 固定高さ */
-  overflow-y: auto; /* 内容がはみ出たら縦方向にスクロール可能 */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25); /* オプショナル: 影を追加してポップアップを際立たせる */
+  width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 @media (max-width: 500px) {
   .popupContainer {
-    width: 90%; /* 小さなデバイスで幅を調整 */
-    height: 90%; /* 小さなデバイスで高さを調整 */
+    width: 90%;
+    max-height: 90vh;
   }
+}
+
+.formControl {
+  margin-top: 16px;
+}
+
+.buttonContainer {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
 }

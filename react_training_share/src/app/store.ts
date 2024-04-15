@@ -11,7 +11,7 @@ export const store = configureStore({
     auth: authReducer,
     post: postReducer,
     profile: profileReducer,
-    selectedWorkout: workoutPopupReducer,
+    workout: workoutReducer,
   },
 });
 
