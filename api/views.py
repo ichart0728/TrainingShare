@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from . import serializers
-from .models import Profile, Post, Comment
+from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord
 
 
 # 新規ユーザー作成用View
@@ -84,3 +84,26 @@ class CommentViewSet(viewsets.ModelViewSet):
             コメント用のシリアライザー
         '''
         serializer.save(userComment=self.request.user)
+
+# 部位カテゴリーテーブル (BodyPart) のView
+class BodyPartViewSet(viewsets.ModelViewSet):
+    queryset = BodyPart.objects.all()
+    serializer_class = serializers.BodyPartSerializer
+
+# トレーニングメニューテーブル (TrainingMenu) のView
+class TrainingMenuViewSet(viewsets.ModelViewSet):
+    queryset = TrainingMenu.objects.all()
+    serializer_class = serializers.TrainingMenuSerializer
+
+# トレーニング記録テーブル (TrainingRecord) のView
+class TrainingRecordViewSet(viewsets.ModelViewSet):
+    queryset = TrainingRecord.objects.all()
+    serializer_class = serializers.TrainingRecordSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return TrainingRecord.objects.filter(user__id=user_id)
+
+    def perform_create(self, serializer):
+        user_id = self.kwargs['user_id']
+        serializer.save(user_id=user_id)

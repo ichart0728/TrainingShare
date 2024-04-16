@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Profile, Post, Comment
+from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -50,3 +50,23 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('id', 'text', 'userComment', 'post')
         extra_kwargs = {'userComment': {'read_only': True}}
+
+# BodyPartモデルのシリアライザー
+class BodyPartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BodyPart
+        fields = ('id', 'name')
+
+# TrainingMenuモデルのシリアライザー
+class TrainingMenuSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrainingMenu
+        fields = ('id', 'name', 'bodyPart')
+        extra_kwargs = {'bodyPart': {'read_only': True}}
+
+# TrainingRecord)のモデルのシリアライザー
+class TrainingRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrainingRecord
+        fields = ('id', 'user', 'menu', 'date', 'weight', 'reps', 'sets', 'created_on')
+        extra_kwargs = {'user': {'read_only': True}}

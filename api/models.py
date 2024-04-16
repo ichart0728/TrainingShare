@@ -80,7 +80,7 @@ class UserManager(BaseUserManager):
 
         return admin_user
 
-# ユーザーモデル定義
+# ユーザーテーブル (User) のモデル
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # 同一メーアドレスのユーザーは許可しない
@@ -95,7 +95,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-# プロフィールモデル定義
+# プロフィールテーブル (Profile) のモデル
 class Profile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nickName = models.CharField(max_length=20)
@@ -112,6 +112,7 @@ class Profile(models.Model):
         return self.nickName
 
 
+# 投稿テーブル (Post) のモデル
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=100)
@@ -128,6 +129,7 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+# コメントテーブル (Comment) のモデル
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.CharField(max_length=100)
@@ -140,6 +142,7 @@ class Comment(models.Model):
     def __str__(self):
         return self.text
 
+# フォローテーブル (Follow) のモデル
 class Follow(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     follower = models.ForeignKey(
@@ -154,3 +157,34 @@ class Follow(models.Model):
 
     def __str__(self):
         return f"{self.follower.email} follows {self.following.email}"
+
+# 部位カテゴリーテーブル (BodyPart) のモデル
+class BodyPart(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+# トレーニングメニューテーブル (TrainingMenu) のモデル
+class TrainingMenu(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    bodyPart = models.ForeignKey(BodyPart, on_delete=models.CASCADE, related_name='training_menus')
+
+    def __str__(self):
+        return f"{self.name} ({self.bodyPart.name})"
+
+# トレーニング記録テーブル (TrainingRecord) のモデル
+class TrainingRecord(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='training_records')
+    menu = models.ForeignKey(TrainingMenu, on_delete=models.CASCADE, related_name='training_records')
+    date = models.DateField()
+    weight = models.FloatField()
+    reps = models.IntegerField()
+    sets = models.IntegerField()
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.menu.name} on {self.date}"
