@@ -9,6 +9,11 @@ import {
   fetchAsyncUpdateProf,
 } from "../api/authApi";
 
+import {
+  fetchAsyncGetBodyPart,
+  fetchAsyncGetTrainingMenu,
+} from "../api/trainingMenuApi";
+
 export const authSlice = createSlice({
   name: "auth",
   initialState: {

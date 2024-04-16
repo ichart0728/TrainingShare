@@ -100,10 +100,17 @@ class TrainingRecordViewSet(viewsets.ModelViewSet):
     queryset = TrainingRecord.objects.all()
     serializer_class = serializers.TrainingRecordSerializer
 
-    def get_queryset(self):
-        user_id = self.kwargs['user_id']
-        return TrainingRecord.objects.filter(user__id=user_id)
-
     def perform_create(self, serializer):
         user_id = self.kwargs['user_id']
         serializer.save(user_id=user_id)
+
+# 指定したUserの投稿一覧
+class TrainingRecordListView(generics.ListAPIView):
+    queryset = TrainingRecord.objects.all()
+    serializer_class = serializers.TrainingRecordSerializer
+
+    def get_queryset(self):
+        '''
+        指定したUserのトレーニング記録を返す
+        '''
+        return self.queryset.filter(user=self.kwargs['pk'])

@@ -5,6 +5,7 @@ import postReducer from "../features/post/postSlice";
 import profileReducer from "../features/profile/profileSlice";
 import workoutReducer from "../features/workout/workoutSlice";
 import workoutPopupReducer from "../features/workout/workoutPopupSlice";
+import trainingReducer from "../features/training/trainingSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     post: postReducer,
     profile: profileReducer,
     workout: workoutReducer,
+    training: trainingReducer,
   },
 });
 
