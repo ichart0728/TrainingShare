@@ -1,37 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import axios from "axios";
-import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
 
-const apiUrlPost = `${process.env.REACT_APP_DEV_API_URL}api/post/`;
-const apiUrlProfile = `${process.env.REACT_APP_DEV_API_URL}api/profile/`;
-
-/*プロフィール情報取得*/
-export const fetchAsyncGetProf = createAsyncThunk(
-  "profile/get",
-  async (userId: string) => {
-    const res = await axios.get(`${apiUrlProfile}${userId}`, {
-      headers: {
-        Authorization: `JWT ${localStorage.localJWT}`,
-      },
-    });
-    /*API側からリスト形式で返ってくるので配列の0番目を取得する*/
-    return res.data[0];
-  }
-);
-
-/*指定したユーザーの投稿一覧取得*/
-export const fetchAsyncGetUserPosts = createAsyncThunk(
-  "profile/getUserPosts",
-  async (userId: string) => {
-    const res = await axios.get(`${apiUrlPost}${userId}`, {
-      headers: {
-        Authorization: `JWT ${localStorage.localJWT}`,
-      },
-    });
-    return res.data;
-  }
-);
+import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "../api/profileApi";
 
 export const profileSlice = createSlice({
   name: "profile",

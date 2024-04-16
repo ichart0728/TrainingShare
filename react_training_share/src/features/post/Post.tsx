@@ -8,13 +8,8 @@ import AvatarGroup from "@material-ui/lab/AvatarGroup";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { selectProfiles } from "../auth/authSlice";
-import {
-  selectComments,
-  fetchPostStart,
-  fetchPostEnd,
-  fetchAsyncPostComment,
-  fetchAsyncPatchLiked,
-} from "./postSlice";
+import { selectComments, fetchPostStart, fetchPostEnd } from "./postSlice";
+import { fetchAsyncPostComment, fetchAsyncPatchLiked } from "../api/postApi";
 import { setUserProfileId } from "../profile/profileSlice";
 import { PROPS_POST } from "../types";
 

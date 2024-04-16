@@ -7,7 +7,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, CircularProgress } from "@material-ui/core";
 
-import { fetchAsyncGetPosts, fetchAsyncGetComments } from "../post/postSlice";
+import { fetchAsyncGetPosts, fetchAsyncGetComments } from "../api/postApi";
 
 import {
   selectIsLoadingAuth,
@@ -19,12 +19,15 @@ import {
   resetOpenSignUp,
   fetchCredStart,
   fetchCredEnd,
+} from "./authSlice";
+
+import {
   fetchAsyncLogin,
   fetchAsyncRegister,
-  fetchAsyncGetMyProf,
-  fetchAsyncGetProfs,
   fetchAsyncCreateProf,
-} from "./authSlice";
+  fetchAsyncGetProfs,
+  fetchAsyncGetMyProf,
+} from "../api/authApi";
 
 const customStyles: Modal.Styles = {
   overlay: {
@@ -199,6 +202,7 @@ const Auth: React.FC = () => {
               await dispatch(fetchAsyncGetProfs());
               await dispatch(fetchAsyncGetPosts());
               await dispatch(fetchAsyncGetComments());
+              await dispatch(fetchAsyncGetMyProf());
               await dispatch(fetchAsyncGetMyProf());
             }
             await dispatch(fetchCredEnd());

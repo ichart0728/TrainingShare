@@ -13,8 +13,11 @@ import {
   setOpenProfile,
   resetOpenProfile,
 } from "../auth/authSlice";
+
 import styles from "./Header.module.css"; // ヘッダー用のCSS
+
 import { MdAddAPhoto } from "react-icons/md";
+
 import {
   selectIsLoadingPost,
   setOpenNewPost,

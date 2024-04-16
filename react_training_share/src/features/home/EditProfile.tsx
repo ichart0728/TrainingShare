@@ -14,8 +14,9 @@ import {
   resetOpenProfile,
   fetchCredStart,
   fetchCredEnd,
-  fetchAsyncUpdateProf,
 } from "../auth/authSlice";
+
+import { fetchAsyncUpdateProf } from "../api/authApi";
 
 import { Button, TextField, IconButton } from "@material-ui/core";
 import { MdAddAPhoto } from "react-icons/md";

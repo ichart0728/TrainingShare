@@ -10,8 +10,8 @@ import {
 } from "@material-ui/core";
 import PostCard from "../post/PostCard";
 import styles from "./Profile.module.css";
-import React, { useEffect, useState } from "react";
-import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "./profileSlice";
+import { useEffect, useState } from "react";
+import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "../api/profileApi";
 import { AppDispatch } from "../../app/store";
 import { CircularProgress } from "@material-ui/core";
 

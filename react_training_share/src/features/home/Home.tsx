@@ -7,26 +7,13 @@ import { AppDispatch } from "../../app/store";
 
 import { Grid } from "@material-ui/core";
 
-import {
-  selectMyProfile,
-  setOpenSignIn,
-  resetOpenSignIn,
-  fetchAsyncGetMyProf,
-  fetchAsyncGetProfs,
-} from "../auth/authSlice";
+import { selectMyProfile } from "../auth/authSlice";
 
-import {
-  selectPosts,
-  fetchAsyncGetPosts,
-  fetchAsyncGetComments,
-} from "../post/postSlice";
+import { selectPosts } from "../post/postSlice";
 
 import Post from "../post/Post";
 import EditProfile from "./EditProfile";
 import NewPost from "./NewPost";
-import Sidebar from "../common/Sidebar";
-
-// 不要になったimport文は削除
 
 const Core: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -35,33 +22,8 @@ const Core: React.FC = () => {
   // 投稿の一覧
   const posts = useSelector(selectPosts);
 
-  // ブラウザが起動したときに最初に実行される処理
-  useEffect(() => {
-    const fetchBootLoader = async () => {
-      if (localStorage.localJWT) {
-        // JWTトークンがある場合は、サインインモーダルを閉じる
-        dispatch(resetOpenSignIn());
-        const result = await dispatch(fetchAsyncGetMyProf());
-        if (fetchAsyncGetMyProf.rejected.match(result)) {
-          // JWTトークンの有効期限が切れている場合はサインインモーダルを表示して終了
-          dispatch(setOpenSignIn());
-          return null;
-        }
-        await dispatch(fetchAsyncGetPosts());
-        await dispatch(fetchAsyncGetProfs());
-        await dispatch(fetchAsyncGetComments());
-      }
-    };
-    fetchBootLoader();
-  }, [dispatch]);
-
   return (
     <div className={styles.coreContainer}>
-      {/* {profile?.nickName && (
-        <div className={styles.coreSidebar}>
-          <Sidebar />
-        </div>
-      )} */}
       <div className={styles.coreMainContent}>
         <EditProfile />
         <Auth />
