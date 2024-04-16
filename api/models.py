@@ -142,25 +142,8 @@ class Comment(models.Model):
     def __str__(self):
         return self.text
 
-# フォローテーブル (Follow) のモデル
-class Follow(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    follower = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='following',
-        on_delete=models.CASCADE
-    )
-    following = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='followers',
-        on_delete=models.CASCADE
-    )
-    created_on = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.follower.email} follows {self.following.email}"
-
 # 部位カテゴリーテーブル (BodyPart) のモデル
 class BodyPart(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
@@ -168,7 +151,6 @@ class BodyPart(models.Model):
 
 # トレーニングメニューテーブル (TrainingMenu) のモデル
 class TrainingMenu(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     bodyPart = models.ForeignKey(BodyPart, on_delete=models.CASCADE, related_name='training_menus')
 
@@ -177,7 +159,6 @@ class TrainingMenu(models.Model):
 
 # トレーニング記録テーブル (TrainingRecord) のモデル
 class TrainingRecord(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='training_records')
     menu = models.ForeignKey(TrainingMenu, on_delete=models.CASCADE, related_name='training_records')
     date = models.DateField()
