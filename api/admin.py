@@ -38,3 +38,5 @@ admin.site.register(models.Comment)
 admin.site.register(models.BodyPart)
 admin.site.register(models.TrainingMenu)
 admin.site.register(models.TrainingRecord)
+admin.site.register(models.TrainingSession)
+

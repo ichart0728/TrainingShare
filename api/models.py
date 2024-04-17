@@ -17,8 +17,8 @@ def upload_avatar_path(instance, filename):
     '''
     # 拡張子を取得
     ext = filename.split('.')[-1]
-    # /avatars/{ユーザーID+ニックネーム.拡張子}
-    return '/'.join(['avatars', str(instance.userProfile.id)+str(instance.nickName)+str('.')+str(ext)])
+    # ファイル名をユーザーIDに変更
+    return f'avatars/{instance.user.id}.{ext}'
 
 def upload_post_path(instance, filename):
     '''
@@ -33,8 +33,8 @@ def upload_post_path(instance, filename):
     '''
     # 拡張子を取得
     ext = filename.split('.')[-1]
-    # /avatars/{ユーザーID+ニックネーム.拡張子}
-    return '/'.join(['posts', str(instance.userPost.id)+str(instance.title)+str('.')+str(ext)])
+    # ファイル名をユーザーIDとタイトルに変更
+    return f'posts/{instance.userPost.id}_{instance.title}.{ext}'
 
 
 # 通常はユーザー名とパスワードで認証を行うが、メールアドレスを使いたいのでオーバーライドする
@@ -50,11 +50,14 @@ class UserManager(BaseUserManager):
         :return: user
             ユーザーのインスタンス
         '''
+        # emailがない場合はエラーを返す
         if not email:
             raise ValueError('email is must')
         # ユーザーが入力したEmailアドレスを正規化
         user = self.model(email=self.normalize_email(email), **extra_fields)
+        # パスワードをハッシュ化
         user.set_password(password)
+        # ユーザーモデルを保存
         user.save(using=self._db)
 
         return user
@@ -71,25 +74,31 @@ class UserManager(BaseUserManager):
         :return: user
             管理用ユーザーのインスタンス
         '''
+        # ユーザーモデルを作成
         admin_user = self.create_user(email=email, password=password)
         # 権限設定
         # https://office54.net/python/django/django-access-limit#section2
         admin_user.is_staff = True
+        # スーパーユーザー権限を付与
         admin_user.is_superuser = True
+        # ユーザーモデルを保存
         admin_user.save(using=self._db)
 
         return admin_user
 
 # ユーザーテーブル (User) のモデル
 class User(AbstractBaseUser, PermissionsMixin):
+    # ユーザーID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # 同一メーアドレスのユーザーは許可しない
-    email = models.EmailField(max_length=50, unique=True)
+    # メールアドレス
+    email = models.EmailField(max_length=254, unique=True)
+    # ユーザーがアクティブかどうか
     is_active = models.BooleanField(default=True)
+    # ユーザーがスタッフかどうか
     is_staff = models.BooleanField(default=False)
-
+    # ユーザーがスーパーユーザーかどうか
     objects = UserManager()
-
+    # メールアドレスをユーザー名として使用
     USERNAME_FIELD = 'email'
 
     def __str__(self):
@@ -97,7 +106,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # プロフィールテーブル (Profile) のモデル
 class Profile(models.Model):
+    # プロフィールID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # ニックネーム
     nickName = models.CharField(max_length=20)
     # ユーザーとプロフィールを1:1で紐づける
     # ユーザーが削除されたらプロフィールも削除されるように設定
@@ -106,6 +117,7 @@ class Profile(models.Model):
         on_delete=models.CASCADE
     )
     created_on = models.DateTimeField(auto_now_add=True)
+    # プロフィール画像
     img = models.ImageField(blank=True, null=True, upload_to=upload_avatar_path)
 
     def __str__(self):
@@ -114,7 +126,9 @@ class Profile(models.Model):
 
 # 投稿テーブル (Post) のモデル
 class Post(models.Model):
+    # 投稿ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # タイトル
     title = models.CharField(max_length=100)
     # ユーザーとプ投稿を1:Nで紐づける
     # ユーザーが削除されたら投稿も削除されるように設定
@@ -122,8 +136,11 @@ class Post(models.Model):
         settings.AUTH_USER_MODEL, related_name='userPost',
         on_delete=models.CASCADE
     )
+    # 投稿作成日時
     created_on = models.DateTimeField(auto_now_add=True)
+    # 投稿画像
     img = models.ImageField(blank=True, null=True, upload_to=upload_post_path)
+    # いいねしたユーザー
     liked = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked', blank=True)
 
     def __str__(self):
@@ -131,12 +148,16 @@ class Post(models.Model):
 
 # コメントテーブル (Comment) のモデル
 class Comment(models.Model):
+    # コメントID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # コメント内容
     text = models.CharField(max_length=100)
+    # ユーザーとコメントを1:Nで紐づける
     userComment = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='userComment',
         on_delete=models.CASCADE
     )
+    # 投稿とコメントを1:Nで紐づける
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -144,28 +165,45 @@ class Comment(models.Model):
 
 # 部位カテゴリーテーブル (BodyPart) のモデル
 class BodyPart(models.Model):
+    # 部位カテゴリーID
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
 
+from django.db import models
+
 # トレーニングメニューテーブル (TrainingMenu) のモデル
 class TrainingMenu(models.Model):
+    # トレーニングメニューID
     name = models.CharField(max_length=100)
-    bodyPart = models.ForeignKey(BodyPart, on_delete=models.CASCADE, related_name='training_menus')
+    # 部位カテゴリーとトレーニングメニューを1:Nで紐づける
+    body_part = models.ForeignKey('BodyPart', on_delete=models.CASCADE, related_name='training_menus')
 
     def __str__(self):
-        return f"{self.name} ({self.bodyPart.name})"
+        return f"{self.name} ({self.body_part.name})"
+
+# トレーニングセッションテーブル (TrainingSession) のモデル
+class TrainingSession(models.Model):
+    # ユーザーID
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # トレーニング日
+    date = models.DateField()
+    # トレーニング時間
+    duration = models.DurationField()
 
 # トレーニング記録テーブル (TrainingRecord) のモデル
 class TrainingRecord(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='training_records')
+    # トレーニング記録ID
+    session = models.ForeignKey(TrainingSession, related_name='performances', on_delete=models.CASCADE, null=True, blank=True)
+    # ユーザーID
     menu = models.ForeignKey(TrainingMenu, on_delete=models.CASCADE, related_name='training_records')
-    date = models.DateField()
+    # 重量
     weight = models.FloatField()
+    # レップ数
     reps = models.IntegerField()
+    # セット数
     sets = models.IntegerField()
-    created_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.menu.name} on {self.date}"
+        return f"{self.session.user.username} - {self.menu.name} on {self.session.date}"

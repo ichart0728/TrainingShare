@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord
+from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession, TrainingRecord
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -59,14 +59,31 @@ class BodyPartSerializer(serializers.ModelSerializer):
 
 # TrainingMenuモデルのシリアライザー
 class TrainingMenuSerializer(serializers.ModelSerializer):
+    # BodyPart情報も読み込むためにネストされたシリアライザーを使用
+    bodyPart = BodyPartSerializer(read_only=True)
+
     class Meta:
         model = TrainingMenu
         fields = ('id', 'name', 'bodyPart')
-        extra_kwargs = {'bodyPart': {'read_only': True}}
 
 # TrainingRecord)のモデルのシリアライザー
 class TrainingRecordSerializer(serializers.ModelSerializer):
+    menu = TrainingMenuSerializer(read_only=True)
+    session = serializers.PrimaryKeyRelatedField(queryset=TrainingSession.objects.all(), allow_null=True)
+
     class Meta:
         model = TrainingRecord
-        fields = ('id', 'user', 'menu', 'date', 'weight', 'reps', 'sets', 'created_on')
-        extra_kwargs = {'user': {'read_only': True}}
+        fields = ('id', 'session', 'menu', 'weight', 'reps', 'sets', 'created_on')
+        extra_kwargs = {
+            'created_on': {'read_only': True},
+        }
+
+class TrainingSessionSerializer(serializers.ModelSerializer):
+    performances = TrainingRecordSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = TrainingSession
+        fields = ('id', 'user', 'date', 'duration', 'performances')
+        extra_kwargs = {
+            'user': {'read_only': True}
+        }

@@ -1,14 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const apiUrlPost = `${process.env.REACT_APP_DEV_API_URL}api/post/`;
-const apiUrlProfile = `${process.env.REACT_APP_DEV_API_URL}api/profile/`;
+const apiUrlPost = `${process.env.REACT_APP_DEV_API_URL}api/posts/`;
+const apiUrlProfile = `${process.env.REACT_APP_DEV_API_URL}api/profiles/`;
 
 /*プロフィール情報取得*/
 export const fetchAsyncGetProf = createAsyncThunk(
   "profile/get",
   async (userId: string) => {
-    const res = await axios.get(`${apiUrlProfile}${userId}`, {
+    const res = await axios.get(`${apiUrlProfile}${userId}/`, {
       headers: {
         Authorization: `JWT ${localStorage.localJWT}`,
       },
@@ -22,7 +22,7 @@ export const fetchAsyncGetProf = createAsyncThunk(
 export const fetchAsyncGetUserPosts = createAsyncThunk(
   "profile/getUserPosts",
   async (userId: string) => {
-    const res = await axios.get(`${apiUrlPost}${userId}`, {
+    const res = await axios.get(`${apiUrlPost}${userId}/`, {
       headers: {
         Authorization: `JWT ${localStorage.localJWT}`,
       },
