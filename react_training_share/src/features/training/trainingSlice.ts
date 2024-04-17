@@ -2,7 +2,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { fetchAsyncGetTrainingMenus } from "../api/trainingMenuApi";
-
+import { logout } from "../auth/authSlice";
 interface TrainingState {
   trainingMenus: any[];
   isLoading: boolean;
@@ -25,6 +25,7 @@ export const trainingSlice = createSlice({
     builder.addCase(fetchAsyncGetTrainingMenus.fulfilled, (state, action) => {
       state.trainingMenus = action.payload;
     });
+    builder.addCase(logout, () => initialState);
   },
 });
 

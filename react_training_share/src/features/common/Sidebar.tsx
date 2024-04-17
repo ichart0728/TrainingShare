@@ -7,6 +7,7 @@ import {
   selectMyProfile,
   setOpenSignIn,
   resetOpenProfile,
+  logout,
 } from "../auth/authSlice";
 import { resetOpenNewPost } from "../post/postSlice";
 import {
@@ -64,6 +65,7 @@ const Sidebar = () => {
       dispatch(resetOpenProfile());
       dispatch(resetOpenNewPost());
       dispatch(setOpenSignIn());
+      dispatch(logout());
       navigate("/");
       setMobileOpen(false);
     }

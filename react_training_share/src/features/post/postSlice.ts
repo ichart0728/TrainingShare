@@ -9,6 +9,8 @@ import {
   fetchAsyncPatchLiked,
 } from "../api/postApi";
 
+import { logout } from "../auth/authSlice";
+
 interface Post {
   id: string;
   title: string;
@@ -135,6 +137,7 @@ export const postSlice = createSlice({
         ),
       };
     });
+    builder.addCase(logout, () => initialState);
   },
 });
 
