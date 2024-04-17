@@ -3,7 +3,7 @@ import { RootState } from "../../app/store";
 import axios from "axios";
 import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
 
-const apiUrlPost = `${process.env.REACT_APP_DEV_API_URL}api/post/`;
+const apiUrlPost = `${process.env.REACT_APP_DEV_API_URL}api/posts/`;
 const apiUrlComment = `${process.env.REACT_APP_DEV_API_URL}api/comment/`;
 
 /*投稿の取得*/

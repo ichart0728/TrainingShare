@@ -2,8 +2,8 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from . import serializers
-from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord
-
+from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession
+from rest_framework.exceptions import ValidationError
 
 # 新規ユーザー作成用View
 class CreateUserView(generics.CreateAPIView):
@@ -46,7 +46,7 @@ class ProfileListView(generics.ListAPIView):
         '''
         指定したUserのプロフィールを返す
         '''
-        return self.queryset.filter(userProfile=self.kwargs['pk'])
+        return self.queryset.filter(userProfile=self.kwargs['user_id'])
 
 # 投稿作成用のView
 class PostViewSet(viewsets.ModelViewSet):
@@ -70,7 +70,7 @@ class PostListView(generics.ListAPIView):
         '''
         指定したUserの投稿一覧を返す
         '''
-        return self.queryset.filter(userPost=self.kwargs['pk'])
+        return self.queryset.filter(userPost=self.kwargs['user_id'])
 
 # コメント作成用のView
 class CommentViewSet(viewsets.ModelViewSet):
@@ -101,16 +101,34 @@ class TrainingRecordViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.TrainingRecordSerializer
 
     def perform_create(self, serializer):
-        user_id = self.kwargs['user_id']
-        serializer.save(user_id=user_id)
+        # クライアントからセッションIDを受け取る
+        session_id = self.request.data.get('session_id')
+        try:
+            # セッションIDからセッションインスタンスを取得
+            session = TrainingSession.objects.get(id=session_id)
+        except TrainingSession.DoesNotExist:
+            raise ValidationError('指定されたセッションが存在しません。')
 
-# 指定したUserの投稿一覧
+        # セッションに紐づけて保存
+        serializer.save(session=session)
+
+# 指定したUserのトレーニング記録を表示するためのView
 class TrainingRecordListView(generics.ListAPIView):
-    queryset = TrainingRecord.objects.all()
     serializer_class = serializers.TrainingRecordSerializer
 
     def get_queryset(self):
         '''
         指定したUserのトレーニング記録を返す
         '''
-        return self.queryset.filter(user=self.kwargs['pk'])
+        user_id = self.kwargs['user_id']  # URLからユーザーIDを取得
+        user_sessions = TrainingSession.objects.filter(user_id=user_id)  # ユーザーのトレーニングセッションを取得
+        return TrainingRecord.objects.filter(session__in=user_sessions)  # そのセッションに関連する記録をフィルター
+
+# トレーニングセッションテーブル (TrainingSession) のView
+class TrainingSessionViewSet(viewsets.ModelViewSet):
+    queryset = TrainingSession.objects.all()
+    serializer_class = serializers.TrainingSessionSerializer
+
+    def perform_create(self, serializer):
+        # ログインユーザーをセッションのユーザーとして設定
+        serializer.save(user=self.request.user)
