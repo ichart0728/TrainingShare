@@ -60,11 +60,11 @@ class BodyPartSerializer(serializers.ModelSerializer):
 # TrainingMenuモデルのシリアライザー
 class TrainingMenuSerializer(serializers.ModelSerializer):
     # BodyPart情報も読み込むためにネストされたシリアライザーを使用
-    bodyPart = BodyPartSerializer(read_only=True)
+    body_part = BodyPartSerializer(read_only=True)
 
     class Meta:
         model = TrainingMenu
-        fields = ('id', 'name', 'bodyPart')
+        fields = ('id', 'name', 'body_part')
 
 # TrainingRecord)のモデルのシリアライザー
 class TrainingRecordSerializer(serializers.ModelSerializer):
