@@ -51,20 +51,20 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'userComment', 'post')
         extra_kwargs = {'userComment': {'read_only': True}}
 
-# BodyPartモデルのシリアライザー
-class BodyPartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BodyPart
-        fields = ('id', 'name')
 
 # TrainingMenuモデルのシリアライザー
 class TrainingMenuSerializer(serializers.ModelSerializer):
-    # BodyPart情報も読み込むためにネストされたシリアライザーを使用
-    body_part = BodyPartSerializer(read_only=True)
-
     class Meta:
         model = TrainingMenu
-        fields = ('id', 'name', 'body_part')
+        fields = ('id', 'name')
+
+# BodyPartモデルのシリアライザー
+class BodyPartSerializer(serializers.ModelSerializer):
+    training_menus = TrainingMenuSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = BodyPart
+        fields = ('id', 'name', 'training_menus')
 
 # TrainingRecord)のモデルのシリアライザー
 class TrainingRecordSerializer(serializers.ModelSerializer):
