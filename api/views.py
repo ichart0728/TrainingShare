@@ -85,15 +85,14 @@ class CommentViewSet(viewsets.ModelViewSet):
         '''
         serializer.save(userComment=self.request.user)
 
-# 部位カテゴリーテーブル (BodyPart) のView
-class BodyPartViewSet(viewsets.ModelViewSet):
+# BodyPartテーブルとトレーニングメニューテーブルを結合して表示するためのView
+class BodyPartWithMenusView(generics.ListAPIView):
     queryset = BodyPart.objects.all()
     serializer_class = serializers.BodyPartSerializer
 
-# トレーニングメニューテーブル (TrainingMenu) のView
-class TrainingMenuViewSet(viewsets.ModelViewSet):
-    queryset = TrainingMenu.objects.all()
-    serializer_class = serializers.TrainingMenuSerializer
+    def get_queryset(self):
+        # トレーニングメニューを取得するためにprefetch_relatedを使用
+        return self.queryset.prefetch_related('training_menus')
 
 # トレーニング記録テーブル (TrainingRecord) のView
 class TrainingRecordViewSet(viewsets.ModelViewSet):
