@@ -103,6 +103,9 @@ export const authSlice = createSlice({
     editNickname(state, action) {
       state.myprofile.nickName = action.payload;
     },
+    logout(state) {
+      return initialState; // ログアウト時に初期状態にリセット
+    },
   },
   /*各reducersの後処理を定義*/
   extraReducers: (builder) => {
@@ -129,9 +132,6 @@ export const authSlice = createSlice({
         prof.id === action.payload.id ? action.payload : prof
       );
     });
-    builder.addCase(resetAllStates, () => {
-      return initialState;
-    });
   },
 });
 
@@ -145,6 +145,7 @@ export const {
   setOpenProfile,
   resetOpenProfile,
   editNickname,
+  logout,
 } = authSlice.actions;
 
 /* ストアから状態を取得してエクスポート*/

@@ -3,6 +3,8 @@ import { RootState } from "../../app/store";
 
 import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "../api/profileApi";
 
+import { logout } from "../auth/authSlice";
+
 interface Profile {
   id: string;
   nickName: string;
@@ -77,6 +79,7 @@ export const profileSlice = createSlice({
       state.userPosts = action.payload;
       state.isLoadingProfile = false;
     });
+    builder.addCase(logout, () => initialState);
   },
 });
 
