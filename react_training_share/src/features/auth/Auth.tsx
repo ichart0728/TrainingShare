@@ -7,10 +7,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, CircularProgress } from "@material-ui/core";
 import { fetchAsyncGetPosts, fetchAsyncGetComments } from "../api/postApi";
-import {
-  fetchAsyncGetBodyPart,
-  fetchAsyncGetTrainingMenu,
-} from "../api/trainingMenuApi";
+import { fetchAsyncGetTrainingMenus } from "../api/trainingMenuApi";
 import {
   selectIsLoadingAuth,
   selectOpenSignIn,
@@ -206,8 +203,7 @@ const Auth: React.FC = () => {
               await dispatch(fetchAsyncGetComments());
               await dispatch(fetchAsyncGetMyProf());
               await dispatch(fetchAsyncGetMyProf());
-              await dispatch(fetchAsyncGetBodyPart());
-              await dispatch(fetchAsyncGetTrainingMenu());
+              await dispatch(fetchAsyncGetTrainingMenus());
             }
             await dispatch(fetchCredEnd());
             await dispatch(resetOpenSignIn());

@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 
 import {
@@ -9,41 +9,67 @@ import {
   fetchAsyncUpdateProf,
 } from "../api/authApi";
 
-import {
-  fetchAsyncGetBodyPart,
-  fetchAsyncGetTrainingMenu,
-} from "../api/trainingMenuApi";
+interface MyProfile {
+  id: string;
+  nickName: string;
+  userProfile: string;
+  created_on: string;
+  img: string;
+}
+interface Profile {
+  id: string;
+  nickName: string;
+  userProfile: string;
+  created_on: string;
+  img: string;
+}
+interface AuthState {
+  /*サインイン用モーダル管理*/
+  openSignIn: boolean;
+  /*サインアップ用モーダル管理*/
+  openSignUp: boolean;
+  /*プロフィール用モーダル管理*/
+  openProfile: boolean;
+  /*ローディグ管理*/
+  isLoadingAuth: boolean;
+  /*ログインユーザーの状態*/
+  myprofile: MyProfile;
+  /*プロフィール一覧格納用*/
+  profiles: Profile[];
+}
 
-export const authSlice = createSlice({
-  name: "auth",
-  initialState: {
-    /*サインイン用モーダル管理*/
-    openSignIn: true,
-    /*サインアップ用モーダル管理*/
-    openSignUp: false,
-    /*プロフィール用モーダル管理*/
-    openProfile: false,
-    /*ローディグ管理*/
-    isLoadingAuth: false,
-    /*ログインユーザーの状態*/
-    myprofile: {
+const initialState: AuthState = {
+  /*サインイン用モーダル管理*/
+  openSignIn: true,
+  /*サインアップ用モーダル管理*/
+  openSignUp: false,
+  /*プロフィール用モーダル管理*/
+  openProfile: false,
+  /*ローディグ管理*/
+  isLoadingAuth: false,
+  /*ログインユーザーの状態*/
+  myprofile: {
+    id: "",
+    nickName: "",
+    userProfile: "",
+    created_on: "",
+    img: "",
+  },
+  /*プロフィール一覧格納用*/
+  profiles: [
+    {
       id: "",
       nickName: "",
       userProfile: "",
       created_on: "",
       img: "",
     },
-    /*プロフィール一覧格納用*/
-    profiles: [
-      {
-        id: "",
-        nickName: "",
-        userProfile: "",
-        created_on: "",
-        img: "",
-      },
-    ],
-  }, // The 'reducers' field lets us define reducers and generate associated actions
+  ],
+};
+
+export const authSlice = createSlice({
+  name: "auth",
+  initialState,
   reducers: {
     /*ローディグ管理の制御*/
     fetchCredStart(state) {
@@ -102,6 +128,9 @@ export const authSlice = createSlice({
       state.profiles = state.profiles.map((prof) =>
         prof.id === action.payload.id ? action.payload : prof
       );
+    });
+    builder.addCase(resetAllStates, () => {
+      return initialState;
     });
   },
 });
