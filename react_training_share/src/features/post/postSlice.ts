@@ -9,40 +9,77 @@ import {
   fetchAsyncPatchLiked,
 } from "../api/postApi";
 
-export const postSlice = createSlice({
-  name: "post",
-  initialState: {
-    /*投稿やコメントをfetchしている時のローディング制御*/
-    isLoadingPost: false,
-    /*新規投稿用モーダルの制御*/
-    openNewPost: false,
-    posts: [
-      {
-        id: "",
-        title: "",
-        userPost: "",
-        created_on: "",
-        img: "",
-        liked: [""],
-      },
-    ],
-    comments: [
-      {
-        id: "",
-        text: "",
-        userComment: "",
-        post: "",
-      },
-    ],
-    profile: {
+interface Post {
+  id: string;
+  title: string;
+  userPost: string;
+  created_on: string;
+  img: string;
+  liked: string[];
+}
+
+interface Comment {
+  id: string;
+  text: string;
+  userComment: string;
+  post: string;
+}
+
+interface Profile {
+  id: string;
+  nickName: string;
+  userProfile: string;
+  created_on: string;
+  img: string;
+  userPosts: Post[];
+}
+
+interface PostState {
+  /*投稿やコメントをfetchしている時のローディング制御*/
+  isLoadingPost: boolean;
+  /*新規投稿用モーダルの制御*/
+  openNewPost: boolean;
+  posts: Post[];
+  comments: Comment[];
+  profile: Profile;
+}
+
+const initialState: PostState = {
+  /*投稿やコメントをfetchしている時のローディング制御*/
+  isLoadingPost: false,
+  /*新規投稿用モーダルの制御*/
+  openNewPost: false,
+  posts: [
+    {
       id: "",
-      nickName: "",
-      userProfile: "",
+      title: "",
+      userPost: "",
       created_on: "",
       img: "",
-      userPosts: [],
+      liked: [""],
     },
+  ],
+  comments: [
+    {
+      id: "",
+      text: "",
+      userComment: "",
+      post: "",
+    },
+  ],
+  profile: {
+    id: "",
+    nickName: "",
+    userProfile: "",
+    created_on: "",
+    img: "",
+    userPosts: [],
   },
+};
+
+export const postSlice = createSlice({
+  name: "post",
+  initialState,
   reducers: {
     /*ローディグ管理の制御*/
     fetchPostStart(state) {

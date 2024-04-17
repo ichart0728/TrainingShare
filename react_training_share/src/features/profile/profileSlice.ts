@@ -3,20 +3,47 @@ import { RootState } from "../../app/store";
 
 import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "../api/profileApi";
 
+interface Profile {
+  id: string;
+  nickName: string;
+  userProfile: string;
+  created_on: string;
+  img: string;
+}
+
+interface UserPost {
+  id: string;
+  userPost: string;
+  img: string;
+  created_on: string;
+}
+interface ProfileState {
+  isLoadingProfile: boolean;
+  profile: Profile;
+  userPosts: UserPost[];
+}
+const initialState: ProfileState = {
+  isLoadingProfile: false,
+  profile: {
+    id: "",
+    nickName: "",
+    userProfile: "",
+    created_on: "",
+    img: "",
+  },
+  userPosts: [
+    {
+      id: "",
+      userPost: "",
+      img: "",
+      created_on: "",
+    },
+  ],
+};
+
 export const profileSlice = createSlice({
   name: "profile",
-  initialState: {
-    /*投稿やコメントをfetchしている時のローディング制御*/
-    isLoadingProfile: false,
-    profile: {
-      id: "",
-      nickName: "",
-      userProfile: "",
-      created_on: "",
-      img: "",
-    },
-    userPosts: [],
-  },
+  initialState,
   reducers: {
     /*ローディグ管理の制御*/
     fetchPostStart(state) {
