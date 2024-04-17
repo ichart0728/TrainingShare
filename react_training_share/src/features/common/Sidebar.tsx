@@ -61,7 +61,6 @@ const Sidebar = () => {
     const confirmLogout = window.confirm("ログアウトしますか？");
     if (confirmLogout) {
       localStorage.removeItem("localJWT");
-      dispatch(editNickname(""));
       dispatch(resetOpenProfile());
       dispatch(resetOpenNewPost());
       dispatch(setOpenSignIn());
