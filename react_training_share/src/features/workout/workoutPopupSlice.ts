@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Workout {
+export interface Workout {
   id: number;
   name: string;
 }
@@ -17,8 +17,11 @@ export const workoutPopupSlice = createSlice({
   name: "workoutPopup",
   initialState,
   reducers: {
-    setselectedWorkouts: (state, action: PayloadAction<Workout>) => {
-      state.selectedWorkouts.push(action.payload);
+    setselectedWorkouts: (state, action: PayloadAction<Workout[]>) => {
+      state.selectedWorkouts = [...state.selectedWorkouts, ...action.payload];
+    },
+    clearSelectedWorkouts: (state) => {
+      state.selectedWorkouts = [];
     },
   },
 });
