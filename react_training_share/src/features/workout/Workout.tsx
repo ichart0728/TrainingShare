@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectWorkouts,
@@ -18,6 +18,23 @@ const Workout = () => {
   const [openModal, setOpenModal] = useState(false);
   const [trainingActive, setTrainingActive] = useState(false);
   const [paused, setPaused] = useState(true);
+  const [time, setTime] = useState(0);
+
+  useEffect(() => {
+    let interval: any = null;
+
+    if (trainingActive && !paused) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [trainingActive, paused]);
 
   const handleStartOrEnd = () => {
     if (trainingActive) {
@@ -33,6 +50,7 @@ const Workout = () => {
 
   const togglePause = () => {
     if (paused) {
+      dispatch(startTimer());
     } else {
       dispatch(pauseTimer());
     }
@@ -47,6 +65,14 @@ const Workout = () => {
     setOpenModal(false);
   };
 
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -55,6 +81,9 @@ const Workout = () => {
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
           Total Training Volume: {totalVolume}
+        </Typography>
+        <Typography variant="h6" gutterBottom>
+          Timer: {formatTime(time)}
         </Typography>
         <Button variant="contained" color="primary" onClick={handleOpenModal}>
           Add Training Menu
