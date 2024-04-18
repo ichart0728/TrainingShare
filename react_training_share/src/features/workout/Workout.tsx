@@ -40,7 +40,7 @@ const Workout = () => {
     if (trainingActive) {
       dispatch(stopTimer());
       setTrainingActive(false);
-      setPaused(true);
+      setTime(0);
     } else {
       dispatch(startTimer());
       setTrainingActive(true);
