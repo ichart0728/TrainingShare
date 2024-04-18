@@ -14,7 +14,7 @@ const initialState: WorkoutState = {
 };
 
 export const workoutPopupSlice = createSlice({
-  name: "workoutPopup",
+  name: "selectedWorkouts",
   initialState,
   reducers: {
     setselectedWorkouts: (state, action: PayloadAction<Workout[]>) => {
