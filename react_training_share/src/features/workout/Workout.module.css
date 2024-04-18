@@ -52,7 +52,7 @@
 }
 
 .fixedWidthButton {
-  min-width: 200px;
+  width: 200px;
 }
 
 @media (max-width: 600px) {
@@ -63,5 +63,9 @@
 
   .bottomControls {
     width: calc(100% - 40px);
+  }
+
+  .fixedWidthButton {
+    width: 150px;
   }
 }
