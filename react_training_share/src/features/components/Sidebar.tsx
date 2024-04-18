@@ -23,6 +23,7 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import HomeIcon from "@material-ui/icons/Home";
+import CalendarToday from "@material-ui/icons/CalendarToday";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import FitnessCenter from "@material-ui/icons/FitnessCenter";
 import styles from "./Sidebar.module.css";
@@ -53,6 +54,11 @@ const Sidebar = () => {
   };
 
   const handleWorkoutClick = () => {
+    navigate("/workout");
+    setMobileOpen(false);
+  };
+
+  const handleCalendarClick = () => {
     navigate("/workout");
     setMobileOpen(false);
   };
@@ -124,6 +130,15 @@ const Sidebar = () => {
               </div>
             </ListItemIcon>
             <ListItemText primary="Workout" className={styles.listItemText} />{" "}
+          </ListItem>
+
+          <ListItem button key="Calendar" onClick={handleCalendarClick}>
+            <ListItemIcon>
+              <div className={styles.iconWrapper}>
+                <CalendarToday className={styles.icon} />
+              </div>
+            </ListItemIcon>
+            <ListItemText primary="Calendar" className={styles.listItemText} />{" "}
           </ListItem>
 
           <ListItem button key="Profile" onClick={handleMyProfileClick}>
