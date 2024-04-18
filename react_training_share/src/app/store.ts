@@ -14,6 +14,7 @@ export const store = configureStore({
     profile: profileReducer,
     workout: workoutReducer,
     training: trainingReducer,
+    selectedWorkouts: workoutPopupReducer,
   },
 });
 
