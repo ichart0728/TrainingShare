@@ -1,17 +1,16 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import {
-  Modal,
-  Button,
-  FormControl,
-  FormGroup,
-  FormControlLabel,
   Checkbox,
-  Typography,
+  FormControlLabel,
+  Button,
+  Tabs,
+  Tab,
+  Box,
 } from "@material-ui/core";
 import styles from "./WorkoutPopup.module.css";
 import React, { useState } from "react";
-import { setselectedWorkouts } from "./workoutPopupSlice";
+import { Workout, setselectedWorkouts } from "./workoutPopupSlice";
 
 const WorkoutPopup = ({
   open,
@@ -21,13 +20,15 @@ const WorkoutPopup = ({
   onClose: () => void;
 }) => {
   const dispatch = useDispatch();
-  const [selectedMenus, setSelectedMenus] = useState<any[]>([]);
-  const trainingOptions = [
-    { id: 1, Name: "スクワット" },
-    { id: 2, Name: "ベンチプレス" },
-    { id: 3, Name: "デッドリフト" },
-    { id: 4, Name: "プルアップ" },
-  ];
+  const [selectedMenus, setSelectedMenus] = useState<Workout[]>([]);
+  const [currentTab, setCurrentTab] = useState(0);
+  const trainingMenus = useSelector(
+    (state: RootState) => state.training.trainingMenus
+  );
+
+  const handleChangeTab = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setCurrentTab(newValue);
+  };
 
   const handleToggle = (id: number, name: string) => {
     const currentIndex = selectedMenus.findIndex((menu) => menu.id === id);
@@ -43,33 +44,46 @@ const WorkoutPopup = ({
   };
 
   const handleAddTraining = () => {
-    selectedMenus.forEach((menu) => {
-      dispatch(setselectedWorkouts(menu));
-    });
+    dispatch(setselectedWorkouts(selectedMenus));
     onClose();
   };
 
   return (
     <div className={styles.popupContainer}>
-      <Typography variant="h6" gutterBottom>
-        Add Training Menu
-      </Typography>
-      <FormControl component="fieldset" className={styles.formControl}>
-        <FormGroup>
-          {trainingOptions.map((option) => (
-            <FormControlLabel
-              key={option.id}
-              control={
-                <Checkbox
-                  checked={selectedMenus.some((menu) => menu.id === option.id)}
-                  onChange={() => handleToggle(option.id, option.Name)}
-                />
-              }
-              label={option.Name}
-            />
+      <Tabs
+        value={currentTab}
+        onChange={handleChangeTab}
+        variant="scrollable"
+        scrollButtons="auto"
+        className={styles.tabsContainer}
+      >
+        {trainingMenus.map((section, index) => (
+          <Tab
+            label={section.name}
+            key={index}
+            className={`${styles.tab} ${
+              currentTab === index ? styles.tabSelected : ""
+            }`}
+          />
+        ))}
+      </Tabs>
+      <div className={styles.contentContainer}>
+        <Box className={styles.menuList}>
+          {trainingMenus[currentTab]?.training_menus.map((menu: Workout) => (
+            <div key={menu.id} className={styles.menuItem}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={selectedMenus.some((m) => m.id === menu.id)}
+                    onChange={() => handleToggle(menu.id, menu.name)}
+                  />
+                }
+                label={menu.name}
+              />
+            </div>
           ))}
-        </FormGroup>
-      </FormControl>
+        </Box>
+      </div>
       <div className={styles.buttonContainer}>
         <Button
           variant="contained"

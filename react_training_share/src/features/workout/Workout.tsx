@@ -33,7 +33,6 @@ const Workout = () => {
 
   const togglePause = () => {
     if (paused) {
-      // dispatch(resumeTimer());
     } else {
       dispatch(pauseTimer());
     }
