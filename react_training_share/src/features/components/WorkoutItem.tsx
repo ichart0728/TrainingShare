@@ -13,7 +13,15 @@ import { useDispatch } from "react-redux";
 import { updateSet } from "../workout/workoutSlice";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import { addSet, deleteSet } from "../workout/workoutSlice"; // ここにアクションをインポート
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import { addSet, deleteSet } from "../workout/workoutSlice";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@material-ui/core";
 
 interface WorkoutItemProps {
   workout: WorkoutDisplay;
@@ -28,6 +36,11 @@ interface SetState {
 
 const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
   const dispatch = useDispatch();
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
   const handleWeightChange = (
     workoutId: string,
     setIndex: number,
@@ -42,6 +55,12 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
         reps,
       })
     );
+  };
+  const handleConfirmDelete = () => {
+    // 削除の確認がクリックされた時の処理をここに追加
+    // 例えば削除処理の実行や、状態の更新
+    setOpenDeleteModal(false);
+    // dispatch(deleteWorkout({ workoutId: workout.id })); // 仮の削除アクション
   };
 
   const handleRepsChange = (
@@ -59,19 +78,26 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
       })
     );
   };
-
-  const AddSet = () => {
+  const handleDeleteWorkout = () => {
+    setOpenDeleteModal(true);
+  };
+  const handleAddSet = () => {
     dispatch(addSet({ workoutId: workout.id }));
   };
-  const DeleteSet = () => {
+  const handleDeleteSet = () => {
     dispatch(deleteSet({ workoutId: workout.id }));
   };
 
   return (
     <Paper className={styles.workoutItem} elevation={2}>
-      <Typography variant="subtitle1" gutterBottom>
-        {workout.target} | {workout.name}
-      </Typography>
+      <div className={styles.workoutHeader}>
+        <Typography variant="subtitle1" gutterBottom>
+          {workout.target} | {workout.name}
+        </Typography>
+        <Button onClick={handleDeleteWorkout} className={styles.deleteButton}>
+          <DeleteOutlineIcon />
+        </Button>
+      </div>
       <Grid container alignItems="center">
         <Grid item xs={2} sm={2} className={styles.labelContainer}>
           <Typography align="center">セット</Typography>
@@ -147,7 +173,7 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
           variant="outlined"
           color="secondary"
           className={styles.setButton}
-          onClick={DeleteSet}
+          onClick={handleDeleteSet}
         >
           - セット削除
         </Button>
@@ -155,11 +181,32 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
           variant="outlined"
           color="primary"
           className={styles.setButton}
-          onClick={AddSet}
+          onClick={handleAddSet}
         >
           + セット追加
         </Button>
       </div>
+      <Dialog
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"削除しますか？"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            このアクションは元に戻せません。本当に削除しますか？
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteModal} color="primary">
+            キャンセル
+          </Button>
+          <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+            削除
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 };

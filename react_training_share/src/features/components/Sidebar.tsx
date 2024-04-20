@@ -11,6 +11,7 @@ import {
 import { resetOpenNewPost } from "../post/postSlice";
 import {
   Avatar,
+  Button,
   Drawer,
   List,
   ListItem,
@@ -28,6 +29,13 @@ import FitnessCenter from "@material-ui/icons/FitnessCenter";
 import styles from "./Sidebar.module.css";
 import { useNavigate } from "react-router-dom";
 import { setUserProfileId } from "../profile/profileSlice";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@material-ui/core";
 
 const Sidebar = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -37,6 +45,21 @@ const Sidebar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const [openLogoutModal, setOpenLogoutModal] = useState(false);
+
+  const handleCloseLogoutModal = () => {
+    setOpenLogoutModal(false);
+  };
+  const handleConfirmLogout = () => {
+    localStorage.removeItem("localJWT");
+    dispatch(resetOpenProfile());
+    dispatch(resetOpenNewPost());
+    dispatch(setOpenSignIn());
+    dispatch(logout());
+    navigate("/");
+    setMobileOpen(false);
+    setOpenLogoutModal(false);
+  };
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -63,16 +86,7 @@ const Sidebar = () => {
   };
 
   const handleLogoutClick = () => {
-    const confirmLogout = window.confirm("ログアウトしますか？");
-    if (confirmLogout) {
-      localStorage.removeItem("localJWT");
-      dispatch(resetOpenProfile());
-      dispatch(resetOpenNewPost());
-      dispatch(setOpenSignIn());
-      dispatch(logout());
-      navigate("/");
-      setMobileOpen(false);
-    }
+    setOpenLogoutModal(true);
   };
 
   return (
@@ -172,6 +186,29 @@ const Sidebar = () => {
           </ListItem>
         </List>
       </Drawer>
+      <Dialog
+        open={openLogoutModal}
+        onClose={handleCloseLogoutModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"ログアウトしますか？"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            ログアウトしますか？
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseLogoutModal} color="primary">
+            キャンセル
+          </Button>
+          <Button onClick={handleConfirmLogout} color="primary" autoFocus>
+            ログアウト
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
