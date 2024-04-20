@@ -52,6 +52,20 @@
   align-items: center;
 }
 
+.workoutHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.deleteButton {
+  margin: 0;
+  padding: 8px;
+  padding-top: 0;
+  min-width: 36px;
+}
+
 @media (max-width: 600px) {
   .input {
     width: 60px;
