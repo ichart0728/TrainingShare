@@ -4,7 +4,7 @@ import axios from "axios";
 import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
 
 const apiUrlPost = `${process.env.REACT_APP_DEV_API_URL}api/posts/`;
-const apiUrlComment = `${process.env.REACT_APP_DEV_API_URL}api/comment/`;
+const apiUrlComment = `${process.env.REACT_APP_DEV_API_URL}api/comments/`;
 
 /*投稿の取得*/
 export const fetchAsyncGetPosts = createAsyncThunk("post/get", async () => {
