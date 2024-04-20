@@ -20,13 +20,20 @@ export const fetchAsyncLogin = createAsyncThunk(
 /*ユーザー新規作成*/
 export const fetchAsyncRegister = createAsyncThunk(
   "auth/register",
-  async (auth: PROPS_AUTHEN) => {
-    const res = await axios.post(`${apiUrl}api/register/`, auth, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return res.data;
+  async (auth: PROPS_AUTHEN, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(`${apiUrl}api/register/`, auth, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        return rejectWithValue(err.response.data);
+      }
+      throw err;
+    }
   }
 );
 

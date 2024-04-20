@@ -7,7 +7,7 @@ app_name = 'user'
 router = DefaultRouter()
 
 # viewsets.ModelViewSetを継承しているViewはDefaultRouterに設定
-router.register('profiles', views.ProfileViewSet)
+router.register('profile', views.ProfileViewSet)
 router.register('posts', views.PostViewSet)
 router.register('comments', views.CommentViewSet)
 router.register('training_records', views.TrainingRecordViewSet)
