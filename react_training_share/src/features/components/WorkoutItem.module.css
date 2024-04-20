@@ -9,6 +9,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 .inputLabel {
@@ -32,16 +33,23 @@
 }
 
 .setRow {
-  margin-bottom: 8px;
+  align-items: center;
 }
 
 .checkboxContainer {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .checkbox {
   margin-left: 0;
+}
+
+.labelContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (max-width: 600px) {
