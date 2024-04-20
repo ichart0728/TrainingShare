@@ -95,6 +95,24 @@ export const workoutSlice = createSlice({
         }
       }
     },
+    addSet: (state, action: PayloadAction<{ workoutId: string }>) => {
+      const { workoutId } = action.payload;
+      const workout = state.workouts.find((w) => w.id === workoutId);
+      if (workout) {
+        workout.sets.push({
+          id: String(Date.now()),
+          weight: 0,
+          reps: 0,
+        });
+      }
+    },
+    deleteSet: (state, action: PayloadAction<{ workoutId: string }>) => {
+      const { workoutId } = action.payload;
+      const workout = state.workouts.find((w) => w.id === workoutId);
+      if (workout && workout.sets.length > 0) {
+        workout.sets.pop(); // 最後のセットを削除
+      }
+    },
     startTimer: (state) => {
       state.isActive = true;
       state.isPaused = false;
@@ -122,6 +140,8 @@ export const {
   removeWorkout,
   updateVolume,
   updateSet,
+  addSet,
+  deleteSet,
   startTimer,
   pauseTimer,
   stopTimer,
