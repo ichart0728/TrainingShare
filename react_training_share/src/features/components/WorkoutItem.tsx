@@ -6,7 +6,6 @@ import {
   Button,
   Grid,
   Checkbox,
-  FormControlLabel,
 } from "@material-ui/core";
 import { WorkoutDisplay } from "../workout/workoutSlice";
 import styles from "./WorkoutItem.module.css";
@@ -14,19 +13,21 @@ import { useDispatch } from "react-redux";
 import { updateSet } from "../workout/workoutSlice";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import { addSet, deleteSet } from "../workout/workoutSlice"; // ここにアクションをインポート
 
 interface WorkoutItemProps {
   workout: WorkoutDisplay;
+  index: number;
 }
 
 interface SetState {
+  id: string;
   weight: number;
   reps: number;
 }
 
-const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
+const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
   const dispatch = useDispatch();
-
   const handleWeightChange = (
     workoutId: string,
     setIndex: number,
@@ -58,6 +59,14 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
       })
     );
   };
+
+  const AddSet = () => {
+    dispatch(addSet({ workoutId: workout.id }));
+  };
+  const DeleteSet = () => {
+    dispatch(deleteSet({ workoutId: workout.id }));
+  };
+
   return (
     <Paper className={styles.workoutItem} elevation={2}>
       <Typography variant="subtitle1" gutterBottom>
@@ -138,10 +147,16 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
           variant="outlined"
           color="secondary"
           className={styles.setButton}
+          onClick={DeleteSet}
         >
           - セット削除
         </Button>
-        <Button variant="outlined" color="primary" className={styles.setButton}>
+        <Button
+          variant="outlined"
+          color="primary"
+          className={styles.setButton}
+          onClick={AddSet}
+        >
           + セット追加
         </Button>
       </div>

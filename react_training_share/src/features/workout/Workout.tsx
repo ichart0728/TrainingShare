@@ -100,7 +100,7 @@ const Workout = () => {
           {/* selectedWorkoutsの要素を表示 */}
           {selectedWorkouts.map((workout, index) => (
             // keyにはworkoutのindexを指定
-            <WorkoutItem key={index} workout={workout} /> // コンポーネントを利用
+            <WorkoutItem key={index} workout={workout} index={index} /> // コンポーネントを利用
           ))}
         </div>
       </div>
