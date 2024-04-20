@@ -12,6 +12,9 @@ import { WorkoutDisplay } from "../workout/workoutSlice";
 import styles from "./WorkoutItem.module.css";
 import { useDispatch } from "react-redux";
 import { updateSet } from "../workout/workoutSlice";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+
 interface WorkoutItemProps {
   workout: WorkoutDisplay;
 }
@@ -57,20 +60,20 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
   };
   return (
     <Paper className={styles.workoutItem} elevation={2}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="subtitle1" gutterBottom>
         {workout.target} | {workout.name}
       </Typography>
       <Grid container alignItems="center">
-        <Grid item xs={3} sm={2}>
+        <Grid item xs={2} sm={2} className={styles.labelContainer}>
           <Typography align="center">セット</Typography>
         </Grid>
-        <Grid item xs={4} sm={4}>
+        <Grid item xs={4} sm={4} className={styles.labelContainer}>
           <Typography align="center">kg</Typography>
         </Grid>
-        <Grid item xs={4} sm={4}>
+        <Grid item xs={4} sm={4} className={styles.labelContainer}>
           <Typography align="center">回</Typography>
         </Grid>
-        <Grid item xs={1} sm={2}>
+        <Grid item xs={2} sm={2} className={styles.labelContainer}>
           <Typography align="center">完了</Typography>
         </Grid>
       </Grid>
@@ -81,10 +84,10 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
           alignItems="center"
           className={styles.setRow}
         >
-          <Grid item xs={3} sm={2}>
+          <Grid item xs={2} sm={2}>
             <Typography align="center">{index + 1}</Typography>
           </Grid>
-          <Grid item xs={4} sm={4}>
+          <Grid item xs={4} sm={4} className={styles.inputContainer}>
             <TextField
               type="number"
               variant="outlined"
@@ -102,7 +105,7 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
               InputProps={{ inputProps: { min: 0 } }}
             />
           </Grid>
-          <Grid item xs={4} sm={4}>
+          <Grid item xs={4} sm={4} className={styles.inputContainer}>
             <TextField
               type="number"
               variant="outlined"
@@ -121,14 +124,12 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
             />
           </Grid>
 
-          <Grid item xs={1} sm={2}>
-            <div className={styles.checkboxContainer}>
-              <FormControlLabel
-                control={<Checkbox color="primary" />}
-                label=""
-                className={styles.checkbox}
-              />
-            </div>
+          <Grid item xs={2} sm={2} className={styles.checkboxContainer}>
+            <Checkbox
+              icon={<CheckBoxOutlineBlankIcon fontSize="medium" />}
+              checkedIcon={<CheckBoxIcon fontSize="medium" />}
+              name="checked"
+            />{" "}
           </Grid>
         </Grid>
       ))}

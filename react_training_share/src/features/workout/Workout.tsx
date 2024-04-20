@@ -79,18 +79,20 @@ const Workout = () => {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <Typography variant="h4" gutterBottom>
-          Workout Tracker
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          Total Training Volume: {totalVolume}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Timer: {formatTime(time)}
-        </Typography>
-        <Button variant="contained" color="primary" onClick={handleOpenModal}>
-          Add Training Menu
-        </Button>
+        <div className={styles.topControls}>
+          <Typography variant="h4" gutterBottom>
+            Workout Tracker
+          </Typography>
+          <Typography variant="subtitle1" gutterBottom>
+            Total Training Volume: {totalVolume}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Timer: {formatTime(time)}
+          </Typography>
+          <Button variant="contained" color="primary" onClick={handleOpenModal}>
+            Add Training Menu
+          </Button>
+        </div>
         <Modal open={openModal} onClose={handleCloseModal}>
           <WorkoutPopup open={openModal} onClose={handleCloseModal} />
         </Modal>
