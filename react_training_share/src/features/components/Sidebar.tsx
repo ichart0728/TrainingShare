@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import StyledBadge from "../home/StyledBadge";
 import {
-  editNickname,
   selectMyProfile,
   setOpenSignIn,
   resetOpenProfile,
