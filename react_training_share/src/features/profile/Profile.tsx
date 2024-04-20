@@ -55,12 +55,12 @@ const Profile = () => {
             <Avatar src={profile.img} className={styles.profileAvatar} />
             <div className={styles.profileInfo}>
               <Typography variant="h6">{profile.nickName}</Typography>
-              <Typography variant="body1" className={styles.followCount}>
+              {/* <Typography variant="body1" className={styles.followCount}>
                 フォロー数: 10
               </Typography>
               <Typography variant="body1" className={styles.followerCount}>
                 フォロワー数: 10
-              </Typography>
+              </Typography> */}
               {myprofile.id !== profile.id && (
                 <div className={styles.followButton}>
                   <Button

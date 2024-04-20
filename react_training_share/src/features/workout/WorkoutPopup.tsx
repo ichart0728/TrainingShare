@@ -10,8 +10,7 @@ import {
 } from "@material-ui/core";
 import styles from "./WorkoutPopup.module.css";
 import React, { useState } from "react";
-import { Workout, setselectedWorkouts } from "./workoutPopupSlice";
-
+import { WorkoutDisplay, selectedWorkout, addWorkout } from "./workoutSlice";
 const WorkoutPopup = ({
   open,
   onClose,
@@ -20,7 +19,7 @@ const WorkoutPopup = ({
   onClose: () => void;
 }) => {
   const dispatch = useDispatch();
-  const [selectedMenus, setSelectedMenus] = useState<Workout[]>([]);
+  const [selectedMenus, setSelectedMenus] = useState<selectedWorkout[]>([]);
   const [currentTab, setCurrentTab] = useState(0);
   const trainingMenus = useSelector(
     (state: RootState) => state.training.trainingMenus
@@ -30,12 +29,12 @@ const WorkoutPopup = ({
     setCurrentTab(newValue);
   };
 
-  const handleToggle = (id: number, name: string) => {
+  const handleToggle = (id: number, target: string, name: string) => {
     const currentIndex = selectedMenus.findIndex((menu) => menu.id === id);
     const newChecked = [...selectedMenus];
 
     if (currentIndex === -1) {
-      newChecked.push({ id, name });
+      newChecked.push({ id, target, name });
     } else {
       newChecked.splice(currentIndex, 1);
     }
@@ -44,10 +43,23 @@ const WorkoutPopup = ({
   };
 
   const handleAddTraining = () => {
-    dispatch(setselectedWorkouts(selectedMenus));
+    selectedMenus.forEach((menu) => {
+      const workoutDisplay: WorkoutDisplay = {
+        id: String(Date.now()),
+        name: menu.name,
+        target: menu.target,
+        sets: [
+          {
+            id: String(Date.now()),
+            weight: 0,
+            reps: 0,
+          },
+        ],
+      };
+      dispatch(addWorkout(workoutDisplay));
+    });
     onClose();
   };
-
   return (
     <div className={styles.popupContainer}>
       <Tabs
@@ -69,19 +81,27 @@ const WorkoutPopup = ({
       </Tabs>
       <div className={styles.contentContainer}>
         <Box className={styles.menuList}>
-          {trainingMenus[currentTab]?.training_menus.map((menu: Workout) => (
-            <div key={menu.id} className={styles.menuItem}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={selectedMenus.some((m) => m.id === menu.id)}
-                    onChange={() => handleToggle(menu.id, menu.name)}
-                  />
-                }
-                label={menu.name}
-              />
-            </div>
-          ))}
+          {trainingMenus[currentTab]?.training_menus.map(
+            (menu: selectedWorkout) => (
+              <div key={menu.id} className={styles.menuItem}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedMenus.some((m) => m.id === menu.id)}
+                      onChange={() =>
+                        handleToggle(
+                          menu.id,
+                          trainingMenus[currentTab].name,
+                          menu.name
+                        )
+                      }
+                    />
+                  }
+                  label={menu.name}
+                />
+              </div>
+            )
+          )}
         </Box>
       </div>
       <div className={styles.buttonContainer}>

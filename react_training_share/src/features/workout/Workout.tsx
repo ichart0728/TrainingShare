@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectWorkouts,
   selectTotalVolume,
   startTimer,
   stopTimer,
@@ -10,10 +9,14 @@ import {
 import styles from "./Workout.module.css";
 import WorkoutPopup from "./WorkoutPopup";
 import { Modal, Button, Typography } from "@material-ui/core";
-
+import { RootState } from "../../app/store";
+import WorkoutItem from "../components/WorkoutItem";
 const Workout = () => {
   const dispatch = useDispatch();
-  const workouts = useSelector(selectWorkouts);
+
+  const selectedWorkouts = useSelector(
+    (state: RootState) => state.workout.workouts
+  );
   const totalVolume = useSelector(selectTotalVolume);
   const [openModal, setOpenModal] = useState(false);
   const [trainingActive, setTrainingActive] = useState(false);
@@ -92,15 +95,10 @@ const Workout = () => {
           <WorkoutPopup open={openModal} onClose={handleCloseModal} />
         </Modal>
         <div className={styles.workoutList}>
-          {workouts.map((workout) => (
-            <div key={workout.id} className={styles.workoutItem}>
-              <Typography variant="h6">{workout.name}</Typography>
-              {workout.sets.map((set, index) => (
-                <Typography key={index} variant="body1">
-                  Weight: {set.weight}, Reps: {set.reps}
-                </Typography>
-              ))}
-            </div>
+          {/* selectedWorkoutsの要素を表示 */}
+          {selectedWorkouts.map((workout, index) => (
+            // keyにはworkoutのindexを指定
+            <WorkoutItem key={index} workout={workout} /> // コンポーネントを利用
           ))}
         </div>
       </div>

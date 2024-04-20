@@ -1,47 +1,47 @@
-// import { createSlice } from "@reduxjs/toolkit";
-
-// interface Workout {
-//   id: string;
-//   training_menu: string;
-//   target: string;
-// }
-
-// interface WorkoutState {
-//   selectedWorkouts: Workout[];
-// }
-
-// const initialState: WorkoutState = {
-//   selectedWorkouts: [],
-// };
-
-// export const workoutSlice = createSlice({
-//   name: "selectedWorkouts",
-//   initialState,
-//   reducers: {
-//     resetselectedWorkouts: (state) => {
-//       state.selectedWorkouts = [];
-//     },
-//   },
-// });
-
-// export type { Workout };
-// export const { resetselectedWorkouts } = workoutSlice.actions;
-// export default workoutSlice.reducer;
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
+import { logout } from "../auth/authSlice";
 
-interface Workout {
+//セットの型
+interface WorkoutSet {
   id: string;
-  name: string;
-  sets: Array<{ weight: number; reps: number }>;
+  //重量
+  weight: number;
+  //回数
+  reps: number;
 }
 
+// トレーニングメニューの型
+export interface WorkoutDisplay {
+  id: string;
+  // トレーニングメニュー
+  name: string;
+  // 対象部位
+  target: string;
+  // セット
+  sets: WorkoutSet[];
+}
+
+// ポップアップで選択したトレーニングメニューの型
+export interface selectedWorkout {
+  id: number;
+  // 対象部位
+  target: string;
+  // トレーニングメニュー
+  name: string;
+}
+
+// トレーニングメニュー全体の状態の型
 interface WorkoutState {
-  workouts: Workout[];
+  // トレーニングメニュー
+  workouts: WorkoutDisplay[];
+  // トータルボリューム
   totalVolume: number;
+  // タイマー
   timer: number;
+  // タイマーの状態
   isActive: boolean;
+  // タイマーが一時停止しているか
   isPaused: boolean;
 }
 
@@ -57,7 +57,7 @@ export const workoutSlice = createSlice({
   name: "workout",
   initialState,
   reducers: {
-    addWorkout: (state, action: PayloadAction<Workout>) => {
+    addWorkout: (state, action: PayloadAction<WorkoutDisplay>) => {
       state.workouts.push(action.payload);
     },
     removeWorkout: (state, action: PayloadAction<string>) => {
@@ -74,6 +74,26 @@ export const workoutSlice = createSlice({
           }, 0)
         );
       }, 0);
+    },
+    updateSet: (
+      state,
+      action: PayloadAction<{
+        workoutId: string;
+        setIndex: number;
+        weight: number;
+        reps: number;
+      }>
+    ) => {
+      const workout = state.workouts.find(
+        (workout) => workout.id === action.payload.workoutId
+      );
+      if (workout) {
+        const set = workout.sets[action.payload.setIndex];
+        if (set) {
+          set.weight = action.payload.weight;
+          set.reps = action.payload.reps;
+        }
+      }
     },
     startTimer: (state) => {
       state.isActive = true;
@@ -92,12 +112,16 @@ export const workoutSlice = createSlice({
       }
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(logout, () => initialState);
+  },
 });
 
 export const {
   addWorkout,
   removeWorkout,
   updateVolume,
+  updateSet,
   startTimer,
   pauseTimer,
   stopTimer,
@@ -105,7 +129,6 @@ export const {
 } = workoutSlice.actions;
 export default workoutSlice.reducer;
 
-export const selectWorkouts = (state: RootState) => state.workout.workouts;
 export const selectTotalVolume = (state: RootState) =>
   state.workout.totalVolume;
 export const selectTimer = (state: RootState) => state.workout.timer;
