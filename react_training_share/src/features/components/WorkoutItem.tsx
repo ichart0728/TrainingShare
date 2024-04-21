@@ -7,9 +7,10 @@ import {
   Grid,
   Checkbox,
 } from "@material-ui/core";
+import { RootState } from "../../app/store";
 import { WorkoutDisplay } from "../workout/workoutSlice";
 import styles from "./WorkoutItem.module.css";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { updateSet } from "../workout/workoutSlice";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
@@ -25,13 +26,28 @@ import {
 
 interface WorkoutItemProps {
   workout: WorkoutDisplay;
-  index: number;
 }
 
-const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
+const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
   const dispatch = useDispatch();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [completed, setCompleted] = useState(workout.sets.map(() => false));
+  // store.training.trainingMenuを取得する
+  const trainingMenus = useSelector(
+    (state: RootState) => state.training.trainingMenus
+  );
+
+  // trainingMenuskから対象のトレーニングメニューの対象部位を取得する
+  const targetName = trainingMenus.find(
+    (menu) => menu.id === workout.body_part
+  )?.name;
+
+  // trainingMenuskから対象のトレーニングメニュー名を取得する
+  const menuName = trainingMenus
+    .find((menu) => menu.id === workout.body_part)
+    ?.training_menus.find(
+      (training_menu: any) => training_menu.id === workout.menu
+    )?.name;
 
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false);
@@ -121,7 +137,7 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
           gutterBottom
           className={styles.workoutTitle}
         >
-          {workout.target} | {workout.name}
+          {targetName} | {menuName}
         </Typography>
         <Button onClick={handleDeleteWorkout} className={styles.deleteButton}>
           <DeleteOutlineIcon />
@@ -129,7 +145,8 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
       </div>
       <div className={styles.volumeDisplay}>
         <Typography variant="subtitle1" gutterBottom>
-          総ボリューム: {completedVolume}/{totalVolume}kg (
+          総ボリューム: {completedVolume.toFixed(2)}/{totalVolume.toFixed(2)}kg
+          (
           {totalVolume > 0
             ? ((completedVolume / totalVolume) * 100).toFixed(1)
             : "0"}
@@ -177,7 +194,7 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
                     completed[setIndex]
                   )
                 }
-                InputProps={{ inputProps: { min: 0 } }}
+                InputProps={{ inputProps: { min: 0, step: "0.05" } }}
               />
             </Grid>
             <Grid item xs={4} sm={4} className={styles.inputContainer}>

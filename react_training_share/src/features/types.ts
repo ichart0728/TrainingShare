@@ -47,3 +47,31 @@ export interface PROPS_POST {
   imageUrl: string;
   liked: string[];
 }
+
+interface WorkoutSet {
+  //重量
+  weight: number;
+  //回数
+  reps: number;
+  //完了したか
+  completed: boolean;
+}
+
+// トレーニングメニューの型
+export interface WorkoutDisplay {
+  // トレーニングメニュー
+  menu: number;
+  // 対象部位
+  body_part: number;
+  // セット
+  sets: WorkoutSet[];
+}
+
+export interface WORKOUT_POST {
+  // ユーザーID
+  date: string;
+  // トレーニング時間
+  duration: number;
+  // トレーニングメニュー
+  workouts: WorkoutDisplay[];
+}

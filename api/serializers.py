@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession, TrainingRecord
+from rest_framework.exceptions import ValidationError
+from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingSession, TrainingRecord, TrainingSet
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -66,24 +67,113 @@ class BodyPartSerializer(serializers.ModelSerializer):
         model = BodyPart
         fields = ('id', 'name', 'training_menus')
 
-# TrainingRecord)のモデルのシリアライザー
+# TrainingSetモデルのシリアライザー
+class TrainingSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrainingSet
+        fields = ['id', 'weight', 'reps', 'completed']
+        extra_kwargs = {
+            'id': {'read_only': True}
+        }
+    def validate(self, data):
+        data.pop('Id', None)
+        return data
+
 class TrainingRecordSerializer(serializers.ModelSerializer):
-    menu = TrainingMenuSerializer(read_only=True)
-    session = serializers.PrimaryKeyRelatedField(queryset=TrainingSession.objects.all(), allow_null=True)
+    sets = TrainingSetSerializer(many=True)
+    menu = serializers.PrimaryKeyRelatedField(
+        queryset=TrainingMenu.objects.all()
+    )
+    body_part = serializers.PrimaryKeyRelatedField(
+        queryset=BodyPart.objects.all(),
+        allow_null=True
+    )
 
     class Meta:
         model = TrainingRecord
-        fields = ('id', 'session', 'menu', 'weight', 'reps', 'sets', 'created_on')
-        extra_kwargs = {
-            'created_on': {'read_only': True},
-        }
+        fields = ['id', 'menu', 'body_part', 'sets']
+
+    def create(self, validated_data):
+        print(f"TrainingRecordSerializer Validated Data: {validated_data}")
+        sets_data = validated_data.pop('sets', [])
+        record = TrainingRecord.objects.create(**validated_data)
+
+        for index, set_data in enumerate(sets_data, start=1):
+            print(f"Set Data: {set_data}")
+            TrainingSet.objects.create(record=record, set_number=index, **set_data)
+            print("Created a new set!")
+
+        return record
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        print(f"TrainingRecordSerializer Representation: {representation}")
+        return representation
 
 class TrainingSessionSerializer(serializers.ModelSerializer):
-    performances = TrainingRecordSerializer(many=True, read_only=True)
+    workouts = TrainingRecordSerializer(many=True)
 
     class Meta:
         model = TrainingSession
-        fields = ('id', 'user', 'date', 'duration', 'performances')
-        extra_kwargs = {
-            'user': {'read_only': True}
-        }
+        fields = ['id', 'date', 'duration', 'workouts']
+
+    def create(self, validated_data):
+        print(f"TrainingSessionSerializer Validated Data: {validated_data}")
+        records_data = validated_data.pop('workouts', [])
+        session = TrainingSession.objects.create(**validated_data)
+
+        for record_data in records_data:
+            print(f"Record Data: {record_data}")
+            menu_id = record_data.get('menu')
+            body_part_id = record_data.get('body_part')
+
+            if isinstance(menu_id, TrainingMenu):
+                menu_id = menu_id.id
+            if isinstance(body_part_id, BodyPart):
+                body_part_id = body_part_id.id
+
+            record_data['menu'] = menu_id
+            record_data['body_part'] = body_part_id
+
+            record_serializer = TrainingRecordSerializer(data=record_data)
+            record_serializer.is_valid(raise_exception=True)
+            record_serializer.save(session=session)
+            print("Created a new record!")
+
+        return session
+
+    def update(self, instance, validated_data):
+        print(f"TrainingSessionSerializer Update Validated Data: {validated_data}")
+        records_data = validated_data.pop('workouts', [])
+
+        instance.date = validated_data.get('date', instance.date)
+        instance.duration = validated_data.get('duration', instance.duration)
+        instance.save()
+
+        # 既存のTrainingRecordを削除
+        instance.workouts.all().delete()
+
+        for record_data in records_data:
+            print(f"Update Record Data: {record_data}")
+            menu_id = record_data.get('menu')
+            body_part_id = record_data.get('body_part')
+
+            if isinstance(menu_id, TrainingMenu):
+                menu_id = menu_id.id
+            if isinstance(body_part_id, BodyPart):
+                body_part_id = body_part_id.id
+
+            record_data['menu'] = menu_id
+            record_data['body_part'] = body_part_id
+
+            record_serializer = TrainingRecordSerializer(data=record_data)
+            record_serializer.is_valid(raise_exception=True)
+            record_serializer.save(session=instance)
+            print("Updated a record!")
+
+        return instance
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        print(f"TrainingSessionSerializer Representation: {representation}")
+        return representation

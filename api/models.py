@@ -192,18 +192,32 @@ class TrainingSession(models.Model):
     # トレーニング時間
     duration = models.DurationField()
 
+    # def __str__(self):
+    #     return f"{self.user.username} - {self.date}"
+
 # トレーニング記録テーブル (TrainingRecord) のモデル
 class TrainingRecord(models.Model):
     # トレーニング記録ID
-    session = models.ForeignKey(TrainingSession, related_name='performances', on_delete=models.CASCADE, null=True, blank=True)
-    # ユーザーID
-    menu = models.ForeignKey(TrainingMenu, on_delete=models.CASCADE, related_name='training_records')
-    # 重量
-    weight = models.FloatField()
-    # レップ数
-    reps = models.IntegerField()
-    # セット数
-    sets = models.IntegerField()
+    session = models.ForeignKey(TrainingSession, related_name='workouts', on_delete=models.CASCADE)
+    # トレーニングメニュー
+    menu = models.ForeignKey(TrainingMenu, on_delete=models.CASCADE, related_name='workouts')
+    # トレーニング部位
+    body_part = models.ForeignKey(BodyPart, on_delete=models.CASCADE, null=True, blank=True)  # 新たに追加
 
     def __str__(self):
         return f"{self.session.user.username} - {self.menu.name} on {self.session.date}"
+
+# トレーニングセットテーブル (TrainingSet) のモデル
+class TrainingSet(models.Model):
+    record = models.ForeignKey(TrainingRecord, on_delete=models.CASCADE, related_name='sets')
+    # セット番号
+    set_number = models.IntegerField()
+    # このセットでの重量
+    weight = models.FloatField()
+    # このセットでのレップ数
+    reps = models.IntegerField()
+    # このセットが完了したかどうか
+    completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Set {self.set_number} of {self.record}"

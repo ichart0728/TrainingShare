@@ -18,20 +18,11 @@ interface WorkoutSet {
 export interface WorkoutDisplay {
   id: string;
   // トレーニングメニュー
-  name: string;
+  menu: number;
   // 対象部位
-  target: string;
+  body_part: number;
   // セット
   sets: WorkoutSet[];
-}
-
-// ポップアップで選択したトレーニングメニューの型
-export interface selectedWorkout {
-  id: number;
-  // 対象部位
-  target: string;
-  // トレーニングメニュー
-  name: string;
 }
 
 // トレーニングメニュー全体の状態の型
@@ -160,6 +151,4 @@ export const {
 } = workoutSlice.actions;
 export default workoutSlice.reducer;
 
-// export const selectTotalVolume = (state: RootState) =>
-//   state.workout.totalVolume;
 export const selectTimer = (state: RootState) => state.workout.timer;
