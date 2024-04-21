@@ -1,14 +1,21 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  WorkoutState,
-  startTimer,
-  stopTimer,
-  pauseTimer,
-} from "./workoutSlice";
+import { WorkoutDisplay, startTimer, stopTimer } from "./workoutSlice";
+import { fetchAsyncPostTrainingSessions } from "../api/workoutApi";
+import { WORKOUT_POST } from "../types";
+
 import styles from "./Workout.module.css";
 import WorkoutPopup from "./WorkoutPopup";
-import { Modal, Button, Typography } from "@material-ui/core";
+import {
+  Modal,
+  Button,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from "@material-ui/core";
 import { RootState } from "../../app/store";
 import WorkoutItem from "../components/WorkoutItem";
 
@@ -18,8 +25,8 @@ const Workout = () => {
   const selectedWorkouts = useSelector(
     (state: RootState) => state.workout.workouts
   );
-  // const totalVolume = useSelector(selectTotalVolume);
-
+  const [openEndModal, setOpenEndModal] = useState(false);
+  const [modalContent, setModalContent] = useState("");
   // selectedWorkoutsの全体のボリュームを計算
   const totalVolume = selectedWorkouts.reduce((total, workout) => {
     return (
@@ -60,10 +67,16 @@ const Workout = () => {
   }, [trainingActive, paused]);
 
   const handleStartOrEnd = () => {
+    const anyIncompleteSets = selectedWorkouts.some((workout) =>
+      workout.sets.some((set) => !set.completed)
+    );
     if (trainingActive) {
-      dispatch(stopTimer());
-      setTrainingActive(false);
-      setTime(0);
+      setModalContent(
+        anyIncompleteSets
+          ? "完了していないセットがあります。トレーニングを終了しますか？"
+          : "トレーニングを終了しますか？"
+      );
+      setOpenEndModal(true);
     } else {
       dispatch(startTimer());
       setTrainingActive(true);
@@ -71,21 +84,41 @@ const Workout = () => {
     }
   };
 
-  const togglePause = () => {
-    if (paused) {
-      dispatch(startTimer());
-    } else {
-      dispatch(pauseTimer());
-    }
-    setPaused(!paused);
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const confirmEndTraining = () => {
+    dispatch(stopTimer());
+    // トレーニングデータを整形
+    const workouts = selectedWorkouts.map((workout) => ({
+      menu: workout.menu,
+      body_part: workout.body_part,
+      sets: workout.sets.map((set) => ({
+        weight: set.weight,
+        reps: set.reps,
+        completed: set.completed,
+      })),
+    }));
+    const workoutData: WORKOUT_POST = {
+      // YYYY-MM-DD形式の日付文字列
+      date: new Date().toISOString().split("T")[0],
+      duration: time,
+      workouts: workouts,
+    };
+    console.log("送信するトレーニングデータ:", workoutData);
+    dispatch(fetchAsyncPostTrainingSessions(workoutData) as any);
+    setTrainingActive(false);
+    setTime(0);
+    setOpenEndModal(false);
   };
 
   const handleOpenModal = () => {
     setOpenModal(true);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleCloseEndModal = () => {
+    setOpenEndModal(false);
   };
 
   const formatTime = (time: number) => {
@@ -107,7 +140,8 @@ const Workout = () => {
           gutterBottom
           className={styles.totalVolume}
         >
-          全体のボリューム: <br /> {completedTotalVolume}/{totalVolume}kg (
+          全体のボリューム: <br /> {completedTotalVolume.toFixed(2)}/
+          {totalVolume.toFixed(2)}kg (
           {totalVolume > 0
             ? ((completedTotalVolume / totalVolume) * 100).toFixed(1)
             : "0"}
@@ -119,21 +153,16 @@ const Workout = () => {
         </Typography>
         <div className={styles.fixedWidthButtonContainer}>
           <Button
-            className={styles.fixedWidthButton}
             variant="contained"
             color={trainingActive ? "secondary" : "primary"}
             onClick={handleStartOrEnd}
-            disabled={paused}
           >
             {trainingActive ? "終了" : "スタート"}
           </Button>
           <Button
-            className={`${styles.fixedWidthButton} ${
-              paused ? styles.pauseButtonPaused : ""
-            }`}
             variant="contained"
             color="primary"
-            onClick={togglePause}
+            onClick={() => setPaused(!paused)}
             disabled={!trainingActive}
           >
             {paused ? "再開" : "一時停止"}
@@ -146,7 +175,7 @@ const Workout = () => {
         </Modal>
         <div className={styles.workoutList}>
           {selectedWorkouts.map((workout, index) => (
-            <WorkoutItem key={index} workout={workout} index={index} />
+            <WorkoutItem key={index} workout={workout} />
           ))}
         </div>
       </div>
@@ -160,6 +189,20 @@ const Workout = () => {
           トレーニングを追加
         </Button>
       </div>
+      <Dialog open={openEndModal} onClose={handleCloseEndModal}>
+        <DialogTitle>トレーニング終了</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{modalContent}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEndModal} color="primary">
+            キャンセル
+          </Button>
+          <Button onClick={confirmEndTraining} color="primary" autoFocus>
+            終了
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

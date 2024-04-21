@@ -1,5 +1,7 @@
 from rest_framework import generics
 from rest_framework import viewsets
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from . import serializers
 from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession
@@ -87,46 +89,55 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 # BodyPartテーブルとトレーニングメニューテーブルを結合して表示するためのView
 class BodyPartWithMenusView(generics.ListAPIView):
+    """
+    BodyPartテーブルとTrainingMenuテーブルを結合して表示するためのView
+    """
     queryset = BodyPart.objects.all().prefetch_related('training_menus')
     serializer_class = serializers.BodyPartSerializer
     def get_queryset(self):
         # トレーニングメニューを取得するためにprefetch_relatedを使用
         return self.queryset.prefetch_related('training_menus')
 
-# トレーニング記録テーブル (TrainingRecord) のView
-class TrainingRecordViewSet(viewsets.ModelViewSet):
-    queryset = TrainingRecord.objects.all()
-    serializer_class = serializers.TrainingRecordSerializer
-
-    def perform_create(self, serializer):
-        # クライアントからセッションIDを受け取る
-        session_id = self.request.data.get('session_id')
-        try:
-            # セッションIDからセッションインスタンスを取得
-            session = TrainingSession.objects.get(id=session_id)
-        except TrainingSession.DoesNotExist:
-            raise ValidationError('指定されたセッションが存在しません。')
-
-        # セッションに紐づけて保存
-        serializer.save(session=session)
-
-# 指定したUserのトレーニング記録を表示するためのView
-class TrainingRecordListView(generics.ListAPIView):
-    serializer_class = serializers.TrainingRecordSerializer
-
-    def get_queryset(self):
-        '''
-        指定したUserのトレーニング記録を返す
-        '''
-        user_id = self.kwargs['user_id']  # URLからユーザーIDを取得
-        user_sessions = TrainingSession.objects.filter(user_id=user_id)  # ユーザーのトレーニングセッションを取得
-        return TrainingRecord.objects.filter(session__in=user_sessions)  # そのセッションに関連する記録をフィルター
-
 # トレーニングセッションテーブル (TrainingSession) のView
 class TrainingSessionViewSet(viewsets.ModelViewSet):
+    """
+    トレーニングセッションのCRUDを行うためのView
+    """
     queryset = TrainingSession.objects.all()
     serializer_class = serializers.TrainingSessionSerializer
 
+    def create(self, request, *args, **kwargs):
+        print("====================================================================================================================================================")
+        print("Creating a new training session with data: %s", request.data)
+        # トレーニングセッションデータを含むリクエストデータの処理
+        session_serializer = self.get_serializer(data=request.data)
+        print("session_serializer: %s", session_serializer)
+        print("session_serializer.is_valid???????")
+
+        session_serializer.is_valid(raise_exception=True)
+        print("session_serializer.is_valid()")
+        self.perform_create(session_serializer)
+        print("perform_created!")
+
+        session = session_serializer.save()
+        headers = self.get_success_headers(session_serializer.data)
+
+        # レスポンスに新しく作成されたセッションのIDを含む
+        session_id = session_serializer.data['id']
+        return Response(session_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     def perform_create(self, serializer):
-        # ログインユーザーをセッションのユーザーとして設定
+        # ユーザー情報をセッションに追加
         serializer.save(user=self.request.user)
+
+class TrainingSessionListView(generics.ListAPIView):
+    serializer_class = serializers.TrainingSessionSerializer
+
+    def get_queryset(self):
+        """
+        指定したユーザーのトレーニングセッションとその記録を取得する
+        """
+        user_id = self.kwargs['user_id']
+        return TrainingSession.objects.filter(user_id=user_id).prefetch_related(
+            'records__sets'  # TrainingRecordとTrainingSetをプリフェッチ
+        )

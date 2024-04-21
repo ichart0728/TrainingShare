@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { RootState } from "../../app/store";
 import axios from "axios";
 import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
 

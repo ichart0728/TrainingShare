@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import styles from "./WorkoutPopup.module.css";
 import React, { useState } from "react";
-import { WorkoutDisplay, selectedWorkout, addWorkout } from "./workoutSlice";
+import { WorkoutDisplay, addWorkout } from "./workoutSlice";
 import { v4 as uuidv4 } from "uuid";
 
 const WorkoutPopup = ({
@@ -22,7 +22,7 @@ const WorkoutPopup = ({
   onClose: () => void;
 }) => {
   const dispatch = useDispatch();
-  const [selectedMenus, setSelectedMenus] = useState<selectedWorkout[]>([]);
+  const [selectedMenus, setSelectedMenus] = useState<number[]>([]); // 選択されたメニューのIDを保持
   const [currentTab, setCurrentTab] = useState(0);
   const trainingMenus = useSelector(
     (state: RootState) => state.training.trainingMenus
@@ -32,35 +32,35 @@ const WorkoutPopup = ({
     setCurrentTab(newValue);
   };
 
-  const handleToggle = (id: number, target: string, name: string) => {
-    const currentIndex = selectedMenus.findIndex((menu) => menu.id === id);
-    const newChecked = [...selectedMenus];
-
-    if (currentIndex === -1) {
-      newChecked.push({ id, target, name });
+  const handleToggle = (menuId: number) => {
+    const index = selectedMenus.indexOf(menuId);
+    if (index === -1) {
+      setSelectedMenus([...selectedMenus, menuId]);
     } else {
-      newChecked.splice(currentIndex, 1);
+      setSelectedMenus(selectedMenus.filter((id) => id !== menuId));
     }
-
-    setSelectedMenus(newChecked);
   };
 
   const handleAddTraining = () => {
-    selectedMenus.forEach((menu) => {
-      const workoutDisplay: WorkoutDisplay = {
-        id: uuidv4(),
-        name: menu.name,
-        target: menu.target,
-        sets: [
-          {
-            id: uuidv4(),
-            weight: 0,
-            reps: 0,
-            completed: false,
-          },
-        ],
-      };
-      dispatch(addWorkout(workoutDisplay));
+    selectedMenus.forEach((menuId) => {
+      const body_part = trainingMenus[currentTab].id;
+      const menu = trainingMenus.find((menu) => menu.id === menuId);
+      if (menu) {
+        const workoutDisplay: WorkoutDisplay = {
+          id: uuidv4(),
+          menu: menu.id,
+          body_part: body_part,
+          sets: [
+            {
+              id: uuidv4(),
+              weight: 0,
+              reps: 0,
+              completed: false,
+            },
+          ],
+        };
+        dispatch(addWorkout(workoutDisplay));
+      }
     });
     onClose();
   };
@@ -89,28 +89,20 @@ const WorkoutPopup = ({
       </Tabs>
       <div className={styles.contentContainer}>
         <Box className={styles.menuList}>
-          {trainingMenus[currentTab]?.training_menus.map(
-            (menu: selectedWorkout) => (
-              <div key={menu.id} className={styles.menuItem}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={selectedMenus.some((m) => m.id === menu.id)}
-                      onChange={() =>
-                        handleToggle(
-                          menu.id,
-                          trainingMenus[currentTab].name,
-                          menu.name
-                        )
-                      }
-                      color="primary"
-                    />
-                  }
-                  label={menu.name}
-                />
-              </div>
-            )
-          )}
+          {trainingMenus[currentTab]?.training_menus.map((menu) => (
+            <div key={menu.id} className={styles.menuItem}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={selectedMenus.includes(menu.id)}
+                    onChange={() => handleToggle(menu.id)}
+                    color="primary"
+                  />
+                }
+                label={menu.name}
+              />
+            </div>
+          ))}
         </Box>
       </div>
       <div className={styles.buttonContainer}>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./Post.module.css";
 import { makeStyles } from "@material-ui/core/styles";
-import { Avatar, Divider, Checkbox } from "@material-ui/core";
+import { Avatar, Checkbox } from "@material-ui/core";
 import { Favorite, FavoriteBorder } from "@material-ui/icons";
 import { useNavigate } from "react-router-dom";
 import AvatarGroup from "@material-ui/lab/AvatarGroup";

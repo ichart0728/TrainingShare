@@ -1,13 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
-import {
-  Avatar,
-  Button,
-  Grid,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@material-ui/core";
+import { Avatar, Button, Grid, Typography } from "@material-ui/core";
 import PostCard from "../post/PostCard";
 import styles from "./Profile.module.css";
 import { useEffect, useState } from "react";
@@ -18,8 +11,6 @@ import { CircularProgress } from "@material-ui/core";
 const Profile = () => {
   const dispatch: AppDispatch = useDispatch();
   const profileId = useSelector((state: RootState) => state.profile.profile.id);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     if (profileId) {

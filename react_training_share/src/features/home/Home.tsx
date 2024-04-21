@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Auth from "../auth/Auth";
 
 import styles from "./Home.module.css";
-import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch } from "../../app/store";
+import { useSelector } from "react-redux";
 
 import { Grid } from "@material-ui/core";
 
@@ -16,7 +15,6 @@ import EditProfile from "./EditProfile";
 import NewPost from "./NewPost";
 
 const Core: React.FC = () => {
-  const dispatch: AppDispatch = useDispatch();
   // ログインユーザーのプロフィール情報
   const profile = useSelector(selectMyProfile);
   // 投稿の一覧
