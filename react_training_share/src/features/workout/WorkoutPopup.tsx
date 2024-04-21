@@ -7,10 +7,13 @@ import {
   Tabs,
   Tab,
   Box,
+  Typography,
 } from "@material-ui/core";
 import styles from "./WorkoutPopup.module.css";
 import React, { useState } from "react";
 import { WorkoutDisplay, selectedWorkout, addWorkout } from "./workoutSlice";
+import { v4 as uuidv4 } from "uuid";
+
 const WorkoutPopup = ({
   open,
   onClose,
@@ -45,14 +48,15 @@ const WorkoutPopup = ({
   const handleAddTraining = () => {
     selectedMenus.forEach((menu) => {
       const workoutDisplay: WorkoutDisplay = {
-        id: String(Date.now()),
+        id: uuidv4(),
         name: menu.name,
         target: menu.target,
         sets: [
           {
-            id: String(Date.now()),
+            id: uuidv4(),
             weight: 0,
             reps: 0,
+            completed: false,
           },
         ],
       };
@@ -60,8 +64,12 @@ const WorkoutPopup = ({
     });
     onClose();
   };
+
   return (
     <div className={styles.popupContainer}>
+      <Typography variant="h6" gutterBottom className={styles.popupTitle}>
+        トレーニング選択
+      </Typography>
       <Tabs
         value={currentTab}
         onChange={handleChangeTab}
@@ -95,6 +103,7 @@ const WorkoutPopup = ({
                           menu.name
                         )
                       }
+                      color="primary"
                     />
                   }
                   label={menu.name}
@@ -110,8 +119,9 @@ const WorkoutPopup = ({
           color="primary"
           onClick={handleAddTraining}
           disabled={selectedMenus.length === 0}
+          className={styles.addButton}
         >
-          Add
+          トレーニングを追加する
         </Button>
       </div>
     </div>

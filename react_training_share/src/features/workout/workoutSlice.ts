@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { logout } from "../auth/authSlice";
+import { v4 as uuidv4 } from "uuid";
 
 //セットの型
 interface WorkoutSet {
@@ -9,6 +10,8 @@ interface WorkoutSet {
   weight: number;
   //回数
   reps: number;
+  //完了したか
+  completed: boolean;
 }
 
 // トレーニングメニューの型
@@ -32,11 +35,13 @@ export interface selectedWorkout {
 }
 
 // トレーニングメニュー全体の状態の型
-interface WorkoutState {
+export interface WorkoutState {
   // トレーニングメニュー
   workouts: WorkoutDisplay[];
   // トータルボリューム
   totalVolume: number;
+  // 完了済みトータルボリューム
+  completedTotalVolume: number;
   // タイマー
   timer: number;
   // タイマーの状態
@@ -48,6 +53,7 @@ interface WorkoutState {
 const initialState: WorkoutState = {
   workouts: [],
   totalVolume: 0,
+  completedTotalVolume: 0,
   timer: 0,
   isActive: false,
   isPaused: false,
@@ -82,6 +88,7 @@ export const workoutSlice = createSlice({
         setIndex: number;
         weight: number;
         reps: number;
+        completed?: boolean;
       }>
     ) => {
       const workout = state.workouts.find(
@@ -92,6 +99,9 @@ export const workoutSlice = createSlice({
         if (set) {
           set.weight = action.payload.weight;
           set.reps = action.payload.reps;
+          if (action.payload.completed !== undefined) {
+            set.completed = action.payload.completed;
+          }
         }
       }
     },
@@ -100,9 +110,10 @@ export const workoutSlice = createSlice({
       const workout = state.workouts.find((w) => w.id === workoutId);
       if (workout) {
         workout.sets.push({
-          id: String(Date.now()),
+          id: uuidv4(),
           weight: 0,
           reps: 0,
+          completed: false,
         });
       }
     },
@@ -149,6 +160,6 @@ export const {
 } = workoutSlice.actions;
 export default workoutSlice.reducer;
 
-export const selectTotalVolume = (state: RootState) =>
-  state.workout.totalVolume;
+// export const selectTotalVolume = (state: RootState) =>
+//   state.workout.totalVolume;
 export const selectTimer = (state: RootState) => state.workout.timer;

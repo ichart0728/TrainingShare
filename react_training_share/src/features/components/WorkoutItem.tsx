@@ -14,7 +14,7 @@ import { updateSet } from "../workout/workoutSlice";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import { addSet, deleteSet } from "../workout/workoutSlice";
+import { addSet, deleteSet, removeWorkout } from "../workout/workoutSlice";
 import {
   Dialog,
   DialogActions,
@@ -28,15 +28,10 @@ interface WorkoutItemProps {
   index: number;
 }
 
-interface SetState {
-  id: string;
-  weight: number;
-  reps: number;
-}
-
 const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
   const dispatch = useDispatch();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [completed, setCompleted] = useState(workout.sets.map(() => false));
 
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false);
@@ -45,7 +40,8 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
     workoutId: string,
     setIndex: number,
     newWeight: number,
-    reps: number
+    reps: number,
+    completed: boolean
   ) => {
     dispatch(
       updateSet({
@@ -53,14 +49,13 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
         setIndex,
         weight: newWeight,
         reps,
+        completed,
       })
     );
   };
   const handleConfirmDelete = () => {
-    // 削除の確認がクリックされた時の処理をここに追加
-    // 例えば削除処理の実行や、状態の更新
-    setOpenDeleteModal(false);
-    // dispatch(deleteWorkout({ workoutId: workout.id })); // 仮の削除アクション
+    dispatch(removeWorkout(workout.id)); // 対象のトレーニングメニューを削除するアクションをディスパッチ
+    setOpenDeleteModal(false); // モーダルを閉じる
   };
 
   const handleRepsChange = (
@@ -75,6 +70,7 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
         setIndex,
         weight,
         reps: newReps,
+        completed: completed[setIndex],
       })
     );
   };
@@ -88,86 +84,133 @@ const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout, index }) => {
     dispatch(deleteSet({ workoutId: workout.id }));
   };
 
+  // トレーニングボリュームを計算
+  const totalVolume = workout.sets.reduce(
+    (acc, set) => acc + set.weight * set.reps,
+    0
+  );
+
+  // 完了したセットの総ボリュームを計算
+  const completedVolume = workout.sets.reduce(
+    (acc, set, idx) => (completed[idx] ? acc + set.weight * set.reps : acc),
+    0
+  );
+
+  // 完了状態の切り替え
+  const handleToggleCompleted = (setIndex: number) => {
+    const updatedCompleted = [...completed];
+    updatedCompleted[setIndex] = !updatedCompleted[setIndex];
+
+    setCompleted(updatedCompleted);
+
+    dispatch(
+      updateSet({
+        workoutId: workout.id,
+        setIndex,
+        weight: workout.sets[setIndex].weight,
+        reps: workout.sets[setIndex].reps,
+        completed: updatedCompleted[setIndex],
+      })
+    );
+  };
   return (
     <Paper className={styles.workoutItem} elevation={2}>
       <div className={styles.workoutHeader}>
-        <Typography variant="subtitle1" gutterBottom>
+        <Typography
+          variant="subtitle1"
+          gutterBottom
+          className={styles.workoutTitle}
+        >
           {workout.target} | {workout.name}
         </Typography>
         <Button onClick={handleDeleteWorkout} className={styles.deleteButton}>
           <DeleteOutlineIcon />
         </Button>
       </div>
-      <Grid container alignItems="center">
-        <Grid item xs={2} sm={2} className={styles.labelContainer}>
-          <Typography align="center">セット</Typography>
-        </Grid>
-        <Grid item xs={4} sm={4} className={styles.labelContainer}>
-          <Typography align="center">kg</Typography>
-        </Grid>
-        <Grid item xs={4} sm={4} className={styles.labelContainer}>
-          <Typography align="center">回</Typography>
-        </Grid>
-        <Grid item xs={2} sm={2} className={styles.labelContainer}>
-          <Typography align="center">完了</Typography>
-        </Grid>
-      </Grid>
-      {workout.sets.map((set, index) => (
-        <Grid
-          container
-          key={index}
-          alignItems="center"
-          className={styles.setRow}
-        >
-          <Grid item xs={2} sm={2}>
-            <Typography align="center">{index + 1}</Typography>
+      <div className={styles.volumeDisplay}>
+        <Typography variant="subtitle1" gutterBottom>
+          総ボリューム: {completedVolume}/{totalVolume}kg (
+          {totalVolume > 0
+            ? ((completedVolume / totalVolume) * 100).toFixed(1)
+            : "0"}
+          %)
+        </Typography>
+      </div>
+      <div className={styles.setContent}>
+        <Grid container alignItems="center" className={styles.setHeader}>
+          <Grid item xs={2} sm={2} className={styles.labelContainer}>
+            <Typography align="center">セット</Typography>
           </Grid>
-          <Grid item xs={4} sm={4} className={styles.inputContainer}>
-            <TextField
-              type="number"
-              variant="outlined"
-              size="small"
-              className={styles.input}
-              value={set.weight}
-              onChange={(e) =>
-                handleWeightChange(
-                  workout.id,
-                  index,
-                  Number(e.target.value),
-                  set.reps
-                )
-              }
-              InputProps={{ inputProps: { min: 0 } }}
-            />
+          <Grid item xs={4} sm={4} className={styles.labelContainer}>
+            <Typography align="center">kg</Typography>
           </Grid>
-          <Grid item xs={4} sm={4} className={styles.inputContainer}>
-            <TextField
-              type="number"
-              variant="outlined"
-              size="small"
-              className={styles.input}
-              value={set.reps}
-              onChange={(e) => {
-                handleRepsChange(
-                  workout.id,
-                  index,
-                  set.weight,
-                  Number(e.target.value)
-                );
-              }}
-              InputProps={{ inputProps: { min: 0 } }}
-            />
+          <Grid item xs={4} sm={4} className={styles.labelContainer}>
+            <Typography align="center">回</Typography>
           </Grid>
+          <Grid item xs={2} sm={2} className={styles.labelContainer}>
+            <Typography align="center">完了</Typography>
+          </Grid>
+        </Grid>
+        {workout.sets.map((set, setIndex) => (
+          <Grid
+            container
+            key={setIndex}
+            alignItems="center"
+            className={styles.setRow}
+          >
+            <Grid item xs={2} sm={2}>
+              <Typography align="center">{setIndex + 1}</Typography>
+            </Grid>
+            <Grid item xs={4} sm={4} className={styles.inputContainer}>
+              <TextField
+                type="number"
+                variant="outlined"
+                size="small"
+                className={styles.input}
+                value={set.weight}
+                onChange={(e) =>
+                  handleWeightChange(
+                    workout.id,
+                    setIndex, // 正しいインデックスを使用
+                    Number(e.target.value),
+                    set.reps,
+                    completed[setIndex]
+                  )
+                }
+                InputProps={{ inputProps: { min: 0 } }}
+              />
+            </Grid>
+            <Grid item xs={4} sm={4} className={styles.inputContainer}>
+              <TextField
+                type="number"
+                variant="outlined"
+                size="small"
+                className={styles.input}
+                value={set.reps}
+                onChange={(e) => {
+                  handleRepsChange(
+                    workout.id,
+                    setIndex, // 正しいインデックスを使用
+                    set.weight,
+                    Number(e.target.value)
+                  );
+                }}
+                InputProps={{ inputProps: { min: 0 } }}
+              />
+            </Grid>
 
-          <Grid item xs={2} sm={2} className={styles.checkboxContainer}>
-            <Checkbox
-              icon={<CheckBoxOutlineBlankIcon fontSize="medium" />}
-              checkedIcon={<CheckBoxIcon fontSize="medium" />}
-              name="checked"
-            />{" "}
+            <Grid item xs={2} sm={2} className={styles.checkboxContainer}>
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon fontSize="medium" />}
+                onChange={() => handleToggleCompleted(setIndex)} // 正しいインデックスを使用
+                checked={completed[setIndex]}
+                checkedIcon={<CheckBoxIcon fontSize="medium" />}
+                name="checked"
+              />{" "}
+            </Grid>
           </Grid>
-        </Grid>
-      ))}
+        ))}
+      </div>
       <div className={styles.buttonContainer}>
         <Button
           variant="outlined"
