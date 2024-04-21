@@ -1,0 +1,128 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  height: calc(100vh - 80px);
+  position: relative;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  overflow-y: auto;
+  padding-bottom: 100px;
+  margin: 0 auto;
+}
+
+.workoutList {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.topControls {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 0 0 10px 10px;
+}
+
+.totalVolume {
+  background-color: #f0f0f0;
+  color: #333;
+  font-family: "Roboto", sans-serif;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 18px;
+  text-align: center;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 10px 0;
+  width: 200px;
+}
+
+.bottomControls {
+  position: absolute;
+  bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: white;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.bottomButton {
+  width: 200px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.fixedWidthButtonContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  gap: 16px;
+}
+
+.fixedWidthButton {
+  width: 200px;
+  border-radius: 20px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.pauseButtonPaused {
+  background-color: #ff9800;
+}
+
+.pauseButtonPaused:hover {
+  background-color: #d98405;
+}
+
+.digitalClock {
+  background-color: #f0f0f0;
+  color: #333;
+  font-family: "Roboto Mono", monospace;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 24px;
+  text-align: center;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 10px 0;
+  width: 150px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    margin-left: 0;
+    height: calc(100vh - 80px);
+  }
+
+  .bottomControls {
+    width: calc(100% - 40px);
+  }
+
+  .fixedWidthButton {
+    width: 70%;
+  }
+}

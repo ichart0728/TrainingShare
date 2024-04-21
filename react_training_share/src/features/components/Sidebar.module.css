@@ -1,0 +1,61 @@
+.drawer {
+  width: 240px; /* Default width for larger screens */
+}
+
+.drawerContent {
+  width: 240px; /* Default width for larger screens */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.menuButtonWrapper {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1200;
+}
+
+.menuButton {
+  padding: 8px;
+}
+
+@media (max-width: 768px) {
+  .drawer {
+    width: 0;
+    flex-shrink: 0;
+  }
+
+  .drawerContent {
+    width: 80px; /* Adjust width for smaller screens */
+  }
+
+  .menuButton {
+    display: block; /* Show menu button on smaller screens */
+  }
+
+  .listItemText {
+    display: none; /* Hide ListItemText on smaller screens */
+  }
+
+  .sidebar_title {
+    display: none;
+  }
+}
+
+.iconWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+}
+
+.icon {
+  font-size: 32px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+}

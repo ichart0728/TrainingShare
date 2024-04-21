@@ -1,0 +1,76 @@
+.profileContainer {
+  padding: 20px;
+  margin-left: 240px;
+}
+
+@media (max-width: 600px) {
+  .profileContainer {
+    margin-left: 0;
+  }
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-direction: column;
+}
+
+@media (min-width: 600px) {
+  .profileHeader {
+    flex-direction: row;
+  }
+}
+
+.profileAvatar {
+  width: 120px;
+  height: 120px;
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 600px) {
+  .profileAvatar {
+    margin-bottom: 0;
+  }
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (min-width: 600px) {
+  .profileInfo {
+    align-items: flex-start;
+  }
+}
+
+.followCount,
+.followerCount {
+  margin-top: 5px;
+}
+
+.followButton {
+  margin-top: 10px;
+}
+
+.postsContainer {
+  margin-top: 20px;
+}
+
+.profileAvatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 600px) {
+  .profileAvatar {
+    margin-left: 0;
+    margin-right: 20px;
+  }
+}
