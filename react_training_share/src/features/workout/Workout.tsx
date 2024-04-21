@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectTotalVolume,
+  WorkoutState,
   startTimer,
   stopTimer,
   pauseTimer,
@@ -11,13 +11,33 @@ import WorkoutPopup from "./WorkoutPopup";
 import { Modal, Button, Typography } from "@material-ui/core";
 import { RootState } from "../../app/store";
 import WorkoutItem from "../components/WorkoutItem";
+
 const Workout = () => {
   const dispatch = useDispatch();
 
   const selectedWorkouts = useSelector(
     (state: RootState) => state.workout.workouts
   );
-  const totalVolume = useSelector(selectTotalVolume);
+  // const totalVolume = useSelector(selectTotalVolume);
+
+  // selectedWorkoutsの全体のボリュームを計算
+  const totalVolume = selectedWorkouts.reduce((total, workout) => {
+    return (
+      total +
+      workout.sets.reduce((setTotal, set) => {
+        return setTotal + set.weight * set.reps;
+      }, 0)
+    );
+  }, 0);
+  // selectedWorkoutsのうち完了済みの全体のボリュームを計算
+  const completedTotalVolume = selectedWorkouts.reduce((total, workout) => {
+    return (
+      total +
+      workout.sets.reduce((setTotal, set) => {
+        return set.completed ? setTotal + set.weight * set.reps : setTotal;
+      }, 0)
+    );
+  }, 0);
   const [openModal, setOpenModal] = useState(false);
   const [trainingActive, setTrainingActive] = useState(false);
   const [paused, setPaused] = useState(true);
@@ -78,49 +98,66 @@ const Workout = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
-        <div className={styles.topControls}>
-          <Typography variant="h4" gutterBottom>
-            Workout Tracker
-          </Typography>
-          <Typography variant="subtitle1" gutterBottom>
-            Total Training Volume: {totalVolume}
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Timer: {formatTime(time)}
-          </Typography>
-          <Button variant="contained" color="primary" onClick={handleOpenModal}>
-            Add Training Menu
+      <div className={styles.topControls}>
+        <Typography variant="h4" gutterBottom>
+          Workout Tracker
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          gutterBottom
+          className={styles.totalVolume}
+        >
+          全体のボリューム: <br /> {completedTotalVolume}/{totalVolume}kg (
+          {totalVolume > 0
+            ? ((completedTotalVolume / totalVolume) * 100).toFixed(1)
+            : "0"}
+          %)
+        </Typography>
+
+        <Typography variant="h6" gutterBottom className={styles.digitalClock}>
+          Timer: {formatTime(time)}
+        </Typography>
+        <div className={styles.fixedWidthButtonContainer}>
+          <Button
+            className={styles.fixedWidthButton}
+            variant="contained"
+            color={trainingActive ? "secondary" : "primary"}
+            onClick={handleStartOrEnd}
+            disabled={paused}
+          >
+            {trainingActive ? "終了" : "スタート"}
+          </Button>
+          <Button
+            className={`${styles.fixedWidthButton} ${
+              paused ? styles.pauseButtonPaused : ""
+            }`}
+            variant="contained"
+            color="primary"
+            onClick={togglePause}
+            disabled={!trainingActive}
+          >
+            {paused ? "再開" : "一時停止"}
           </Button>
         </div>
+      </div>
+      <div className={styles.content}>
         <Modal open={openModal} onClose={handleCloseModal}>
           <WorkoutPopup open={openModal} onClose={handleCloseModal} />
         </Modal>
         <div className={styles.workoutList}>
-          {/* selectedWorkoutsの要素を表示 */}
           {selectedWorkouts.map((workout, index) => (
-            // keyにはworkoutのindexを指定
-            <WorkoutItem key={index} workout={workout} index={index} /> // コンポーネントを利用
+            <WorkoutItem key={index} workout={workout} index={index} />
           ))}
         </div>
       </div>
       <div className={styles.bottomControls}>
         <Button
-          className={styles.fixedWidthButton}
+          className={styles.bottomButton}
           variant="contained"
           color="primary"
-          onClick={handleStartOrEnd}
+          onClick={handleOpenModal}
         >
-          {trainingActive ? "End Training" : "Start Training"}
-        </Button>
-        <Button
-          className={styles.fixedWidthButton}
-          variant="contained"
-          color="primary"
-          onClick={togglePause}
-          disabled={!trainingActive}
-        >
-          {paused ? "Resume Training" : "Pause Training"}
+          トレーニングを追加
         </Button>
       </div>
     </div>

@@ -1,8 +1,10 @@
 .workoutItem {
   width: 100%;
-  padding: 16px;
-  margin: 8px 0;
+  padding: 20px;
+  margin: 16px 0;
   box-sizing: border-box;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .inputContainer {
@@ -18,22 +20,26 @@
 
 .input {
   margin: 8px;
-  width: 80px;
+  width: 100%;
+  max-width: 100px;
 }
 
 .buttonContainer {
   display: flex;
   justify-content: space-between;
-  margin-top: 16px;
+  margin-top: 20px;
 }
 
 .setButton {
   flex-grow: 1;
   margin: 0 8px;
+  border-radius: 20px;
+  font-weight: bold;
 }
 
 .setRow {
   align-items: center;
+  margin-bottom: 8px;
 }
 
 .checkboxContainer {
@@ -57,17 +63,44 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  margin-bottom: 16px;
+  border-bottom: 0.5px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.workoutTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .deleteButton {
   margin: 0;
   padding: 8px;
-  padding-top: 0;
   min-width: 36px;
+}
+
+.setContent {
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.volumeDisplay {
+  color: #757575;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.setHeader {
+  margin-bottom: 8px;
+  font-weight: bold;
 }
 
 @media (max-width: 600px) {
   .input {
-    width: 60px;
+    max-width: 80px;
   }
 }
