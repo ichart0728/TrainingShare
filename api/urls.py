@@ -17,5 +17,6 @@ urlpatterns = [
     path('profiles/<uuid:user_id>/', views.ProfileListView.as_view(), name='profile-detail'),
     path('posts/<uuid:user_id>/', views.PostListView.as_view(), name='user-posts'),
     path('training_menus/', views.BodyPartWithMenusView.as_view(), name='training_menus'),
+    path('my_training_sessions/', views.TrainingSessionListView.as_view(), name='my-trainings'),
     path('', include(router.urls))
 ]

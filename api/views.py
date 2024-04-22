@@ -107,15 +107,12 @@ class TrainingSessionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.TrainingSessionSerializer
 
     def create(self, request, *args, **kwargs):
-        print("====================================================================================================================================================")
         print("Creating a new training session with data: %s", request.data)
         # トレーニングセッションデータを含むリクエストデータの処理
         session_serializer = self.get_serializer(data=request.data)
         print("session_serializer: %s", session_serializer)
-        print("session_serializer.is_valid???????")
 
         session_serializer.is_valid(raise_exception=True)
-        print("session_serializer.is_valid()")
         self.perform_create(session_serializer)
         print("perform_created!")
 
@@ -135,9 +132,10 @@ class TrainingSessionListView(generics.ListAPIView):
 
     def get_queryset(self):
         """
-        指定したユーザーのトレーニングセッションとその記録を取得する
+        ログインしているユーザーのトレーニングセッションとその記録を取得する
         """
-        user_id = self.kwargs['user_id']
-        return TrainingSession.objects.filter(user_id=user_id).prefetch_related(
-            'records__sets'  # TrainingRecordとTrainingSetをプリフェッチ
-        )
+        # 認証されたユーザーのIDを使用してクエリを実行
+        user = self.request.user
+        if not user.is_authenticated:
+            return TrainingSession.objects.none()  # 認証されていない場合は空のクエリセットを返す
+        return TrainingSession.objects.filter(user=user).prefetch_related('workouts__sets')

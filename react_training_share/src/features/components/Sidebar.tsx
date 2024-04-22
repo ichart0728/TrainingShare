@@ -64,8 +64,12 @@ const Sidebar = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  // const handleHomeClick = () => {
+  //   navigate("/");
+  //   setMobileOpen(false);
+  // };
   const handleHomeClick = () => {
-    navigate("/");
+    navigate("/workout_history");
     setMobileOpen(false);
   };
 

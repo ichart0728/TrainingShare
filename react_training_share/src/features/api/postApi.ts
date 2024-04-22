@@ -74,24 +74,11 @@ export const fetchAsyncPatchLiked = createAsyncThunk(
   }
 );
 
-/*コメントの一覧を取得*/
-export const fetchAsyncGetComments = createAsyncThunk(
-  "comment/get",
-  async () => {
-    const res = await axios.get(apiUrlComment, {
-      headers: {
-        Authorization: `JWT ${localStorage.localJWT}`,
-      },
-    });
-    return res.data;
-  }
-);
-
-/*コメント新規作成*/
-export const fetchAsyncPostComment = createAsyncThunk(
-  "comment/post",
-  async (comment: PROPS_COMMENT) => {
-    const res = await axios.post(apiUrlComment, comment, {
+/*指定したユーザーの投稿一覧取得*/
+export const fetchAsyncGetUserPosts = createAsyncThunk(
+  "profile/getUserPosts",
+  async (userId: string) => {
+    const res = await axios.get(`${apiUrlPost}${userId}/`, {
       headers: {
         Authorization: `JWT ${localStorage.localJWT}`,
       },

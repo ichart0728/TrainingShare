@@ -4,7 +4,8 @@ import { Avatar, Button, Grid, Typography } from "@material-ui/core";
 import PostCard from "../post/PostCard";
 import styles from "./Profile.module.css";
 import { useEffect, useState } from "react";
-import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "../api/profileApi";
+import { fetchAsyncGetProf } from "../api/profileApi";
+import { fetchAsyncGetUserPosts } from "../api/postApi";
 import { AppDispatch } from "../../app/store";
 import { CircularProgress } from "@material-ui/core";
 

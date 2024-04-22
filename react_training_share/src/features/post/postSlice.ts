@@ -4,10 +4,13 @@ import { RootState } from "../../app/store";
 import {
   fetchAsyncGetPosts,
   fetchAsyncNewPost,
-  fetchAsyncGetComments,
-  fetchAsyncPostComment,
   fetchAsyncPatchLiked,
 } from "../api/postApi";
+
+import {
+  fetchAsyncGetComments,
+  fetchAsyncPostComment,
+} from "../api/commentApi";
 
 import { logout } from "../auth/authSlice";
 

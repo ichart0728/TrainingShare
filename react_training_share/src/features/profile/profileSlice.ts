@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 
-import { fetchAsyncGetProf, fetchAsyncGetUserPosts } from "../api/profileApi";
+import { fetchAsyncGetProf } from "../api/profileApi";
+import { fetchAsyncGetUserPosts } from "../api/postApi";
 
 import { logout } from "../auth/authSlice";
 

@@ -6,7 +6,8 @@ import Modal from "react-modal";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, CircularProgress } from "@material-ui/core";
-import { fetchAsyncGetPosts, fetchAsyncGetComments } from "../api/postApi";
+import { fetchAsyncGetPosts } from "../api/postApi";
+import { fetchAsyncGetComments } from "../api/commentApi";
 import { fetchAsyncGetTrainingMenus } from "../api/trainingMenuApi";
 import {
   selectIsLoadingAuth,

@@ -5,6 +5,7 @@ import postReducer from "../features/post/postSlice";
 import profileReducer from "../features/profile/profileSlice";
 import workoutReducer from "../features/workout/workoutSlice";
 import trainingReducer from "../features/training/trainingSlice";
+import workoutHistoryReducer from "../features/workout_history/workoutHistorySlice";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     profile: profileReducer,
     workout: workoutReducer,
     training: trainingReducer,
+    workoutHistory: workoutHistoryReducer,
   },
 });
 

@@ -9,7 +9,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { selectProfiles } from "../auth/authSlice";
 import { selectComments, fetchPostStart, fetchPostEnd } from "./postSlice";
-import { fetchAsyncPostComment, fetchAsyncPatchLiked } from "../api/postApi";
+import { fetchAsyncPatchLiked } from "../api/postApi";
+import { fetchAsyncPostComment } from "../api/commentApi";
+
 import { setUserProfileId } from "../profile/profileSlice";
 import { PROPS_POST } from "../types";
 
