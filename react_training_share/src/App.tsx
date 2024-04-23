@@ -7,7 +7,7 @@ import Auth from "./features/auth/Auth";
 import Home from "./features/home/Home";
 import Workout from "./features/workout/Workout";
 import Profile from "./features/profile/Profile";
-// import WorkoutHistory from "./features/workout_history/WorkoutHistory";
+import WorkoutHistory from "./features/workout_history/WorkoutHistory";
 
 function App() {
   const nickName = useSelector(
@@ -32,10 +32,10 @@ function App() {
               path="/profile/:nickname"
               element={nickName ? <Profile /> : <Navigate to="/" />}
             />
-            {/* <Route
+            <Route
               path="/workout_history"
               element={nickName ? <WorkoutHistory /> : <Navigate to="/" />}
-            />{" "} */}
+            />{" "}
           </Routes>
         </main>
       </div>
