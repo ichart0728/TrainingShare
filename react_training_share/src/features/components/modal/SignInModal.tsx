@@ -1,42 +1,40 @@
 import React, { useState } from "react";
-import { AppDispatch } from "../../app/store";
+import { AppDispatch } from "../../../app/store";
 import { useSelector, useDispatch } from "react-redux";
 import styles from "./Modal.module.css";
 import Modal from "react-modal";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, CircularProgress } from "@material-ui/core";
-import { fetchAsyncGetPosts } from "../api/postApi";
-import { fetchAsyncGetComments } from "../api/commentApi";
-
+import { fetchAsyncGetPosts } from "../../api/postApi";
+import { fetchAsyncGetComments } from "../../api/commentApi";
+import { fetchAsyncGetTrainingMenus } from "../../api/trainingMenuApi";
 import {
   selectIsLoadingAuth,
-  selectOpenSignUp,
-  setOpenSignIn,
-  resetOpenSignUp,
+  selectOpenSignIn,
+  setOpenSignUp,
+  resetOpenSignIn,
   fetchCredStart,
   fetchCredEnd,
-} from "../auth/authSlice";
+} from "../../auth/authSlice";
 import {
   fetchAsyncLogin,
-  fetchAsyncRegister,
-  fetchAsyncCreateProf,
   fetchAsyncGetProfs,
   fetchAsyncGetMyProf,
-} from "../api/authApi";
+} from "../../api/authApi";
 
-const SignUpModal: React.FC = () => {
+const SignInModal: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const openSignUp = useSelector(selectOpenSignUp);
+  const openSignIn = useSelector(selectOpenSignIn);
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
-  const [signUpError, setSignUpError] = useState("");
+  const [loginError, setLoginError] = useState("");
 
   return (
     <Modal
-      isOpen={openSignUp}
+      isOpen={openSignIn}
       onRequestClose={async () => {
-        await dispatch(resetOpenSignUp());
-        setSignUpError("");
+        await dispatch(resetOpenSignIn());
+        setLoginError("");
       }}
       className={styles.modal}
       overlayClassName={styles.modalOverlay}
@@ -47,24 +45,17 @@ const SignUpModal: React.FC = () => {
           initialValues={{ email: "", password: "" }}
           onSubmit={async (values) => {
             await dispatch(fetchCredStart());
-            const resultReg = await dispatch(fetchAsyncRegister(values));
-            if (fetchAsyncRegister.fulfilled.match(resultReg)) {
-              await dispatch(fetchAsyncLogin(values));
-              await dispatch(fetchAsyncCreateProf({ nickName: "anonymous" }));
+            const result = await dispatch(fetchAsyncLogin(values));
+            if (fetchAsyncLogin.fulfilled.match(result)) {
               await dispatch(fetchAsyncGetProfs());
               await dispatch(fetchAsyncGetPosts());
               await dispatch(fetchAsyncGetComments());
               await dispatch(fetchAsyncGetMyProf());
-              await dispatch(resetOpenSignUp());
+              await dispatch(fetchAsyncGetMyProf());
+              await dispatch(fetchAsyncGetTrainingMenus());
+              await dispatch(resetOpenSignIn());
             } else {
-              if (
-                resultReg.payload &&
-                (resultReg.payload as { email?: string }).email
-              ) {
-                setSignUpError("This email is already registered");
-              } else {
-                setSignUpError("Error occurred during sign up");
-              }
+              setLoginError("Invalid email or password");
             }
             await dispatch(fetchCredEnd());
           }}
@@ -103,8 +94,8 @@ const SignUpModal: React.FC = () => {
               {touched.password && errors.password && (
                 <div className={styles.authError}>{errors.password}</div>
               )}
-              {signUpError && (
-                <div className={styles.authError}>{signUpError}</div>
+              {loginError && (
+                <div className={styles.authError}>{loginError}</div>
               )}
               <Button
                 variant="contained"
@@ -114,17 +105,17 @@ const SignUpModal: React.FC = () => {
                 fullWidth
                 style={{ marginTop: "20px" }}
               >
-                Register
+                Login
               </Button>
               <span
                 className={styles.authText}
                 onClick={async () => {
-                  await dispatch(setOpenSignIn());
-                  await dispatch(resetOpenSignUp());
+                  await dispatch(resetOpenSignIn());
+                  await dispatch(setOpenSignUp());
                 }}
                 style={{ marginTop: "20px" }}
               >
-                You already have an account?
+                You don't have an account?
               </span>
             </Form>
           )}
@@ -134,4 +125,4 @@ const SignUpModal: React.FC = () => {
   );
 };
 
-export default SignUpModal;
+export default SignInModal;
