@@ -112,7 +112,7 @@
   gap: 20px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   .volumeAndTimerContainer {
     flex-direction: column;
     align-items: center;
