@@ -1,10 +1,11 @@
 // BodyPartChart.tsx
 
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
-import { Tabs, Tab, useMediaQuery, useTheme } from "@material-ui/core";
+import { Pie, Line } from "react-chartjs-2";
+import { Tabs, Tab } from "@material-ui/core";
 import styles from "./BodyPartChart.module.css";
 import {
+  ArcElement,
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
@@ -18,6 +19,7 @@ import {
 import "chartjs-adapter-date-fns";
 
 ChartJS.register(
+  ArcElement,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -28,18 +30,6 @@ ChartJS.register(
   Legend
 );
 
-interface DataSet {
-  label: string;
-  data: { x: string; y: number }[];
-  borderColor: string;
-  fill: boolean;
-}
-
-interface ChartData {
-  labels: string[];
-  datasets: DataSet[];
-}
-
 interface WorkoutChartProps {
   trainingSessions: any[];
   selectedTab: number;
@@ -48,12 +38,12 @@ interface WorkoutChartProps {
 }
 
 const bodyPartColors: { [key: number]: string } = {
-  1: "#FF6384",
-  2: "#36A2EB",
-  3: "#FFCE56",
-  4: "#4BC0C0",
-  5: "#9966FF",
-  6: "#FF9F40",
+  1: "#3498DB", // 明るいブルー
+  2: "#2ECC71", // 明るいグリーン
+  3: "#F39C12", // 明るいオレンジ
+  4: "#1ABC9C", // ティール
+  5: "#9B59B6", // アメジスト
+  6: "#34495E", // アスファルト（ダークグレー）
 };
 
 const WorkoutChart: React.FC<WorkoutChartProps> = ({
@@ -62,12 +52,17 @@ const WorkoutChart: React.FC<WorkoutChartProps> = ({
   onTabChange,
   trainingMenus,
 }) => {
-  const [chartData, setChartData] = useState<ChartData>({
+  const [lineChartData, setLineChartData] = useState<any>({
+    labels: [],
+    datasets: [],
+  });
+  const [doughnutChartData, setDoughnutChartData] = useState<any>({
     labels: [],
     datasets: [],
   });
 
   useEffect(() => {
+    // 線グラフデータの設定
     const labels = trainingSessions.map(
       (session) => new Date(session.date).toISOString().split("T")[0]
     );
@@ -95,55 +90,92 @@ const WorkoutChart: React.FC<WorkoutChartProps> = ({
       fill: false,
     }));
 
-    setChartData({ labels, datasets });
-  }, [trainingSessions, trainingMenus]);
+    setLineChartData({ labels, datasets });
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    // 円グラフデータの設定
+    const doughnutData = trainingMenus.map((part) =>
+      trainingSessions.reduce(
+        (acc, session) =>
+          acc +
+          session.workouts
+            .filter(
+              (workout: { body_part: string }) =>
+                Number(workout.body_part) === part.id
+            )
+            .reduce(
+              (sum: number, workout: { body_part: string; sets: any[] }) =>
+                sum +
+                workout.sets.reduce(
+                  (setSum, set) => setSum + set.weight * set.reps,
+                  0
+                ),
+              0
+            ),
+        0
+      )
+    );
+    setDoughnutChartData({
+      labels: trainingMenus.map((part) => part.name),
+      datasets: [
+        {
+          data: doughnutData,
+          backgroundColor: trainingMenus.map((part) => bodyPartColors[part.id]),
+          label: "Workout Distribution",
+        },
+      ],
+    });
+  }, [trainingSessions, trainingMenus]);
 
   return (
     <div className={styles.container}>
-      <Tabs
-        value={selectedTab}
-        onChange={onTabChange}
-        aria-label="body part tabs"
-        // variant={isMobile ? "scrollable" : "standard"}
-        // scrollButtons={isMobile ? "on" : "auto"}
-        variant="scrollable"
-        scrollButtons="on"
-        className={styles.tabsContainer}
-      >
-        <Tab label="すべて" className={styles.tab} />
-        {trainingMenus.map((part) => (
-          <Tab label={part.name} key={part.id} className={styles.tab} />
-        ))}
-      </Tabs>
-      <div className={styles.chartContainer}>
-        <Line
-          data={{
-            labels: chartData.labels,
-            datasets:
-              selectedTab === 0
-                ? chartData.datasets
-                : [chartData.datasets[selectedTab - 1]],
-          }}
-          options={{
-            scales: {
-              x: {
-                type: "time",
-                time: { unit: "day", displayFormats: { day: "yyyy-MM-dd" } },
-                display: window.screen.width > 414,
+      <div className={styles.lineChart}>
+        <Tabs
+          value={selectedTab}
+          onChange={onTabChange}
+          aria-label="body part tabs"
+          variant="scrollable"
+          scrollButtons="on"
+          className={styles.tabsContainer}
+        >
+          <Tab label="すべて" className={styles.tab} />
+          {trainingMenus.map((part) => (
+            <Tab label={part.name} key={part.id} className={styles.tab} />
+          ))}
+        </Tabs>
+        <div className={styles.chartContainer}>
+          <Line
+            data={{
+              labels: lineChartData.labels,
+              datasets:
+                selectedTab === 0
+                  ? lineChartData.datasets
+                  : [lineChartData.datasets[selectedTab - 1]],
+            }}
+            options={{
+              scales: {
+                x: {
+                  type: "time",
+                  time: { unit: "day", displayFormats: { day: "yyyy-MM-dd" } },
+                  display: window.screen.width > 414,
+                },
+                y: {
+                  beginAtZero: true,
+                  display: window.screen.width > 414,
+                },
               },
-              y: {
-                beginAtZero: true,
-                display: window.screen.width > 414,
-              },
-            },
-            // responsive: true,
-            maintainAspectRatio: false,
-          }}
-          className={styles.chart}
-        />
+              maintainAspectRatio: false,
+            }}
+            className={styles.chart}
+          />
+        </div>
+      </div>
+      <div>
+        <div className={styles.chartContainer}>
+          <Pie
+            data={doughnutChartData}
+            options={{ maintainAspectRatio: false }}
+          />
+        </div>
       </div>
     </div>
   );
