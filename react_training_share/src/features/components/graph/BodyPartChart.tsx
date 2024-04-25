@@ -13,6 +13,7 @@ import {
   TimeScale,
   Title,
   Tooltip,
+  Legend,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 
@@ -23,7 +24,8 @@ ChartJS.register(
   LineElement,
   TimeScale,
   Title,
-  Tooltip
+  Tooltip,
+  Legend
 );
 
 interface DataSet {
@@ -101,13 +103,14 @@ const WorkoutChart: React.FC<WorkoutChartProps> = ({
 
   return (
     <div className={styles.container}>
-      {/* <div className={styles.tabsContainer}> */}
       <Tabs
         value={selectedTab}
         onChange={onTabChange}
         aria-label="body part tabs"
-        variant={isMobile ? "scrollable" : "standard"}
-        scrollButtons={isMobile ? "on" : "auto"}
+        // variant={isMobile ? "scrollable" : "standard"}
+        // scrollButtons={isMobile ? "on" : "auto"}
+        variant="scrollable"
+        scrollButtons="on"
         className={styles.tabsContainer}
       >
         <Tab label="すべて" className={styles.tab} />
@@ -115,9 +118,8 @@ const WorkoutChart: React.FC<WorkoutChartProps> = ({
           <Tab label={part.name} key={part.id} className={styles.tab} />
         ))}
       </Tabs>
-      {/* </div> */}
       <div className={styles.chartContainer}>
-        {/* <Line
+        <Line
           data={{
             labels: chartData.labels,
             datasets:
@@ -130,14 +132,18 @@ const WorkoutChart: React.FC<WorkoutChartProps> = ({
               x: {
                 type: "time",
                 time: { unit: "day", displayFormats: { day: "yyyy-MM-dd" } },
+                display: window.screen.width > 414,
               },
-              y: { beginAtZero: true },
+              y: {
+                beginAtZero: true,
+                display: window.screen.width > 414,
+              },
             },
-            responsive: true,
+            // responsive: true,
             maintainAspectRatio: false,
           }}
           className={styles.chart}
-        /> */}
+        />
       </div>
     </div>
   );
