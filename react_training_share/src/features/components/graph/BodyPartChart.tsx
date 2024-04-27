@@ -30,11 +30,36 @@ ChartJS.register(
   Legend
 );
 
+interface Set {
+  id: string;
+  weight: number;
+  reps: number;
+  completed: boolean;
+}
+
+interface Workout {
+  id: string;
+  menu: string;
+  body_part: string;
+  sets: Set[];
+}
+
+interface TrainingSession {
+  id: string;
+  date: string;
+  duration: number;
+  workouts: Workout[];
+}
+
+interface TrainingMenu {
+  id: number;
+  name: string;
+}
 interface WorkoutChartProps {
-  trainingSessions: any[];
+  trainingSessions: TrainingSession[];
   selectedTab: number;
   onTabChange: (event: ChangeEvent<{}>, newValue: number) => void;
-  trainingMenus: { id: number; name: string }[];
+  trainingMenus: TrainingMenu[];
 }
 
 const bodyPartColors: { [key: number]: string } = {
@@ -61,22 +86,47 @@ const WorkoutChart: React.FC<WorkoutChartProps> = ({
     datasets: [],
   });
 
+  const aggregateSessionsByDate = (sessions: TrainingSession[]) => {
+    return sessions.reduce((acc: TrainingSession[], session) => {
+      const existingIndex = acc.findIndex((s) => s.date === session.date);
+      if (existingIndex !== -1) {
+        // 既存のセッションがあれば、新しいworkoutsを追加して新しいセッションオブジェクトを作成
+        const newSession = {
+          ...acc[existingIndex],
+          workouts: [...acc[existingIndex].workouts, ...session.workouts],
+        };
+        // 既存のセッションを新しいもので置き換え
+        const newAcc = [...acc];
+        newAcc[existingIndex] = newSession;
+        return newAcc;
+      } else {
+        // 新しい日付の場合は、そのまま追加
+        return [...acc, session];
+      }
+    }, []);
+  };
+
   useEffect(() => {
+    // 本日から過去1ヶ月の日付を取得
+    const labels = [
+      new Date(new Date().setDate(new Date().getDate() - 7))
+        .toISOString()
+        .split("T")[0],
+      new Date().toISOString().split("T")[0],
+    ];
+
+    // trainingMenusから日付ごとにトレーニングメニューの合計重量を取得
+    const aggregatedSessions = aggregateSessionsByDate(trainingSessions);
+
     // 線グラフデータの設定
-    const labels = trainingSessions.map(
-      (session) => new Date(session.date).toISOString().split("T")[0]
-    );
     const datasets = trainingMenus.map((part) => ({
       label: part.name,
-      data: trainingSessions.map((session) => ({
+      data: aggregatedSessions.map((session: TrainingSession) => ({
         x: session.date,
         y: session.workouts
-          .filter(
-            (workout: { body_part: string }) =>
-              Number(workout.body_part) === part.id
-          )
+          .filter((workout: Workout) => Number(workout.body_part) === part.id)
           .reduce(
-            (acc: number, workout: { body_part: string; sets: any[] }) =>
+            (acc: number, workout: Workout) =>
               acc +
               workout.sets.reduce(
                 (accSet, set) => accSet + set.weight * set.reps,
@@ -95,15 +145,12 @@ const WorkoutChart: React.FC<WorkoutChartProps> = ({
     // 円グラフデータの設定
     const doughnutData = trainingMenus.map((part) =>
       trainingSessions.reduce(
-        (acc, session) =>
+        (acc, session: TrainingSession) =>
           acc +
           session.workouts
-            .filter(
-              (workout: { body_part: string }) =>
-                Number(workout.body_part) === part.id
-            )
+            .filter((workout: Workout) => Number(workout.body_part) === part.id)
             .reduce(
-              (sum: number, workout: { body_part: string; sets: any[] }) =>
+              (sum: number, workout: Workout) =>
                 sum +
                 workout.sets.reduce(
                   (setSum, set) => setSum + set.weight * set.reps,
@@ -156,7 +203,7 @@ const WorkoutChart: React.FC<WorkoutChartProps> = ({
                 x: {
                   type: "time",
                   time: { unit: "day", displayFormats: { day: "yyyy-MM-dd" } },
-                  display: window.screen.width > 414,
+                  display: window.screen.width > 414 ? true : false,
                 },
                 y: {
                   beginAtZero: true,
