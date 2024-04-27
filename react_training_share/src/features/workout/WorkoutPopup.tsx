@@ -12,6 +12,7 @@ import {
 import styles from "./WorkoutPopup.module.css";
 import React, { useState } from "react";
 import { WorkoutDisplay, addWorkout } from "./workoutSlice";
+import { AppDispatch } from "../../app/store";
 import { v4 as uuidv4 } from "uuid";
 
 const WorkoutPopup = ({
@@ -21,7 +22,7 @@ const WorkoutPopup = ({
   open: boolean;
   onClose: () => void;
 }) => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const [selectedMenus, setSelectedMenus] = useState<number[]>([]); // 選択されたメニューのIDを保持
   const [currentTab, setCurrentTab] = useState(0);
   const trainingMenus = useSelector(

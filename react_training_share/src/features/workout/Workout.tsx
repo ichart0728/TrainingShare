@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { WorkoutDisplay, startTimer, stopTimer } from "./workoutSlice";
 import { fetchAsyncPostTrainingSessions } from "../api/workoutApi";
 import { WORKOUT_POST } from "../types";
-
+import { AppDispatch } from "../../app/store";
 import styles from "./Workout.module.css";
 import WorkoutPopup from "./WorkoutPopup";
 import {
@@ -28,7 +28,7 @@ import PauseIcon from "@material-ui/icons/Pause";
 import ReplayIcon from "@material-ui/icons/Replay";
 
 const Workout = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const selectedWorkouts = useSelector(
     (state: RootState) => state.workout.workouts

@@ -16,6 +16,7 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import { addSet, deleteSet, removeWorkout } from "../workout/workoutSlice";
+import { AppDispatch } from "../../app/store";
 import {
   Dialog,
   DialogActions,
@@ -29,7 +30,7 @@ interface WorkoutItemProps {
 }
 
 const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [completed, setCompleted] = useState(workout.sets.map(() => false));
   // store.training.trainingMenuを取得する
