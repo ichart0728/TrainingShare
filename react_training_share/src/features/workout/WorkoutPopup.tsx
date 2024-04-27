@@ -35,16 +35,27 @@ const WorkoutPopup = ({
   const handleToggle = (menuId: number) => {
     const index = selectedMenus.indexOf(menuId);
     if (index === -1) {
+      // 選択されていない場合
+      // 選択されたメニューのIDを追加
       setSelectedMenus([...selectedMenus, menuId]);
     } else {
+      // 選択されている場合
+      // 選択されたメニューのIDを削除
       setSelectedMenus(selectedMenus.filter((id) => id !== menuId));
     }
+    console.log("selectedMenus1: ", selectedMenus);
   };
 
   const handleAddTraining = () => {
+    // menuId: トレーニングメニューのID
     selectedMenus.forEach((menuId) => {
+      // body_part: 部位のID
       const body_part = trainingMenus[currentTab].id;
-      const menu = trainingMenus.find((menu) => menu.id === menuId);
+      // 選択された部位に含まれるトレーニングメニューを取得
+      const training_menus = trainingMenus[currentTab].training_menus;
+      // 選択されたトレーニングメニューの情報を取得
+      const menu = training_menus.find((menu) => menu.id === menuId);
+
       if (menu) {
         const workoutDisplay: WorkoutDisplay = {
           id: uuidv4(),
