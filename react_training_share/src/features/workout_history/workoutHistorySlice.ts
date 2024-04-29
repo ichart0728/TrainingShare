@@ -12,7 +12,7 @@ interface TrainingSet {
 interface TrainingRecord {
   id: string;
   menu: string;
-  body_part: string;
+  body_part: number;
   sets: TrainingSet[];
 }
 

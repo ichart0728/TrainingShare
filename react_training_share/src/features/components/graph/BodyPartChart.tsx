@@ -17,7 +17,7 @@ interface Set {
 interface Workout {
   id: string;
   menu: string;
-  body_part: string;
+  body_part: number;
   sets: Set[];
 }
 

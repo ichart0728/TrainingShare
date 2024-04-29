@@ -13,7 +13,7 @@ interface TrainingSession {
   workouts: {
     id: string;
     menu: string;
-    body_part: string;
+    body_part: number;
     sets: {
       id: string;
       weight: number;
