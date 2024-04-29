@@ -6,6 +6,8 @@ from rest_framework.permissions import AllowAny
 from . import serializers
 from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession
 from rest_framework.exceptions import ValidationError
+from django.utils import timezone
+import datetime
 
 # 新規ユーザー作成用View
 class CreateUserView(generics.CreateAPIView):
@@ -133,9 +135,14 @@ class TrainingSessionListView(generics.ListAPIView):
     def get_queryset(self):
         """
         ログインしているユーザーのトレーニングセッションとその記録を取得する
+        過去半年間のデータのみを取得
         """
-        # 認証されたユーザーのIDを使用してクエリを実行
         user = self.request.user
         if not user.is_authenticated:
             return TrainingSession.objects.none()  # 認証されていない場合は空のクエリセットを返す
-        return TrainingSession.objects.filter(user=user).prefetch_related('workouts__sets')
+
+        # 現在日付から半年前の日付を計算
+        six_months_ago = timezone.now() - datetime.timedelta(days=180)
+
+        # 過去半年間のデータのみをフィルタリングして取得
+        return TrainingSession.objects.filter(user=user, date__gte=six_months_ago).prefetch_related('workouts__sets')

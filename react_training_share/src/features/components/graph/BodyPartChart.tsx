@@ -1,33 +1,38 @@
 // BodyPartChart.tsx
 
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { Pie, Line } from "react-chartjs-2";
+import React from "react";
 import { Tabs, Tab } from "@material-ui/core";
 import styles from "./BodyPartChart.module.css";
 import {
   ArcElement,
   Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
+  RadialLinearScale,
   PointElement,
   LineElement,
-  TimeScale,
-  Title,
+  Filler,
   Tooltip,
   Legend,
+  TimeScale,
+  CategoryScale,
+  LinearScale,
 } from "chart.js";
+
 import "chartjs-adapter-date-fns";
+import LineChartComponent from "./LineChartComponent";
+import PieChartComponent from "./PieChartComponent";
+import RadarChartComponent from "./RadarChartComponent";
 
 ChartJS.register(
   ArcElement,
-  CategoryScale,
-  LinearScale,
+  RadialLinearScale,
   PointElement,
   LineElement,
-  TimeScale,
-  Title,
+  Filler,
   Tooltip,
-  Legend
+  Legend,
+  TimeScale,
+  CategoryScale,
+  LinearScale
 );
 
 interface Set {
@@ -57,8 +62,6 @@ interface TrainingMenu {
 }
 interface WorkoutChartProps {
   trainingSessions: TrainingSession[];
-  selectedTab: number;
-  onTabChange: (event: ChangeEvent<{}>, newValue: number) => void;
   trainingMenus: TrainingMenu[];
 }
 
@@ -73,112 +76,18 @@ const bodyPartColors: { [key: number]: string } = {
 
 const WorkoutChart: React.FC<WorkoutChartProps> = ({
   trainingSessions,
-  selectedTab,
-  onTabChange,
   trainingMenus,
 }) => {
-  const [lineChartData, setLineChartData] = useState<any>({
-    labels: [],
-    datasets: [],
-  });
-  const [doughnutChartData, setDoughnutChartData] = useState<any>({
-    labels: [],
-    datasets: [],
-  });
-
-  const aggregateSessionsByDate = (sessions: TrainingSession[]) => {
-    return sessions.reduce((acc: TrainingSession[], session) => {
-      const existingIndex = acc.findIndex((s) => s.date === session.date);
-      if (existingIndex !== -1) {
-        // 既存のセッションがあれば、新しいworkoutsを追加して新しいセッションオブジェクトを作成
-        const newSession = {
-          ...acc[existingIndex],
-          workouts: [...acc[existingIndex].workouts, ...session.workouts],
-        };
-        // 既存のセッションを新しいもので置き換え
-        const newAcc = [...acc];
-        newAcc[existingIndex] = newSession;
-        return newAcc;
-      } else {
-        // 新しい日付の場合は、そのまま追加
-        return [...acc, session];
-      }
-    }, []);
+  const [selectedTab, setSelectedTab] = React.useState(0);
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setSelectedTab(newValue);
   };
-
-  useEffect(() => {
-    // 本日から過去1ヶ月の日付を取得
-    const labels = [
-      new Date(new Date().setDate(new Date().getDate() - 7))
-        .toISOString()
-        .split("T")[0],
-      new Date().toISOString().split("T")[0],
-    ];
-
-    // trainingMenusから日付ごとにトレーニングメニューの合計重量を取得
-    const aggregatedSessions = aggregateSessionsByDate(trainingSessions);
-
-    // 線グラフデータの設定
-    const datasets = trainingMenus.map((part) => ({
-      label: part.name,
-      data: aggregatedSessions.map((session: TrainingSession) => ({
-        x: session.date,
-        y: session.workouts
-          .filter((workout: Workout) => Number(workout.body_part) === part.id)
-          .reduce(
-            (acc: number, workout: Workout) =>
-              acc +
-              workout.sets.reduce(
-                (accSet, set) => accSet + set.weight * set.reps,
-                0
-              ),
-            0
-          ),
-      })),
-      borderColor: bodyPartColors[part.id],
-      backgroundColor: bodyPartColors[part.id],
-      fill: false,
-    }));
-
-    setLineChartData({ labels, datasets });
-
-    // 円グラフデータの設定
-    const doughnutData = trainingMenus.map((part) =>
-      trainingSessions.reduce(
-        (acc, session: TrainingSession) =>
-          acc +
-          session.workouts
-            .filter((workout: Workout) => Number(workout.body_part) === part.id)
-            .reduce(
-              (sum: number, workout: Workout) =>
-                sum +
-                workout.sets.reduce(
-                  (setSum, set) => setSum + set.weight * set.reps,
-                  0
-                ),
-              0
-            ),
-        0
-      )
-    );
-    setDoughnutChartData({
-      labels: trainingMenus.map((part) => part.name),
-      datasets: [
-        {
-          data: doughnutData,
-          backgroundColor: trainingMenus.map((part) => bodyPartColors[part.id]),
-          label: "Workout Distribution",
-        },
-      ],
-    });
-  }, [trainingSessions, trainingMenus]);
-
   return (
     <div className={styles.container}>
-      <div className={styles.lineChart}>
+      <div className={styles.chart}>
         <Tabs
           value={selectedTab}
-          onChange={onTabChange}
+          onChange={handleTabChange}
           aria-label="body part tabs"
           variant="scrollable"
           scrollButtons="on"
@@ -190,37 +99,30 @@ const WorkoutChart: React.FC<WorkoutChartProps> = ({
           ))}
         </Tabs>
         <div className={styles.chartContainer}>
-          <Line
-            data={{
-              labels: lineChartData.labels,
-              datasets:
-                selectedTab === 0
-                  ? lineChartData.datasets
-                  : [lineChartData.datasets[selectedTab - 1]],
-            }}
-            options={{
-              scales: {
-                x: {
-                  type: "time",
-                  time: { unit: "day", displayFormats: { day: "yyyy-MM-dd" } },
-                  display: window.screen.width > 414 ? true : false,
-                },
-                y: {
-                  beginAtZero: true,
-                  display: window.screen.width > 414,
-                },
-              },
-              maintainAspectRatio: false,
-            }}
-            className={styles.chart}
+          <div className={styles.chart}>
+            <LineChartComponent
+              trainingSessions={trainingSessions}
+              trainingMenus={trainingMenus}
+              selectedTab={selectedTab}
+              bodyPartColors={bodyPartColors}
+            />
+          </div>
+        </div>
+      </div>
+      <div className={styles.chart}>
+        <div>
+          <PieChartComponent
+            trainingSessions={trainingSessions}
+            trainingMenus={trainingMenus}
+            bodyPartColors={bodyPartColors}
           />
         </div>
       </div>
-      <div>
-        <div className={styles.chartContainer}>
-          <Pie
-            data={doughnutChartData}
-            options={{ maintainAspectRatio: false }}
+      <div className={styles.chart}>
+        <div>
+          <RadarChartComponent
+            trainingSessions={trainingSessions}
+            trainingMenus={trainingMenus}
           />
         </div>
       </div>
