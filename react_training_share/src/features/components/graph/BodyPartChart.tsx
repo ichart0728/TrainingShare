@@ -3,37 +3,9 @@
 import React from "react";
 import { Tabs, Tab } from "@material-ui/core";
 import styles from "./BodyPartChart.module.css";
-import {
-  ArcElement,
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-  TimeScale,
-  CategoryScale,
-  LinearScale,
-} from "chart.js";
-
-import "chartjs-adapter-date-fns";
 import LineChartComponent from "./LineChartComponent";
 import PieChartComponent from "./PieChartComponent";
 import RadarChartComponent from "./RadarChartComponent";
-
-ChartJS.register(
-  ArcElement,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-  TimeScale,
-  CategoryScale,
-  LinearScale
-);
 
 interface Set {
   id: string;
