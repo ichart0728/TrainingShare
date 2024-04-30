@@ -41,7 +41,7 @@ const RadarChartComponent: React.FC<PROPS_RADAR_CHART> = ({
       labels: frequencyData.map((item) => item.name),
       datasets: [
         {
-          label: "Training Frequency Last Month",
+          label: "過去1ヶ月のトレーニング頻度",
           backgroundColor: "rgba(34, 202, 236, 0.2)",
           borderColor: "rgba(34, 202, 236, 1)",
           pointBackgroundColor: "rgba(34, 202, 236, 1)",
