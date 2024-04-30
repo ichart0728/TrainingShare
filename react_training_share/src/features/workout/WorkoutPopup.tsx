@@ -1,5 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../app/store";
+import React, { useState } from "react";
 import {
   Checkbox,
   FormControlLabel,
@@ -9,11 +8,15 @@ import {
   Box,
   Typography,
 } from "@material-ui/core";
-import styles from "./WorkoutPopup.module.css";
-import React, { useState } from "react";
-import { PROPS_WORKOUT_DISPLAY, addWorkout } from "./workoutSlice";
-import { AppDispatch } from "../../app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../app/store";
 import { v4 as uuidv4 } from "uuid";
+import { PROPS_WORKOUT_DISPLAY, addWorkout } from "./workoutSlice";
+import styles from "./WorkoutPopup.module.css";
+
+interface MenuSelection {
+  [key: number]: number[]; // タブのインデックスごとに選択されたメニューIDのリストを保持
+}
 
 const WorkoutPopup = ({
   open,
@@ -23,8 +26,11 @@ const WorkoutPopup = ({
   onClose: () => void;
 }) => {
   const dispatch: AppDispatch = useDispatch();
-  const [selectedMenus, setSelectedMenus] = useState<number[]>([]); // 選択されたメニューのIDを保持
+  // タブごとに選択されたメニューを保持する
+  const [menuSelections, setMenuSelections] = useState<MenuSelection>({});
+  // 現在のタブ
   const [currentTab, setCurrentTab] = useState(0);
+  // トレーニングメニューのリスト
   const trainingMenus = useSelector(
     (state: RootState) => state.training.trainingMenus
   );
@@ -34,45 +40,47 @@ const WorkoutPopup = ({
   };
 
   const handleToggle = (menuId: number) => {
-    const index = selectedMenus.indexOf(menuId);
-    if (index === -1) {
-      // 選択されていない場合
-      // 選択されたメニューのIDを追加
-      setSelectedMenus([...selectedMenus, menuId]);
-    } else {
-      // 選択されている場合
-      // 選択されたメニューのIDを削除
-      setSelectedMenus(selectedMenus.filter((id) => id !== menuId));
-    }
-    console.log("selectedMenus1: ", selectedMenus);
+    // 現在のタブの選択されたメニューIDリストを取得
+    const currentSelections = menuSelections[currentTab] || [];
+    // 選択されたメニューIDが既に選択されているかを確認
+    const index = currentSelections.indexOf(menuId);
+    // 選択されていない場合は追加、選択されている場合は削除
+    const updatedSelections =
+      index === -1
+        ? [...currentSelections, menuId]
+        : currentSelections.filter((id) => id !== menuId);
+
+    setMenuSelections({
+      ...menuSelections,
+      [currentTab]: updatedSelections,
+    });
   };
 
   const handleAddTraining = () => {
-    // menuId: トレーニングメニューのID
-    selectedMenus.forEach((menuId) => {
-      // body_part: 部位のID
-      const body_part = trainingMenus[currentTab].id;
-      // 選択された部位に含まれるトレーニングメニューを取得
-      const training_menus = trainingMenus[currentTab].training_menus;
-      // 選択されたトレーニングメニューの情報を取得
-      const menu = training_menus.find((menu) => menu.id === menuId);
+    // 選択されたメニューを元にWorkoutDisplayを作成し、storeに追加
+    Object.entries(menuSelections).forEach(([tabIndex, menuIds]) => {
+      const body_part = trainingMenus[parseInt(tabIndex)].id;
+      const training_menus = trainingMenus[parseInt(tabIndex)].training_menus;
 
-      if (menu) {
-        const workoutDisplay: PROPS_WORKOUT_DISPLAY = {
-          id: uuidv4(),
-          menu: menu.id,
-          body_part: body_part,
-          sets: [
-            {
-              id: uuidv4(),
-              weight: 0,
-              reps: 0,
-              completed: false,
-            },
-          ],
-        };
-        dispatch(addWorkout(workoutDisplay));
-      }
+      menuIds.forEach((menuId: number) => {
+        const menu = training_menus.find((menu) => menu.id === menuId);
+        if (menu) {
+          const workoutDisplay: PROPS_WORKOUT_DISPLAY = {
+            id: uuidv4(),
+            menu: menu.id,
+            body_part: body_part,
+            sets: [
+              {
+                id: uuidv4(),
+                weight: 0,
+                reps: 0,
+                completed: false,
+              },
+            ],
+          };
+          dispatch(addWorkout(workoutDisplay));
+        }
+      });
     });
     onClose();
   };
@@ -106,7 +114,9 @@ const WorkoutPopup = ({
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={selectedMenus.includes(menu.id)}
+                    checked={
+                      menuSelections[currentTab]?.includes(menu.id) || false
+                    }
                     onChange={() => handleToggle(menu.id)}
                     color="primary"
                   />
@@ -122,7 +132,9 @@ const WorkoutPopup = ({
           variant="contained"
           color="primary"
           onClick={handleAddTraining}
-          disabled={selectedMenus.length === 0}
+          disabled={Object.keys(menuSelections).every(
+            (key) => menuSelections[Number(key)].length === 0
+          )}
           className={styles.addButton}
         >
           トレーニングを追加する
