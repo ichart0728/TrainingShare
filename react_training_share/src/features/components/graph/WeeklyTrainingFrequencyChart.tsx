@@ -19,7 +19,18 @@ interface WeeklyTrainingFrequencyChartProps {
 const WeeklyTrainingFrequencyChart: React.FC<
   WeeklyTrainingFrequencyChartProps
 > = ({ trainingSessions }) => {
-  const [chartData, setChartData] = useState<any>();
+  const [chartData, setChartData] = useState<any>({
+    labels: ["日", "月", "火", "水", "木", "金", "土"],
+    datasets: [
+      {
+        label: "週別トレーニング回数",
+        data: Array(7).fill(0),
+        backgroundColor: Array(7).fill("rgba(200, 200, 200, 0.6)"),
+        borderColor: Array(7).fill("rgba(200, 200, 200, 1)"),
+        borderWidth: 1,
+      },
+    ],
+  });
 
   useEffect(() => {
     const oneMonthAgo = new Date();
@@ -57,10 +68,6 @@ const WeeklyTrainingFrequencyChart: React.FC<
 
     setChartData(data);
   }, [trainingSessions]);
-
-  if (!chartData) {
-    return <div>Loading...</div>; // データが未設定の時はLoadingを表示
-  }
 
   const options = {
     responsive: true,

@@ -34,12 +34,16 @@ const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
       return total;
     });
 
+    const hasData = data.some((value) => value !== 0);
+
     return {
-      labels: trainingMenus.map((menu) => menu.name),
+      labels: hasData ? trainingMenus.map((menu) => menu.name) : [],
       datasets: [
         {
-          data,
-          backgroundColor: trainingMenus.map((part) => bodyPartColors[part.id]),
+          data: hasData ? data : Array(trainingMenus.length).fill(1),
+          backgroundColor: hasData
+            ? trainingMenus.map((part) => bodyPartColors[part.id])
+            : Array(trainingMenus.length).fill("rgba(200, 200, 200, 0.6)"),
           borderColor: "#ffffff", // セグメント間の境界線色
           borderWidth: 2, // セグメント間の境界線の太さ
         },
