@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Radar } from "react-chartjs-2";
 import styles from "./BodyPartChart.module.css";
+import {
+  PROPS_RADAR_CHART,
+  PROPS_TRAINING_SESSION,
+  PROPS_TRAINING_MENU,
+} from "../../types";
 
 import {
   Chart as ChartJS,
@@ -21,34 +26,7 @@ ChartJS.register(
   Legend
 );
 
-interface TrainingSession {
-  id: string;
-  date: string;
-  duration: number;
-  workouts: {
-    id: string;
-    menu: string;
-    body_part: number;
-    sets: {
-      id: string;
-      weight: number;
-      reps: number;
-      completed: boolean;
-    }[];
-  }[];
-}
-
-interface TrainingMenu {
-  id: number;
-  name: string;
-}
-
-interface RadarChartProps {
-  trainingSessions: TrainingSession[];
-  trainingMenus: TrainingMenu[];
-}
-
-const RadarChartComponent: React.FC<RadarChartProps> = ({
+const RadarChartComponent: React.FC<PROPS_RADAR_CHART> = ({
   trainingSessions,
   trainingMenus,
 }) => {
@@ -117,8 +95,8 @@ const RadarChartComponent: React.FC<RadarChartProps> = ({
 };
 
 function calculateTrainingFrequency(
-  trainingMenus: TrainingMenu[],
-  trainingSessions: TrainingSession[]
+  trainingMenus: PROPS_TRAINING_MENU[],
+  trainingSessions: PROPS_TRAINING_SESSION[]
 ) {
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);

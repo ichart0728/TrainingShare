@@ -8,7 +8,7 @@ import {
   Checkbox,
 } from "@material-ui/core";
 import { RootState } from "../../app/store";
-import { WorkoutDisplay } from "../workout/workoutSlice";
+import { PROPS_WORKOUT_DISPLAY } from "../workout/workoutSlice";
 import styles from "./WorkoutItem.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import { updateSet } from "../workout/workoutSlice";
@@ -24,12 +24,9 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@material-ui/core";
+import { PROPS_WORKOUT_ITEM } from "../types";
 
-interface WorkoutItemProps {
-  workout: WorkoutDisplay;
-}
-
-const WorkoutItem: React.FC<WorkoutItemProps> = ({ workout }) => {
+const WorkoutItem: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   const dispatch: AppDispatch = useDispatch();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [completed, setCompleted] = useState(workout.sets.map(() => false));

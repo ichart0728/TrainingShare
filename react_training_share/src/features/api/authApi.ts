@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { PROPS_AUTHEN, PROPS_PROFILE, PROPS_NICKNAME } from "../types";
+import { PROPS_AUTHEN, PROPS_PUT_PROFILE, PROPS_NICKNAME } from "../types";
 
 const apiUrl = process.env.REACT_APP_DEV_API_URL;
 
@@ -54,7 +54,7 @@ export const fetchAsyncCreateProf = createAsyncThunk(
 /*プロフィール更新*/
 export const fetchAsyncUpdateProf = createAsyncThunk(
   "profile/put",
-  async (profile: PROPS_PROFILE) => {
+  async (profile: PROPS_PUT_PROFILE) => {
     const uploadData = new FormData();
     uploadData.append("nickName", profile.nickName);
     profile.img && uploadData.append("img", profile.img, profile.img.name);

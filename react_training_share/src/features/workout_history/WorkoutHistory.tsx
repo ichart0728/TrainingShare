@@ -21,18 +21,12 @@ const WorkoutHistory = () => {
   const trainingMenus = useSelector(
     (state: RootState) => state.training.trainingMenus
   );
-  // const [selectedTab, setSelectedTab] = useState(0);
-  // const handleTabChange = (event: ChangeEvent<{}>, newValue: number) => {
-  //   setSelectedTab(newValue);
-  // };
 
   return (
     <div className={styles.historyContainer}>
       {" "}
       <BodyPartChart
         trainingSessions={trainingSessions}
-        // selectedTab={selectedTab}
-        // onTabChange={handleTabChange}
         trainingMenus={trainingMenus}
       />
     </div>

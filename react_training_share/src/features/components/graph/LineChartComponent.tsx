@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Line } from "react-chartjs-2";
 import styles from "./BodyPartChart.module.css";
+import { PROPS_LINE_CHART, PROPS_TRAINING_SESSION } from "../../types";
 
 import {
   Chart as ChartJS,
@@ -24,47 +25,14 @@ ChartJS.register(
   Legend
 );
 
-interface Set {
-  id: string;
-  weight: number;
-  reps: number;
-  completed: boolean;
-}
-
-interface Workout {
-  id: string;
-  menu: string;
-  body_part: number;
-  sets: Set[];
-}
-
-interface TrainingSession {
-  id: string;
-  date: string;
-  duration: number;
-  workouts: Workout[];
-}
-
-interface TrainingMenu {
-  id: number;
-  name: string;
-}
-
-interface LineChartProps {
-  trainingSessions: TrainingSession[];
-  trainingMenus: TrainingMenu[];
-  selectedTab: number;
-  bodyPartColors: { [key: number]: string };
-}
-
-const LineChartComponent: React.FC<LineChartProps> = ({
+const LineChartComponent: React.FC<PROPS_LINE_CHART> = ({
   trainingSessions,
   trainingMenus,
   selectedTab,
   bodyPartColors,
 }) => {
-  const aggregateSessionsByDate = (sessions: TrainingSession[]) => {
-    return sessions.reduce((acc: TrainingSession[], session) => {
+  const aggregateSessionsByDate = (sessions: PROPS_TRAINING_SESSION[]) => {
+    return sessions.reduce((acc: PROPS_TRAINING_SESSION[], session) => {
       const existingIndex = acc.findIndex((s) => s.date === session.date);
       if (existingIndex !== -1) {
         const newSession = {

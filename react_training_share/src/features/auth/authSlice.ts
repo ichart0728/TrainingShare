@@ -9,36 +9,8 @@ import {
   fetchAsyncUpdateProf,
 } from "../api/authApi";
 
-interface MyProfile {
-  id: string;
-  nickName: string;
-  userProfile: string;
-  created_on: string;
-  img: string;
-}
-interface Profile {
-  id: string;
-  nickName: string;
-  userProfile: string;
-  created_on: string;
-  img: string;
-}
-interface AuthState {
-  /*サインイン用モーダル管理*/
-  openSignIn: boolean;
-  /*サインアップ用モーダル管理*/
-  openSignUp: boolean;
-  /*プロフィール用モーダル管理*/
-  openProfile: boolean;
-  /*ローディグ管理*/
-  isLoadingAuth: boolean;
-  /*ログインユーザーの状態*/
-  myprofile: MyProfile;
-  /*プロフィール一覧格納用*/
-  profiles: Profile[];
-}
-
-const initialState: AuthState = {
+import { PROPS_AUTH_STATE } from "../types";
+const initialState: PROPS_AUTH_STATE = {
   /*サインイン用モーダル管理*/
   openSignIn: true,
   /*サインアップ用モーダル管理*/
@@ -63,6 +35,7 @@ const initialState: AuthState = {
       userProfile: "",
       created_on: "",
       img: "",
+      userPosts: [],
     },
   ],
 };

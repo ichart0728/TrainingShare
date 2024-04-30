@@ -1,35 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { fetchAsyncGetTrainingSessions } from "../api/workoutApi";
+import { PROPS_WORKOUT_HISTORY_STATE, PROPS_TRAINING_SESSION } from "../types";
 
-interface TrainingSet {
-  id: string;
-  weight: number;
-  reps: number;
-  completed: boolean;
-}
-
-interface TrainingRecord {
-  id: string;
-  menu: string;
-  body_part: number;
-  sets: TrainingSet[];
-}
-
-interface TrainingSession {
-  id: string;
-  date: string;
-  duration: number;
-  workouts: TrainingRecord[];
-}
-
-interface WorkoutHistoryState {
-  trainingSessions: TrainingSession[];
-  loading: boolean;
-  error: string | null;
-}
-
-const initialState: WorkoutHistoryState = {
+const initialState: PROPS_WORKOUT_HISTORY_STATE = {
   trainingSessions: [],
   loading: false,
   error: null,
@@ -47,7 +21,7 @@ export const workoutHistorySlice = createSlice({
       })
       .addCase(
         fetchAsyncGetTrainingSessions.fulfilled,
-        (state, action: PayloadAction<TrainingSession[]>) => {
+        (state, action: PayloadAction<PROPS_TRAINING_SESSION[]>) => {
           state.loading = false;
           state.trainingSessions = action.payload;
         }

@@ -4,7 +4,7 @@ import { logout } from "../auth/authSlice";
 import { v4 as uuidv4 } from "uuid";
 
 //セットの型
-interface WorkoutSet {
+interface PROPS_WORKOUT_SET {
   id: string;
   //重量
   weight: number;
@@ -15,20 +15,20 @@ interface WorkoutSet {
 }
 
 // トレーニングメニューの型
-export interface WorkoutDisplay {
+export interface PROPS_WORKOUT_DISPLAY {
   id: string;
   // トレーニングメニュー
   menu: number;
   // 対象部位
   body_part: number;
   // セット
-  sets: WorkoutSet[];
+  sets: PROPS_WORKOUT_SET[];
 }
 
 // トレーニングメニュー全体の状態の型
-export interface WorkoutState {
+export interface PROPS_WORKOUT_STATE {
   // トレーニングメニュー
-  workouts: WorkoutDisplay[];
+  workouts: PROPS_WORKOUT_DISPLAY[];
   // トータルボリューム
   totalVolume: number;
   // 完了済みトータルボリューム
@@ -41,7 +41,7 @@ export interface WorkoutState {
   isPaused: boolean;
 }
 
-const initialState: WorkoutState = {
+const initialState: PROPS_WORKOUT_STATE = {
   workouts: [],
   totalVolume: 0,
   completedTotalVolume: 0,
@@ -54,7 +54,7 @@ export const workoutSlice = createSlice({
   name: "workout",
   initialState,
   reducers: {
-    addWorkout: (state, action: PayloadAction<WorkoutDisplay>) => {
+    addWorkout: (state, action: PayloadAction<PROPS_WORKOUT_DISPLAY>) => {
       state.workouts.push(action.payload);
     },
     removeWorkout: (state, action: PayloadAction<string>) => {

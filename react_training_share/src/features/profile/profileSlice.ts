@@ -5,26 +5,8 @@ import { fetchAsyncGetProf } from "../api/profileApi";
 import { fetchAsyncGetUserPosts } from "../api/postApi";
 
 import { logout } from "../auth/authSlice";
+import { ProfileState } from "../types";
 
-interface Profile {
-  id: string;
-  nickName: string;
-  userProfile: string;
-  created_on: string;
-  img: string;
-}
-
-interface UserPost {
-  id: string;
-  userPost: string;
-  img: string;
-  created_on: string;
-}
-interface ProfileState {
-  isLoadingProfile: boolean;
-  profile: Profile;
-  userPosts: UserPost[];
-}
 const initialState: ProfileState = {
   isLoadingProfile: false,
   profile: {
@@ -33,6 +15,7 @@ const initialState: ProfileState = {
     userProfile: "",
     created_on: "",
     img: "",
+    userPosts: [],
   },
   userPosts: [
     {

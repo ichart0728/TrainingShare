@@ -6,37 +6,7 @@ import styles from "./BodyPartChart.module.css";
 import LineChartComponent from "./LineChartComponent";
 import PieChartComponent from "./PieChartComponent";
 import RadarChartComponent from "./RadarChartComponent";
-
-interface Set {
-  id: string;
-  weight: number;
-  reps: number;
-  completed: boolean;
-}
-
-interface Workout {
-  id: string;
-  menu: string;
-  body_part: number;
-  sets: Set[];
-}
-
-interface TrainingSession {
-  id: string;
-  date: string;
-  duration: number;
-  workouts: Workout[];
-}
-
-interface TrainingMenu {
-  id: number;
-  name: string;
-}
-interface WorkoutChartProps {
-  trainingSessions: TrainingSession[];
-  trainingMenus: TrainingMenu[];
-}
-
+import { PROPS_WORKOUT_CHART } from "../../types";
 const bodyPartColors: { [key: number]: string } = {
   1: "#3498DB", // 明るいブルー
   2: "#2ECC71", // 明るいグリーン
@@ -46,7 +16,7 @@ const bodyPartColors: { [key: number]: string } = {
   6: "#34495E", // アスファルト（ダークグレー）
 };
 
-const WorkoutChart: React.FC<WorkoutChartProps> = ({
+const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
   trainingSessions,
   trainingMenus,
 }) => {

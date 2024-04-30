@@ -13,43 +13,9 @@ import {
 } from "../api/commentApi";
 
 import { logout } from "../auth/authSlice";
+import { PROPS_POST_STATE } from "../types";
 
-interface Post {
-  id: string;
-  title: string;
-  userPost: string;
-  created_on: string;
-  img: string;
-  liked: string[];
-}
-
-interface Comment {
-  id: string;
-  text: string;
-  userComment: string;
-  post: string;
-}
-
-interface Profile {
-  id: string;
-  nickName: string;
-  userProfile: string;
-  created_on: string;
-  img: string;
-  userPosts: Post[];
-}
-
-interface PostState {
-  /*投稿やコメントをfetchしている時のローディング制御*/
-  isLoadingPost: boolean;
-  /*新規投稿用モーダルの制御*/
-  openNewPost: boolean;
-  posts: Post[];
-  comments: Comment[];
-  profile: Profile;
-}
-
-const initialState: PostState = {
+const initialState: PROPS_POST_STATE = {
   /*投稿やコメントをfetchしている時のローディング制御*/
   isLoadingPost: false,
   /*新規投稿用モーダルの制御*/

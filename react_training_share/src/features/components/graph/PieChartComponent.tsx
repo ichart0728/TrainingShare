@@ -3,38 +3,11 @@ import React from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import styles from "./BodyPartChart.module.css";
+import { PROPS_PIE_CHART } from "../../types";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface TrainingSession {
-  id: string;
-  date: string;
-  duration: number;
-  workouts: {
-    id: string;
-    menu: string;
-    body_part: number;
-    sets: {
-      id: string;
-      weight: number;
-      reps: number;
-      completed: boolean;
-    }[];
-  }[];
-}
-
-interface TrainingMenu {
-  id: number;
-  name: string;
-}
-
-interface PieChartProps {
-  trainingSessions: TrainingSession[];
-  trainingMenus: TrainingMenu[];
-  bodyPartColors: { [key: number]: string };
-}
-
-const PieChartComponent: React.FC<PieChartProps> = ({
+const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
   trainingSessions,
   trainingMenus,
   bodyPartColors,

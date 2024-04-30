@@ -3,23 +3,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { fetchAsyncGetTrainingMenus } from "../api/trainingMenuApi";
 import { logout } from "../auth/authSlice";
+import { PROPS_TRAINING_STATE } from "../types";
 
-export interface Training {
-  id: number;
-  name: string;
-}
-export interface TrainingMenu {
-  id: number;
-  name: string;
-  training_menus: Training[];
-}
-
-interface TrainingState {
-  trainingMenus: TrainingMenu[];
-  isLoading: boolean;
-}
-
-const initialState: TrainingState = {
+const initialState: PROPS_TRAINING_STATE = {
   trainingMenus: [
     {
       id: 0,

@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import styles from "./WorkoutPopup.module.css";
 import React, { useState } from "react";
-import { WorkoutDisplay, addWorkout } from "./workoutSlice";
+import { PROPS_WORKOUT_DISPLAY, addWorkout } from "./workoutSlice";
 import { AppDispatch } from "../../app/store";
 import { v4 as uuidv4 } from "uuid";
 
@@ -58,7 +58,7 @@ const WorkoutPopup = ({
       const menu = training_menus.find((menu) => menu.id === menuId);
 
       if (menu) {
-        const workoutDisplay: WorkoutDisplay = {
+        const workoutDisplay: PROPS_WORKOUT_DISPLAY = {
           id: uuidv4(),
           menu: menu.id,
           body_part: body_part,

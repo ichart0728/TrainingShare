@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { WorkoutDisplay, startTimer, stopTimer } from "./workoutSlice";
+import { PROPS_WORKOUT_DISPLAY, startTimer, stopTimer } from "./workoutSlice";
 import { fetchAsyncPostTrainingSessions } from "../api/workoutApi";
 import { WORKOUT_POST } from "../types";
 import { AppDispatch } from "../../app/store";
@@ -100,9 +100,11 @@ const Workout = () => {
     dispatch(stopTimer());
     // トレーニングデータを整形
     const workouts = selectedWorkouts.map((workout) => ({
+      id: workout.id,
       menu: workout.menu,
       body_part: workout.body_part,
       sets: workout.sets.map((set) => ({
+        id: set.id,
         weight: set.weight,
         reps: set.reps,
         completed: set.completed,
