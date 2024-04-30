@@ -1,5 +1,4 @@
-// LineChartComponent.tsx
-import React, { useState } from "react";
+import React from "react";
 import { Line } from "react-chartjs-2";
 import styles from "./BodyPartChart.module.css";
 import { PROPS_LINE_CHART, PROPS_TRAINING_SESSION } from "../../types";
@@ -31,31 +30,39 @@ const LineChartComponent: React.FC<PROPS_LINE_CHART> = ({
   selectedTab,
   bodyPartColors,
 }) => {
+  // 日付ごとにトレーニングセッションを集計する
   const aggregateSessionsByDate = (sessions: PROPS_TRAINING_SESSION[]) => {
-    return sessions.reduce((acc: PROPS_TRAINING_SESSION[], session) => {
+    const today = new Date();
+    const oneWeekAgo = new Date(today);
+    oneWeekAgo.setDate(today.getDate() - 7);
+
+    // 過去1週間のデータのみをフィルタリング
+    const filteredSessions = sessions.filter(
+      (session) =>
+        new Date(session.date) >= oneWeekAgo && new Date(session.date) <= today
+    );
+
+    return filteredSessions.reduce((acc: PROPS_TRAINING_SESSION[], session) => {
       const existingIndex = acc.findIndex((s) => s.date === session.date);
       if (existingIndex !== -1) {
         const newSession = {
           ...acc[existingIndex],
           workouts: [...acc[existingIndex].workouts, ...session.workouts],
         };
-        acc = [
-          ...acc.slice(0, existingIndex),
-          newSession,
-          ...acc.slice(existingIndex + 1),
-        ];
+        acc[existingIndex] = newSession;
       } else {
-        acc = [...acc, session];
+        acc.push(session);
       }
       return acc;
     }, []);
   };
 
+  // 各トレーニングメニューごとの集計データを計算する
   const calculateChartData = () => {
     const aggregatedSessions = aggregateSessionsByDate(trainingSessions);
     return {
       labels: aggregatedSessions.map((session) => session.date),
-      datasets: trainingMenus.map((menu, index) => ({
+      datasets: trainingMenus.map((menu) => ({
         label: menu.name,
         data: aggregatedSessions.map((session) => {
           return session.workouts
@@ -98,6 +105,7 @@ const LineChartComponent: React.FC<PROPS_LINE_CHART> = ({
                 displayFormats: {
                   day: "yyyy-MM-dd",
                 },
+                tooltipFormat: "MMM dd",
               },
               display: true,
             },
