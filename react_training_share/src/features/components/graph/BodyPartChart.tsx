@@ -4,6 +4,8 @@ import styles from "./BodyPartChart.module.css";
 import LineChartComponent from "./LineChartComponent";
 import PieChartComponent from "./PieChartComponent";
 import RadarChartComponent from "./RadarChartComponent";
+import WeeklyTrainingFrequencyChart from "./WeeklyTrainingFrequencyChart";
+
 import { PROPS_WORKOUT_CHART } from "../../types";
 
 const bodyPartColors: { [key: number]: string } = {
@@ -84,6 +86,16 @@ const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
               trainingSessions={trainingSessions}
               trainingMenus={trainingMenus}
             />
+          </div>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <div className={styles.chartHeader}>
+            <Typography variant="h6" className={styles.chartTitle}>
+              週別トレーニング回数
+            </Typography>
+          </div>
+          <div className={styles.chartContainer}>
+            <WeeklyTrainingFrequencyChart trainingSessions={trainingSessions} />
           </div>
         </Grid>
       </Grid>
