@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { PROPS_WORKOUT_DISPLAY, startTimer, stopTimer } from "./workoutSlice";
+import { clearWorkouts, startTimer, stopTimer } from "./workoutSlice";
 import { fetchAsyncPostTrainingSessions } from "../api/workoutApi";
 import { WORKOUT_POST } from "../types";
 import { AppDispatch } from "../../app/store";
@@ -21,6 +21,7 @@ import {
 
 import { RootState } from "../../app/store";
 import WorkoutItem from "../components/WorkoutItem";
+import { useNavigate } from "react-router-dom";
 
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -29,6 +30,7 @@ import ReplayIcon from "@material-ui/icons/Replay";
 
 const Workout = () => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
 
   const selectedWorkouts = useSelector(
     (state: RootState) => state.workout.workouts
@@ -121,6 +123,8 @@ const Workout = () => {
     setTrainingActive(false);
     setTime(0);
     setOpenEndModal(false);
+    dispatch(clearWorkouts());
+    navigate("/workout_history");
   };
 
   const handleOpenModal = () => {

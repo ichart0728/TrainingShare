@@ -115,6 +115,9 @@ export const workoutSlice = createSlice({
         workout.sets.pop(); // 最後のセットを削除
       }
     },
+    clearWorkouts: (state) => {
+      state.workouts = [];
+    },
     startTimer: (state) => {
       state.isActive = true;
       state.isPaused = false;
@@ -148,6 +151,7 @@ export const {
   pauseTimer,
   stopTimer,
   incrementTimer,
+  clearWorkouts,
 } = workoutSlice.actions;
 export default workoutSlice.reducer;
 
