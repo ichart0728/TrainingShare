@@ -1,4 +1,3 @@
-// PieChartComponent.tsx
 import React from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
@@ -41,6 +40,8 @@ const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
         {
           data,
           backgroundColor: trainingMenus.map((part) => bodyPartColors[part.id]),
+          borderColor: "#ffffff", // セグメント間の境界線色
+          borderWidth: 2, // セグメント間の境界線の太さ
         },
       ],
     };
@@ -50,7 +51,29 @@ const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
 
   return (
     <div className={styles.chartContainer}>
-      <Pie data={chartData} options={{ maintainAspectRatio: false }} />
+      <Pie
+        data={chartData}
+        options={{
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "top", // 凡例の位置
+              labels: {
+                font: {
+                  size: 14, // ラベルフォントサイズ
+                },
+              },
+            },
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  return `${tooltipItem.label}: ${tooltipItem.raw} kg`;
+                },
+              },
+            },
+          },
+        }}
+      />
     </div>
   );
 };
