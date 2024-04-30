@@ -62,9 +62,27 @@ const WeeklyTrainingFrequencyChart: React.FC<
     return <div>Loading...</div>; // データが未設定の時はLoadingを表示
   }
 
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        position: "top" as const,
+      },
+    },
+  };
+
   return (
-    <div>
-      <Bar data={chartData} />
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <Bar data={chartData} options={options} />
     </div>
   );
 };
