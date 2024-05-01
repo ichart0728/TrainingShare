@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Radar } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+
 import styles from "./BodyPartChart.module.css";
 import {
   PROPS_RADAR_CHART,
@@ -20,6 +22,7 @@ ChartJS.register(
   RadialLinearScale,
   PointElement,
   LineElement,
+  ChartDataLabels,
   Filler,
   Tooltip,
   Legend
@@ -87,6 +90,9 @@ const RadarChartComponent: React.FC<PROPS_RADAR_CHART> = ({
 
   const options = {
     plugins: {
+      datalabels: {
+        display: false,
+      },
       legend: {
         position: "top" as const,
       },

@@ -1,10 +1,11 @@
 import React from "react";
 import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, ArcElement, Tooltip } from "chart.js";
 import styles from "./BodyPartChart.module.css";
 import { PROPS_PIE_CHART } from "../../types";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, ChartDataLabels);
 
 const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
   trainingSessions,
@@ -35,19 +36,22 @@ const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
     });
 
     const hasData = data.some((value) => value !== 0);
+    const totalData = data.reduce((acc, value) => acc + value, 0);
 
     return {
-      labels: hasData ? trainingMenus.map((menu) => menu.name) : [],
+      labels: hasData ? trainingMenus.map((menu) => menu.name) : ["No data"],
       datasets: [
         {
-          data: hasData ? data : Array(trainingMenus.length).fill(1),
+          data: hasData ? data : [1],
           backgroundColor: hasData
             ? trainingMenus.map((part) => bodyPartColors[part.id])
-            : Array(trainingMenus.length).fill("rgba(200, 200, 200, 0.6)"),
+            : ["rgba(200, 200, 200, 0.6)"],
           borderColor: "#ffffff", // セグメント間の境界線色
           borderWidth: 2, // セグメント間の境界線の太さ
         },
       ],
+      totalData,
+      hasData,
     };
   };
 
@@ -60,19 +64,44 @@ const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
         options={{
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              position: "top", // 凡例の位置
-              labels: {
-                font: {
-                  size: 14, // ラベルフォントサイズ
-                },
-              },
-            },
             tooltip: {
               callbacks: {
                 label: function (tooltipItem) {
+                  if (!chartData.hasData) {
+                    return "";
+                  }
                   return `${tooltipItem.label}: ${tooltipItem.raw} kg`;
                 },
+              },
+            },
+            datalabels: {
+              formatter: (value, ctx) => {
+                if (!chartData.hasData) {
+                  return "";
+                }
+                const label = ctx.chart.data.labels?.[ctx.dataIndex];
+                const percentage = (
+                  (value / chartData.totalData) *
+                  100
+                ).toFixed(1);
+                return `${label}\n${percentage}%`;
+              },
+              color: "#fff",
+              font: {
+                size: 12,
+                weight: "bold",
+              },
+              textAlign: "center",
+              padding: {
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+              },
+              offset: 0,
+              display: function (ctx) {
+                const value = ctx.dataset.data[ctx.dataIndex];
+                return value !== 0;
               },
             },
           },

@@ -7,10 +7,9 @@ import {
   LinearScale,
   BarElement,
   Tooltip,
-  Legend,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 interface WeeklyTrainingFrequencyChartProps {
   trainingSessions: PROPS_TRAINING_SESSION[];
@@ -23,7 +22,6 @@ const WeeklyTrainingFrequencyChart: React.FC<
     labels: ["日", "月", "火", "水", "木", "金", "土"],
     datasets: [
       {
-        label: "週別トレーニング回数",
         data: Array(7).fill(0),
         backgroundColor: Array(7).fill("rgba(200, 200, 200, 0.6)"),
         borderColor: Array(7).fill("rgba(200, 200, 200, 1)"),
@@ -49,7 +47,6 @@ const WeeklyTrainingFrequencyChart: React.FC<
       labels: ["日", "月", "火", "水", "木", "金", "土"],
       datasets: [
         {
-          label: "週別トレーニング回数",
           data: weeklyData,
           backgroundColor: weeklyData.map((_, index) =>
             index === weeklyData.indexOf(Math.max(...weeklyData))
@@ -82,7 +79,7 @@ const WeeklyTrainingFrequencyChart: React.FC<
     },
     plugins: {
       legend: {
-        position: "top" as const,
+        display: false,
       },
     },
   };

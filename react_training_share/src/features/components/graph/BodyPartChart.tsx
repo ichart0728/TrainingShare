@@ -32,7 +32,7 @@ const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
         <Grid item xs={12}>
           <div className={styles.chartHeader}>
             <Typography variant="h6" className={styles.chartTitle}>
-              進捗線グラフ
+              成長グラフ
             </Typography>
           </div>
           <div className={styles.tabsWrapper}>
@@ -78,7 +78,7 @@ const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
         <Grid item xs={12} md={6}>
           <div className={styles.chartHeader}>
             <Typography variant="h6" className={styles.chartTitle}>
-              レーダーチャート分析
+              トレーニングバランス
             </Typography>
           </div>
           <div className={styles.chartContainer}>
@@ -88,10 +88,10 @@ const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
             />
           </div>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={12}>
           <div className={styles.chartHeader}>
             <Typography variant="h6" className={styles.chartTitle}>
-              週別トレーニング回数
+              曜日別トレーニング回数
             </Typography>
           </div>
           <div className={styles.chartContainer}>
