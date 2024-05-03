@@ -1,13 +1,13 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
-import { Avatar, Button, Grid, Typography } from "@material-ui/core";
-import PostCard from "../post/PostCard";
+import { Avatar, Typography } from "@material-ui/core";
 import styles from "./Profile.module.css";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { fetchAsyncGetProf } from "../api/profileApi";
 import { fetchAsyncGetUserPosts } from "../api/postApi";
 import { AppDispatch } from "../../app/store";
 import { CircularProgress } from "@material-ui/core";
+import BodyPartChart from "../components/graph/BodyPartChart";
 
 const Profile = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -21,19 +21,15 @@ const Profile = () => {
   }, [profileId, dispatch]);
 
   const profile = useSelector((state: RootState) => state.profile.profile);
-  const myprofile = useSelector((state: RootState) => state.auth.myprofile);
   const isLoading = useSelector(
     (state: RootState) => state.profile.isLoadingProfile
   );
-
-  const posts = useSelector(
-    (state: RootState) => state.profile.userPosts || []
+  const trainingSessions = useSelector(
+    (state: RootState) => state.workoutHistory.trainingSessions
   );
-  const [isFollowing, setIsFollowing] = useState(false);
-
-  const handleFollowClick = () => {
-    setIsFollowing(!isFollowing);
-  };
+  const trainingMenus = useSelector(
+    (state: RootState) => state.training.trainingMenus
+  );
 
   if (isLoading) {
     return <CircularProgress />;
@@ -45,35 +41,13 @@ const Profile = () => {
         <>
           <div className={styles.profileHeader}>
             <Avatar src={profile.img} className={styles.profileAvatar} />
-            <div className={styles.profileInfo}>
-              <Typography variant="h6">{profile.nickName}</Typography>
-              {/* <Typography variant="body1" className={styles.followCount}>
-                フォロー数: 10
-              </Typography>
-              <Typography variant="body1" className={styles.followerCount}>
-                フォロワー数: 10
-              </Typography> */}
-              {myprofile.id !== profile.id && (
-                <div className={styles.followButton}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleFollowClick}
-                  >
-                    {isFollowing ? "Following" : "Follow"}
-                  </Button>
-                </div>
-              )}
-            </div>
+            <Typography variant="h6">{profile.nickName}</Typography>
           </div>
-          <div className={styles.postsContainer}>
-            <Grid container spacing={2}>
-              {posts.map((post: any) => (
-                <Grid item xs={12} sm={6} md={4} key={post.id}>
-                  <PostCard post={post} />
-                </Grid>
-              ))}
-            </Grid>
+          <div className={styles.historyContainer}>
+            <BodyPartChart
+              trainingSessions={trainingSessions}
+              trainingMenus={trainingMenus}
+            />
           </div>
         </>
       )}

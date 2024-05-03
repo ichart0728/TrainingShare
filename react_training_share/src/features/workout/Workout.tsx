@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearWorkouts, startTimer, stopTimer } from "./workoutSlice";
 import { fetchAsyncPostTrainingSessions } from "../api/workoutApi";
+import { fetchAsyncGetTrainingSessions } from "../api/workoutApi";
 import { WORKOUT_POST } from "../types";
 import { AppDispatch } from "../../app/store";
 import styles from "./Workout.module.css";
@@ -124,6 +125,7 @@ const Workout = () => {
     setTime(0);
     setOpenEndModal(false);
     dispatch(clearWorkouts());
+    dispatch(fetchAsyncGetTrainingSessions());
     navigate("/workout_history");
   };
 

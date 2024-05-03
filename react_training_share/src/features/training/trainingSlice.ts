@@ -26,6 +26,7 @@ export const trainingSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchAsyncGetTrainingMenus.fulfilled, (state, action) => {
+      console.log(action.payload);
       state.trainingMenus = action.payload;
     });
     builder.addCase(logout, () => initialState);
