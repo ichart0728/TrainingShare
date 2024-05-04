@@ -29,7 +29,9 @@ const CalendarScreen = () => {
       const training = trainings.find((t) => t.id === workout.body_part);
       return training ? training.name : "";
     });
-    return bodyParts.join(", ");
+    // bodyPartsから重複を削除
+    const uniqueBodyParts = Array.from(new Set(bodyParts));
+    return uniqueBodyParts.join(", ");
   };
 
   const events = trainingSessions.map((session) => ({
