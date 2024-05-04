@@ -8,6 +8,7 @@ import Home from "./features/home/Home";
 import Workout from "./features/workout/Workout";
 import Profile from "./features/profile/Profile";
 import WorkoutHistory from "./features/workout_history/WorkoutHistory";
+import CalendarScreen from "./features/calendar/CalendarScreen";
 
 function App() {
   const nickName = useSelector(
@@ -35,7 +36,11 @@ function App() {
             <Route
               path="/workout_history"
               element={nickName ? <WorkoutHistory /> : <Navigate to="/" />}
-            />{" "}
+            />
+            <Route
+              path="/calendar"
+              element={nickName ? <CalendarScreen /> : <Navigate to="/" />}
+            />
           </Routes>
         </main>
       </div>

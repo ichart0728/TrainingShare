@@ -85,7 +85,7 @@ const Sidebar = () => {
   };
 
   const handleCalendarClick = () => {
-    navigate("/workout");
+    navigate("/calendar");
     setMobileOpen(false);
   };
 
