@@ -2,44 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { logout } from "../auth/authSlice";
 import { v4 as uuidv4 } from "uuid";
-
-//セットの型
-interface PROPS_WORKOUT_SET {
-  id: string;
-  //重量
-  weight: number;
-  //回数
-  reps: number;
-  //完了したか
-  completed: boolean;
-}
-
-// トレーニングメニューの型
-export interface PROPS_WORKOUT_DISPLAY {
-  id: string;
-  // トレーニングメニュー
-  menu: number;
-  // 対象部位
-  body_part: number;
-  // セット
-  sets: PROPS_WORKOUT_SET[];
-}
-
-// トレーニングメニュー全体の状態の型
-export interface PROPS_WORKOUT_STATE {
-  // トレーニングメニュー
-  workouts: PROPS_WORKOUT_DISPLAY[];
-  // トータルボリューム
-  totalVolume: number;
-  // 完了済みトータルボリューム
-  completedTotalVolume: number;
-  // タイマー
-  timer: number;
-  // タイマーの状態
-  isActive: boolean;
-  // タイマーが一時停止しているか
-  isPaused: boolean;
-}
+import { PROPS_WORKOUT, PROPS_WORKOUT_STATE } from "../types";
 
 const initialState: PROPS_WORKOUT_STATE = {
   workouts: [],
@@ -54,7 +17,7 @@ export const workoutSlice = createSlice({
   name: "workout",
   initialState,
   reducers: {
-    addWorkout: (state, action: PayloadAction<PROPS_WORKOUT_DISPLAY>) => {
+    addWorkout: (state, action: PayloadAction<PROPS_WORKOUT>) => {
       state.workouts.push(action.payload);
     },
     removeWorkout: (state, action: PayloadAction<string>) => {

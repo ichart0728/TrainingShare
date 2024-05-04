@@ -48,6 +48,15 @@ export interface PROPS_POST {
   liked: string[];
 }
 
+export interface WORKOUT_POST {
+  // ユーザーID
+  date: string;
+  // トレーニング時間
+  duration: number;
+  // トレーニングメニュー
+  workouts: PROPS_WORKOUT[];
+}
+
 interface PROPS_WORKOUT_SET {
   id: string;
   //重量
@@ -58,27 +67,7 @@ interface PROPS_WORKOUT_SET {
   completed: boolean;
 }
 
-// トレーニングメニューの型
-export interface PROPS_WORKOUT_DISPLAY {
-  id: string;
-  // トレーニングメニュー
-  menu: number;
-  // 対象部位
-  body_part: number;
-  // セット
-  sets: PROPS_WORKOUT_SET[];
-}
-
-export interface WORKOUT_POST {
-  // ユーザーID
-  date: string;
-  // トレーニング時間
-  duration: number;
-  // トレーニングメニュー
-  workouts: PROPS_WORKOUT_DISPLAY[];
-}
-
-interface PROPS_WORKOUT {
+export interface PROPS_WORKOUT {
   id: string;
   menu: string;
   body_part: number;
@@ -124,7 +113,7 @@ export interface PROPS_WORKOUT_HISTORY_STATE {
 // トレーニングメニュー全体の状態の型
 export interface PROPS_WORKOUT_STATE {
   // トレーニングメニュー
-  workouts: PROPS_WORKOUT_DISPLAY[];
+  workouts: PROPS_WORKOUT[];
   // トータルボリューム
   totalVolume: number;
   // 完了済みトータルボリューム
@@ -229,5 +218,5 @@ export interface PROPS_AUTH_STATE {
 }
 
 export interface PROPS_WORKOUT_ITEM {
-  workout: PROPS_WORKOUT_DISPLAY;
+  workout: PROPS_WORKOUT;
 }

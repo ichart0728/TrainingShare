@@ -11,8 +11,9 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../app/store";
 import { v4 as uuidv4 } from "uuid";
-import { PROPS_WORKOUT_DISPLAY, addWorkout } from "./workoutSlice";
+import { addWorkout } from "./workoutSlice";
 import styles from "./WorkoutPopup.module.css";
+import { PROPS_WORKOUT } from "../types";
 
 interface MenuSelection {
   [key: number]: number[]; // タブのインデックスごとに選択されたメニューIDのリストを保持
@@ -65,9 +66,9 @@ const WorkoutPopup = ({
       menuIds.forEach((menuId: number) => {
         const menu = training_menus.find((menu) => menu.id === menuId);
         if (menu) {
-          const workoutDisplay: PROPS_WORKOUT_DISPLAY = {
+          const workoutDisplay: PROPS_WORKOUT = {
             id: uuidv4(),
-            menu: menu.id,
+            menu: String(menu.id),
             body_part: body_part,
             sets: [
               {
