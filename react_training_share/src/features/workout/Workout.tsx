@@ -102,17 +102,19 @@ const Workout = () => {
   const confirmEndTraining = () => {
     dispatch(stopTimer());
     // トレーニングデータを整形
-    const workouts = selectedWorkouts.map((workout) => ({
-      id: workout.id,
-      menu: workout.menu,
-      body_part: workout.body_part,
-      sets: workout.sets.map((set) => ({
-        id: set.id,
-        weight: set.weight,
-        reps: set.reps,
-        completed: set.completed,
-      })),
-    }));
+    const workouts = selectedWorkouts
+      .filter((workout) => workout.sets.length > 0)
+      .map((workout) => ({
+        id: workout.id,
+        menu: workout.menu,
+        body_part: workout.body_part,
+        sets: workout.sets.map((set) => ({
+          id: set.id,
+          weight: set.weight,
+          reps: set.reps,
+          completed: set.completed,
+        })),
+      }));
     const workoutData: WORKOUT_POST = {
       // YYYY-MM-DD形式の日付文字列
       date: new Date().toISOString().split("T")[0],
