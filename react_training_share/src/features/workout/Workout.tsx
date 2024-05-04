@@ -21,7 +21,7 @@ import {
 } from "@material-ui/core";
 
 import { RootState } from "../../app/store";
-import WorkoutItem from "../components/WorkoutItem";
+import WorkoutItemEdit from "../components/WorkoutItemEdit";
 import { useNavigate } from "react-router-dom";
 
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
@@ -211,7 +211,7 @@ const Workout = () => {
         </Modal>
         <div className={styles.workoutList}>
           {selectedWorkouts.map((workout, index) => (
-            <WorkoutItem key={index} workout={workout} />
+            <WorkoutItemEdit key={index} workout={workout} />
           ))}
         </div>
       </div>

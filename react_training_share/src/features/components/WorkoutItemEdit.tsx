@@ -8,8 +8,7 @@ import {
   Checkbox,
 } from "@material-ui/core";
 import { RootState } from "../../app/store";
-import { PROPS_WORKOUT_DISPLAY } from "../workout/workoutSlice";
-import styles from "./WorkoutItem.module.css";
+import styles from "./WorkoutItemEdit.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import { updateSet } from "../workout/workoutSlice";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
@@ -24,9 +23,9 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@material-ui/core";
-import { PROPS_WORKOUT_ITEM } from "../types";
+import { PROPS_WORKOUT_ITEM, Training } from "../types";
 
-const WorkoutItem: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
+const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   const dispatch: AppDispatch = useDispatch();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [completed, setCompleted] = useState(workout.sets.map(() => false));
@@ -42,9 +41,9 @@ const WorkoutItem: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
 
   // trainingMenuskから対象のトレーニングメニュー名を取得する
   const menuName = trainingMenus
-    .find((menu) => menu.id === workout.body_part)
+    .find((menu) => Number(menu.id) === workout.body_part)
     ?.training_menus.find(
-      (training_menu: any) => training_menu.id === workout.menu
+      (training_menu: Training) => training_menu.id === Number(workout.menu)
     )?.name;
 
   const handleCloseDeleteModal = () => {
@@ -269,4 +268,4 @@ const WorkoutItem: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   );
 };
 
-export default WorkoutItem;
+export default WorkoutItemEdit;
