@@ -94,7 +94,12 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
     dispatch(addSet({ workoutId: workout.id }));
   };
   const handleDeleteSet = () => {
-    dispatch(deleteSet({ workoutId: workout.id }));
+    // セットが1つしかない場合は削除しない
+    if (workout.sets.length === 1) {
+      return;
+    } else {
+      dispatch(deleteSet({ workoutId: workout.id }));
+    }
   };
 
   // トレーニングボリュームを計算
