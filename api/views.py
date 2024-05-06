@@ -70,14 +70,19 @@ class TrainingSessionListView(generics.ListAPIView):
         user = self.request.user
         six_months_ago = timezone.now() - datetime.timedelta(days=180)
         return TrainingSession.objects.filter(user=user, date__gte=six_months_ago).prefetch_related('workouts__sets')
-
 class WeightHistoryViewSet(viewsets.ModelViewSet):
     queryset = WeightHistory.objects.all()
     serializer_class = serializers.WeightHistorySerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(profile=self.request.user.userProfile)
+        date = serializer.validated_data['date']
+        profile = self.request.user.userProfile
+        weight_history, created = WeightHistory.objects.update_or_create(
+            profile=profile,
+            date=date,
+            defaults=serializer.validated_data
+        )
 
     def get_queryset(self):
         return self.queryset.filter(profile=self.request.user.userProfile)
@@ -88,7 +93,13 @@ class BodyFatPercentageHistoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(profile=self.request.user.userProfile)
+        date = serializer.validated_data['date']
+        profile = self.request.user.userProfile
+        body_fat_percentage_history, created = BodyFatPercentageHistory.objects.update_or_create(
+            profile=profile,
+            date=date,
+            defaults=serializer.validated_data
+        )
 
     def get_queryset(self):
         return self.queryset.filter(profile=self.request.user.userProfile)
@@ -99,7 +110,13 @@ class MuscleMassHistoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(profile=self.request.user.userProfile)
+        date = serializer.validated_data['date']
+        profile = self.request.user.userProfile
+        muscle_mass_history, created = MuscleMassHistory.objects.update_or_create(
+            profile=profile,
+            date=date,
+            defaults=serializer.validated_data
+        )
 
     def get_queryset(self):
         return self.queryset.filter(profile=self.request.user.userProfile)

@@ -1,0 +1,25 @@
+.dialogTitle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: #f5f5f5;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  right: 16px;
+}
+
+.dialogContent {
+  padding: 24px;
+}
+
+.listItem {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.listItem:last-child {
+  border-bottom: none;
+}

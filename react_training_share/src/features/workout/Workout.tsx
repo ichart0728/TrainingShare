@@ -6,7 +6,7 @@ import { fetchAsyncGetTrainingSessions } from "../api/workoutApi";
 import { WORKOUT_POST } from "../types";
 import { AppDispatch } from "../../app/store";
 import styles from "./Workout.module.css";
-import WorkoutPopup from "./WorkoutPopup";
+import WorkoutModal from "../components/modal/WorkoutModal";
 import {
   Modal,
   Button,
@@ -150,13 +150,10 @@ const Workout = () => {
   return (
     <div className={styles.container}>
       <div className={styles.topControls}>
-        <Typography variant="h4" gutterBottom>
-          Workout Tracker
-        </Typography>
         <div className={styles.volumeAndTimerContainer}>
           <div className={styles.totalVolume}>
             <Typography variant="subtitle1" gutterBottom>
-              Total Volume
+              合計ボリューム
               <br />
             </Typography>
             <Typography variant="h6" gutterBottom>
@@ -171,7 +168,7 @@ const Workout = () => {
 
           <div className={styles.timer}>
             <Typography variant="subtitle1" gutterBottom>
-              Timer
+              タイマー
             </Typography>
             <Typography variant="h6" gutterBottom>
               {formatTime(time)}
@@ -209,7 +206,7 @@ const Workout = () => {
       </div>
       <div className={styles.content}>
         <Modal open={openModal} onClose={handleCloseModal}>
-          <WorkoutPopup open={openModal} onClose={handleCloseModal} />
+          <WorkoutModal open={openModal} onClose={handleCloseModal} />
         </Modal>
         <div className={styles.workoutList}>
           {selectedWorkouts.map((workout, index) => (

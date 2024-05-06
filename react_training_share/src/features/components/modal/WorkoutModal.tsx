@@ -9,17 +9,17 @@ import {
   Typography,
 } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../app/store";
+import { RootState, AppDispatch } from "../../../app/store";
 import { v4 as uuidv4 } from "uuid";
-import { addWorkout } from "./workoutSlice";
-import styles from "./WorkoutPopup.module.css";
-import { PROPS_WORKOUT } from "../types";
+import { addWorkout } from "../../workout/workoutSlice";
+import styles from "./WorkoutModal.module.css";
+import { PROPS_WORKOUT } from "../../types";
 
 interface MenuSelection {
   [key: number]: number[]; // タブのインデックスごとに選択されたメニューIDのリストを保持
 }
 
-const WorkoutPopup = ({
+const WorkoutModal = ({
   open,
   onClose,
 }: {
@@ -145,4 +145,4 @@ const WorkoutPopup = ({
   );
 };
 
-export default WorkoutPopup;
+export default WorkoutModal;

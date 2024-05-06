@@ -5,6 +5,7 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { RootState } from "../../app/store";
 import WorkoutItemView from "../components/WorkoutItemView";
+import SelectTrainingSessionModal from "../components/modal/SelectTrainingSessionModal";
 import { PROPS_TRAINING_SESSION, Training } from "../types";
 
 const localizer = momentLocalizer(moment);
@@ -13,13 +14,13 @@ const CalendarScreen = () => {
   const trainingSessions = useSelector(
     (state: RootState) => state.workoutHistory.trainingSessions
   );
-
   const trainings = useSelector(
     (state: RootState) => state.training.trainingMenus
   );
-
   const [selectedSession, setSelectedSession] =
     useState<PROPS_TRAINING_SESSION | null>(null);
+  const [openSessionList, setOpenSessionList] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const getTrainingTitle = (
     session: PROPS_TRAINING_SESSION,
@@ -29,7 +30,6 @@ const CalendarScreen = () => {
       const training = trainings.find((t) => t.id === workout.body_part);
       return training ? training.name : "";
     });
-    // bodyPartsから重複を削除
     const uniqueBodyParts = Array.from(new Set(bodyParts));
     return uniqueBodyParts.join(", ");
   };
@@ -45,6 +45,20 @@ const CalendarScreen = () => {
     setSelectedSession(event.session);
   };
 
+  const handleCloseSessionList = () => {
+    setOpenSessionList(false);
+  };
+
+  const handleSelectSessionFromList = (session: PROPS_TRAINING_SESSION) => {
+    setSelectedSession(session);
+    setOpenSessionList(false);
+  };
+
+  const handleShowMore = (events: any[], date: Date) => {
+    setSelectedDate(date);
+    setOpenSessionList(true);
+  };
+
   return (
     <div>
       <div style={{ height: "500px" }}>
@@ -56,37 +70,31 @@ const CalendarScreen = () => {
           style={{ height: "100%" }}
           views={["month"]}
           onSelectEvent={handleSelectEvent}
-          eventPropGetter={(event: any) => {
-            const sessionCount = trainingSessions.filter((session) =>
-              moment(session.date).isSame(event.start, "day")
-            ).length;
-            return {
-              style: {
-                backgroundColor: "#3174ad",
-                color: "#ffffff",
-                borderRadius: "5px",
-                border: "none",
-              },
-              title:
-                sessionCount > 1
-                  ? `${event.title} +${sessionCount - 1} more`
-                  : event.title,
-            };
-          }}
+          onShowMore={handleShowMore}
+          eventPropGetter={() => ({
+            style: {
+              backgroundColor: "#3174ad",
+              color: "#ffffff",
+              borderRadius: "5px",
+              border: "none",
+            },
+          })}
         />
       </div>
       {selectedSession && (
         <div>
           <h3>トレーニング内容</h3>
-          {selectedSession.workouts.map(
-            (workout) =>
-              // completedがtrueのデータだけ表示
-              workout.sets.every((set) => set.completed) && (
-                <WorkoutItemView key={workout.id} workout={workout} />
-              )
-          )}{" "}
+          {selectedSession.workouts.map((workout) => (
+            <WorkoutItemView key={workout.id} workout={workout} />
+          ))}{" "}
         </div>
       )}
+      <SelectTrainingSessionModal
+        open={openSessionList}
+        onClose={handleCloseSessionList}
+        selectedDate={selectedDate}
+        onSelectSession={handleSelectSessionFromList}
+      />
     </div>
   );
 };
