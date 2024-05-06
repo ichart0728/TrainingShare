@@ -41,7 +41,7 @@ export const fetchAsyncRegister = createAsyncThunk(
 export const fetchAsyncCreateProf = createAsyncThunk(
   "profile/post",
   async (nickName: PROPS_NICKNAME) => {
-    const res = await axios.post(`${apiUrl}api/profile/`, nickName, {
+    const res = await axios.post(`${apiUrl}api/profiles/`, nickName, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `JWT ${localStorage.localJWT}`,
@@ -76,7 +76,7 @@ export const fetchAsyncUpdateProf = createAsyncThunk(
 export const fetchAsyncGetMyProf = createAsyncThunk(
   "myprofile/get",
   async () => {
-    const res = await axios.get(`${apiUrl}api/myprofile/`, {
+    const res = await axios.get(`${apiUrl}api/profiles/`, {
       headers: {
         Authorization: `JWT ${localStorage.localJWT}`,
       },
@@ -87,7 +87,7 @@ export const fetchAsyncGetMyProf = createAsyncThunk(
 
 /*プロフィール一覧取得*/
 export const fetchAsyncGetProfs = createAsyncThunk("profiles/get", async () => {
-  const res = await axios.get(`${apiUrl}api/profile/`, {
+  const res = await axios.get(`${apiUrl}api/profiles/`, {
     headers: {
       Authorization: `JWT ${localStorage.localJWT}`,
     },

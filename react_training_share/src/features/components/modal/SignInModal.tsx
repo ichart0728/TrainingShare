@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { AppDispatch } from "../../../app/store";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import styles from "./Modal.module.css";
 import Modal from "react-modal";
 import { Formik, Form, Field } from "formik";
@@ -27,6 +28,8 @@ import {
 
 const SignInModal: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+
   const openSignIn = useSelector(selectOpenSignIn);
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
   const [loginError, setLoginError] = useState("");
@@ -57,6 +60,7 @@ const SignInModal: React.FC = () => {
               await dispatch(fetchAsyncGetTrainingMenus());
               await dispatch(fetchAsyncGetTrainingSessions());
               await dispatch(resetOpenSignIn());
+              navigate("/workout_history");
             } else {
               setLoginError("Invalid email or password");
             }

@@ -2,8 +2,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { WORKOUT_POST } from "../types";
 
-const apiUrlTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/training_sessions/`;
-const apiUrlMyTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/my_training_sessions/`;
+const apiUrlTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/training-sessions/`;
+const apiUrlMyTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/my-training-sessions/`;
 
 // トレーニングセッションを登録
 export const fetchAsyncPostTrainingSessions = createAsyncThunk(

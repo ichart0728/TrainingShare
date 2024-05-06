@@ -121,20 +121,16 @@ class TrainingRecordSerializer(serializers.ModelSerializer):
         fields = ['id', 'menu', 'body_part', 'sets']
 
     def create(self, validated_data):
-        print(f"TrainingRecordSerializer Validated Data: {validated_data}")
         sets_data = validated_data.pop('sets', [])
         record = TrainingRecord.objects.create(**validated_data)
 
         for index, set_data in enumerate(sets_data, start=1):
-            print(f"Set Data: {set_data}")
             TrainingSet.objects.create(record=record, set_number=index, **set_data)
-            print("Created a new set!")
 
         return record
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        print(f"TrainingRecordSerializer Representation: {representation}")
         return representation
 
 class TrainingSessionSerializer(serializers.ModelSerializer):
@@ -145,12 +141,10 @@ class TrainingSessionSerializer(serializers.ModelSerializer):
         fields = ['id', 'date', 'duration', 'workouts']
 
     def create(self, validated_data):
-        print(f"TrainingSessionSerializer Validated Data: {validated_data}")
         records_data = validated_data.pop('workouts', [])
         session = TrainingSession.objects.create(**validated_data)
 
         for record_data in records_data:
-            print(f"Record Data: {record_data}")
             menu_id = record_data.get('menu')
             body_part_id = record_data.get('body_part')
 
@@ -165,12 +159,10 @@ class TrainingSessionSerializer(serializers.ModelSerializer):
             record_serializer = TrainingRecordSerializer(data=record_data)
             record_serializer.is_valid(raise_exception=True)
             record_serializer.save(session=session)
-            print("Created a new record!")
 
         return session
 
     def update(self, instance, validated_data):
-        print(f"TrainingSessionSerializer Update Validated Data: {validated_data}")
         records_data = validated_data.pop('workouts', [])
 
         instance.date = validated_data.get('date', instance.date)
@@ -181,7 +173,6 @@ class TrainingSessionSerializer(serializers.ModelSerializer):
         instance.workouts.all().delete()
 
         for record_data in records_data:
-            print(f"Update Record Data: {record_data}")
             menu_id = record_data.get('menu')
             body_part_id = record_data.get('body_part')
 
@@ -196,11 +187,9 @@ class TrainingSessionSerializer(serializers.ModelSerializer):
             record_serializer = TrainingRecordSerializer(data=record_data)
             record_serializer.is_valid(raise_exception=True)
             record_serializer.save(session=instance)
-            print("Updated a record!")
 
         return instance
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        print(f"TrainingSessionSerializer Representation: {representation}")
         return representation

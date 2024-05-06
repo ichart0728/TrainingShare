@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { AppDispatch } from "../../../app/store";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import styles from "./Modal.module.css";
 import Modal from "react-modal";
 import { Formik, Form, Field } from "formik";
@@ -27,6 +28,7 @@ import {
 
 const SignUpModal: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
   const openSignUp = useSelector(selectOpenSignUp);
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
   const [signUpError, setSignUpError] = useState("");
@@ -56,6 +58,7 @@ const SignUpModal: React.FC = () => {
               await dispatch(fetchAsyncGetComments());
               await dispatch(fetchAsyncGetMyProf());
               await dispatch(resetOpenSignUp());
+              navigate("/workout_history");
             } else {
               if (
                 resultReg.payload &&

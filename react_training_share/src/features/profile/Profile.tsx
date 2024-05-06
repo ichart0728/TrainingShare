@@ -61,7 +61,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (profileId) {
-      dispatch(fetchAsyncGetProf(profileId));
+      dispatch(fetchAsyncGetProf());
       dispatch(fetchAsyncGetUserPosts(profileId));
       dispatch(fetchAsyncListWeightHistory());
       dispatch(fetchAsyncListBodyFatPercentageHistory());
