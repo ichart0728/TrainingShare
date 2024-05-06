@@ -11,35 +11,34 @@ import WorkoutHistory from "./features/workout_history/WorkoutHistory";
 import CalendarScreen from "./features/calendar/CalendarScreen";
 
 function App() {
-  const nickName = useSelector(
-    (state: RootState) => state.auth.myprofile.nickName
-  );
+  const userId = useSelector((state: RootState) => state.auth.myprofile.id);
+
   return (
     <BrowserRouter>
       <div style={{ display: "flex" }}>
-        {nickName && <Sidebar />}
+        {userId && <Sidebar />}
         <main style={{ flexGrow: 1, padding: "20px" }}>
           <Routes>
             <Route path="/" element={<Auth />} />
             <Route
               path="/home"
-              element={nickName ? <Home /> : <Navigate to="/" />}
+              element={userId ? <Home /> : <Navigate to="/" />}
             />
             <Route
               path="/workout"
-              element={nickName ? <Workout /> : <Navigate to="/" />}
+              element={userId ? <Workout /> : <Navigate to="/" />}
             />
             <Route
               path="/profile/:nickname"
-              element={nickName ? <Profile /> : <Navigate to="/" />}
+              element={userId ? <Profile /> : <Navigate to="/" />}
             />
             <Route
               path="/workout_history"
-              element={nickName ? <WorkoutHistory /> : <Navigate to="/" />}
+              element={userId ? <WorkoutHistory /> : <Navigate to="/" />}
             />
             <Route
               path="/calendar"
-              element={nickName ? <CalendarScreen /> : <Navigate to="/" />}
+              element={userId ? <CalendarScreen /> : <Navigate to="/" />}
             />
           </Routes>
         </main>

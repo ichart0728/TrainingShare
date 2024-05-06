@@ -87,6 +87,7 @@ class UserManager(BaseUserManager):
         return admin_user
 
 # ユーザーテーブル (User) のモデル
+# ユーザーテーブル (User) のモデル
 class User(AbstractBaseUser, PermissionsMixin):
     # ユーザーID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -120,9 +121,64 @@ class Profile(models.Model):
     # プロフィール画像
     img = models.ImageField(blank=True, null=True, upload_to=upload_avatar_path)
 
+    # 性別
+    GENDER_CHOICES = (
+        ('男性', '男性'),
+        ('女性', '女性'),
+        ('その他', 'その他'),
+    )
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
+
+    # 身長
+    height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+
+    # 生年月日
+    dateOfBirth = models.DateField(blank=True, null=True)
+
     def __str__(self):
         return self.nickName
 
+# 体重履歴テーブル (WeightHistory) のモデル
+class WeightHistory(models.Model):
+    # 体重履歴ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # プロフィールと体重履歴を1:Nで紐づける
+    profile = models.ForeignKey(Profile, related_name='weightHistory', on_delete=models.CASCADE)
+    # 体重
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    # 記録日
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.profile.nickName} - {self.date}"
+
+# 体脂肪率履歴テーブル (BodyFatPercentageHistory) のモデル
+class BodyFatPercentageHistory(models.Model):
+    # 体脂肪率履歴ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # プロフィールと体脂肪率履歴を1:Nで紐づける
+    profile = models.ForeignKey(Profile, related_name='bodyFatPercentageHistory', on_delete=models.CASCADE)
+    # 体脂肪率
+    bodyFatPercentage = models.DecimalField(max_digits=5, decimal_places=2)
+    # 記録日
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.profile.nickName} - {self.date}"
+
+# 筋肉量履歴テーブル (MuscleMassHistory) のモデル
+class MuscleMassHistory(models.Model):
+    # 筋肉量履歴ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # プロフィールと筋肉量履歴を1:Nで紐づける
+    profile = models.ForeignKey(Profile, related_name='muscleMassHistory', on_delete=models.CASCADE)
+    # 筋肉量
+    muscleMass = models.DecimalField(max_digits=5, decimal_places=2)
+    # 記録日
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.profile.nickName} - {self.date}"
 
 # 投稿テーブル (Post) のモデル
 class Post(models.Model):

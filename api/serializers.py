@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingSession, TrainingRecord, TrainingSet
+from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingSession, TrainingRecord, TrainingSet, WeightHistory, BodyFatPercentageHistory, MuscleMassHistory
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -26,15 +26,42 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-
     created_on = serializers.DateTimeField(format='%Y-%m-%d', read_only=True)
+    weightHistory = serializers.SerializerMethodField()
+    bodyFatPercentageHistory = serializers.SerializerMethodField()
+    muscleMassHistory = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
-        fields = ('id', 'nickName', 'userProfile', 'created_on', 'img')
-        # サーバー側で識別可能なので、クライアント側からログインユーザーを指定しないようにしておく
+        fields = ('id', 'nickName', 'userProfile', 'created_on', 'img', 'gender', 'height', 'dateOfBirth', 'weightHistory', 'bodyFatPercentageHistory', 'muscleMassHistory')
         extra_kwargs = {'userProfile': {'read_only': True}}
 
+    def get_weightHistory(self, obj):
+        weightHistory = WeightHistory.objects.filter(profile=obj).order_by('date')[:365]
+        return WeightHistorySerializer(weightHistory, many=True).data
+
+    def get_bodyFatPercentageHistory(self, obj):
+        bodyFatPercentageHistory = BodyFatPercentageHistory.objects.filter(profile=obj).order_by('date')[:365]
+        return BodyFatPercentageHistorySerializer(bodyFatPercentageHistory, many=True).data
+
+    def get_muscleMassHistory(self, obj):
+        muscleMassHistory = MuscleMassHistory.objects.filter(profile=obj).order_by('date')[:365]
+        return MuscleMassHistorySerializer(muscleMassHistory, many=True).data
+
+class WeightHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WeightHistory
+        fields = ('weight', 'date')
+
+class BodyFatPercentageHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BodyFatPercentageHistory
+        fields = ('bodyFatPercentage', 'date')
+
+class MuscleMassHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MuscleMassHistory
+        fields = ('muscleMass', 'date')
 
 class PostSerializer(serializers.ModelSerializer):
 

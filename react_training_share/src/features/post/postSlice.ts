@@ -44,6 +44,9 @@ const initialState: PROPS_POST_STATE = {
     userProfile: "",
     created_on: "",
     img: "",
+    gender: "",
+    height: 0,
+    dateOfBirth: "",
     userPosts: [],
   },
 };

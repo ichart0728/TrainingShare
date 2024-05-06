@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from . import serializers
-from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession
+from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession, WeightHistory, BodyFatPercentageHistory, MuscleMassHistory
 from rest_framework.exceptions import ValidationError
 from django.utils import timezone
 import datetime
@@ -21,14 +21,21 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
 
-    # クライアント側からはuserProfileを指定しなくていいようにしているので、サーバー側で指定するようにオーバーライドする
     def perform_create(self, serializer):
-        '''
-        ログインしているユーザーを識別して、シリアライザーに設定する
-        :params: serializer
-            プロフィール用のシリアライザー
-        '''
         serializer.save(userProfile=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(userProfile=self.request.user)
+
+    def get_queryset(self):
+        return self.queryset.filter(userProfile=self.request.user)
+
+class MyProfileListView(generics.ListAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = serializers.ProfileSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(userProfile=self.request.user)
 
 # ログインユーザーのプロフィールを表示するためのView
 class MyProfileListView(generics.ListAPIView):
@@ -146,3 +153,59 @@ class TrainingSessionListView(generics.ListAPIView):
 
         # 過去半年間のデータのみをフィルタリングして取得
         return TrainingSession.objects.filter(user=user, date__gte=six_months_ago).prefetch_related('workouts__sets')
+
+class WeightHistoryCreateView(generics.CreateAPIView):
+    queryset = WeightHistory.objects.all()
+    serializer_class = serializers.WeightHistorySerializer
+
+    def perform_create(self, serializer):
+        try:
+            serializer.save(profile=self.request.user.userProfile)
+        except Exception as e:
+            raise
+
+class BodyFatPercentageHistoryCreateView(generics.CreateAPIView):
+    queryset = BodyFatPercentageHistory.objects.all()
+    serializer_class = serializers.BodyFatPercentageHistorySerializer
+
+    def perform_create(self, serializer):
+        try:
+            serializer.save(profile=self.request.user.userProfile)
+        except Exception as e:
+            raise
+
+class MuscleMassHistoryCreateView(generics.CreateAPIView):
+    queryset = MuscleMassHistory.objects.all()
+    serializer_class = serializers.MuscleMassHistorySerializer
+
+    def dispatch(self, request, *args, **kwargs):
+        # リクエストデータをログに出力
+        return super().dispatch(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+
+        try:
+            serializer.save(profile=self.request.user.userProfile)
+        except Exception as e:
+            raise
+
+class WeightHistoryListView(generics.ListAPIView):
+    serializer_class = serializers.WeightHistorySerializer
+
+    def get_queryset(self):
+        profile = self.request.user.userProfile
+        return WeightHistory.objects.filter(profile=profile)
+
+class BodyFatPercentageHistoryListView(generics.ListAPIView):
+    serializer_class = serializers.BodyFatPercentageHistorySerializer
+
+    def get_queryset(self):
+        profile = self.request.user.userProfile
+        return BodyFatPercentageHistory.objects.filter(profile=profile)
+
+class MuscleMassHistoryListView(generics.ListAPIView):
+    serializer_class = serializers.MuscleMassHistorySerializer
+
+    def get_queryset(self):
+        profile = self.request.user.userProfile
+        return MuscleMassHistory.objects.filter(profile=profile)

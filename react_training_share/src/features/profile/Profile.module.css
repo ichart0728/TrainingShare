@@ -1,62 +1,153 @@
 .profileContainer {
-  padding: 20px;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
-@media (max-width: 480px) {
-  .profileContainer {
-    margin-left: 0;
-  }
+.profileCard {
+  margin-bottom: 2rem;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.profileContent {
+  padding: 2rem;
 }
 
 .profileHeader {
   display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
 }
 
-@media (min-width: 600px) {
+@media (max-width: 600px) {
   .profileHeader {
-    flex-direction: row;
-  }
-}
-
-@media (min-width: 600px) {
-  .profileAvatar {
-    margin-bottom: 0;
+    flex-direction: column;
+    align-items: center;
   }
 }
 
 .profileAvatar {
   width: 120px;
   height: 120px;
-  margin-right: 20px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: auto;
-  margin-right: auto;
+  margin-right: 2rem;
 }
 
-@media (min-width: 600px) {
+@media (max-width: 600px) {
   .profileAvatar {
-    margin-left: 0;
-    margin-right: 20px;
+    margin-right: 0;
+    margin-bottom: 1rem;
   }
+}
+
+.profileInfo {
+  flex: 1;
+  width: 100%;
+}
+
+.profileDetails {
+  margin-top: 1rem;
+}
+
+.profileDetail {
+  margin-bottom: 0.5rem;
+}
+
+.editButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.profileEditForm {
+  margin-top: 2rem;
+}
+
+.profileInput {
+  margin-bottom: 1rem;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 2rem;
+}
+
+.divider {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.chartCard {
+  margin-bottom: 2rem;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
 .historyContainer {
   width: 100%;
   margin: 0 auto;
-  padding: 20px;
   box-sizing: border-box;
 }
 
-@media (max-width: 480px) {
-  .historyContainer {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 20px;
+.inputContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .inputContainer {
+    flex-direction: column;
+    align-items: stretch;
   }
+}
+
+.inputField {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+@media (max-width: 600px) {
+  .inputField {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+}
+
+.recordButton {
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .recordButton {
+    width: 100%;
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.profileField {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.profileLabel {
+  width: 120px;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .profileLabel {
+    width: 100px;
+  }
+}
+
+.profileValue {
+  flex: 1;
 }

@@ -132,6 +132,9 @@ interface PROPS_PROFILE {
   userProfile: string;
   created_on: string;
   img: string;
+  gender: string;
+  height: number;
+  dateOfBirth: string;
   userPosts: Post[];
 }
 interface UserPost {
@@ -140,9 +143,28 @@ interface UserPost {
   img: string;
   created_on: string;
 }
+
+interface WeightHistory {
+  date: string;
+  weight: number;
+}
+
+interface muscleMassHistory {
+  date: string;
+  muscleMass: number;
+}
+
+interface BodyFatPercentageHistory {
+  date: string;
+  bodyFatPercentage: number;
+}
+
 export interface ProfileState {
   isLoadingProfile: boolean;
   profile: PROPS_PROFILE;
+  weightHistory: WeightHistory[];
+  bodyFatPercentageHistory: BodyFatPercentageHistory[];
+  muscleMassHistory: muscleMassHistory[];
   userPosts: UserPost[];
 }
 
@@ -200,6 +222,9 @@ interface PROPS_PROFILE {
   userProfile: string;
   created_on: string;
   img: string;
+  gender: string;
+  height: number;
+  dateOfBirth: string;
 }
 
 export interface PROPS_AUTH_STATE {

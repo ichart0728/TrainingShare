@@ -27,7 +27,7 @@ const Core: React.FC = () => {
         <Auth />
         <NewPost />
         {/* メインコンテンツ */}
-        {profile?.nickName && (
+        {profile?.id && (
           <div className={styles.core_posts}>
             {/* 投稿一覧 */}
             <Grid container spacing={4}>

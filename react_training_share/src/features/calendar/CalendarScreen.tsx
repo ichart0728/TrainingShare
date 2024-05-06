@@ -5,7 +5,7 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { RootState } from "../../app/store";
 import WorkoutItemView from "../components/WorkoutItemView";
-import { PROPS_WORKOUT, PROPS_TRAINING_SESSION, Training } from "../types";
+import { PROPS_TRAINING_SESSION, Training } from "../types";
 
 const localizer = momentLocalizer(moment);
 

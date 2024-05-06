@@ -9,6 +9,8 @@ import { TextField, Button, CircularProgress } from "@material-ui/core";
 import { fetchAsyncGetPosts } from "../../api/postApi";
 import { fetchAsyncGetComments } from "../../api/commentApi";
 import { fetchAsyncGetTrainingMenus } from "../../api/trainingMenuApi";
+import { fetchAsyncGetTrainingSessions } from "../../api/workoutApi";
+
 import {
   selectIsLoadingAuth,
   selectOpenSignIn,
@@ -53,6 +55,7 @@ const SignInModal: React.FC = () => {
               await dispatch(fetchAsyncGetMyProf());
               await dispatch(fetchAsyncGetMyProf());
               await dispatch(fetchAsyncGetTrainingMenus());
+              await dispatch(fetchAsyncGetTrainingSessions());
               await dispatch(resetOpenSignIn());
             } else {
               setLoginError("Invalid email or password");

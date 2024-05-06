@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { fetchAsyncGetTrainingSessions } from "../api/workoutApi";
 import { PROPS_WORKOUT_HISTORY_STATE, PROPS_TRAINING_SESSION } from "../types";
+import { logout } from "../auth/authSlice";
 
 const initialState: PROPS_WORKOUT_HISTORY_STATE = {
   trainingSessions: [],
@@ -30,7 +31,8 @@ export const workoutHistorySlice = createSlice({
         state.loading = false;
         state.error =
           action.error.message ?? "Failed to fetch training sessions";
-      });
+      })
+      .addCase(logout, () => initialState);
   },
 });
 

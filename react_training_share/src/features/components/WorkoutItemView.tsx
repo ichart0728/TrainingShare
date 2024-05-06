@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Typography,
   Paper,
@@ -8,16 +8,13 @@ import {
 } from "@material-ui/core";
 import { RootState } from "../../app/store";
 import styles from "./WorkoutItemView.module.css";
-import { useSelector, useDispatch } from "react-redux";
-import { updateSet } from "../workout/workoutSlice";
+import { useSelector } from "react-redux";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import { AppDispatch } from "../../app/store";
 
 import { PROPS_WORKOUT_ITEM, Training } from "../types";
 
 const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
-  const dispatch: AppDispatch = useDispatch();
   // store.training.trainingMenuを取得する
   const trainingMenus = useSelector(
     (state: RootState) => state.training.trainingMenus

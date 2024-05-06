@@ -1,7 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 
-import { fetchAsyncGetProf } from "../api/profileApi";
+import {
+  fetchAsyncGetProf,
+  fetchAsyncListWeightHistory,
+  fetchAsyncListBodyFatPercentageHistory,
+  fetchAsyncListMuscleMassHistory,
+} from "../api/profileApi";
 import { fetchAsyncGetUserPosts } from "../api/postApi";
 
 import { logout } from "../auth/authSlice";
@@ -15,8 +20,29 @@ const initialState: ProfileState = {
     userProfile: "",
     created_on: "",
     img: "",
+    gender: "",
+    height: 0,
+    dateOfBirth: "",
     userPosts: [],
   },
+  weightHistory: [
+    {
+      date: "",
+      weight: 0,
+    },
+  ],
+  bodyFatPercentageHistory: [
+    {
+      date: "",
+      bodyFatPercentage: 0,
+    },
+  ],
+  muscleMassHistory: [
+    {
+      date: "",
+      muscleMass: 0,
+    },
+  ],
   userPosts: [
     {
       id: "",
@@ -63,6 +89,24 @@ export const profileSlice = createSlice({
       state.userPosts = action.payload;
       state.isLoadingProfile = false;
     });
+    builder.addCase(fetchAsyncListWeightHistory.fulfilled, (state, action) => {
+      state.weightHistory = action.payload;
+      state.isLoadingProfile = false;
+    });
+    builder.addCase(
+      fetchAsyncListBodyFatPercentageHistory.fulfilled,
+      (state, action) => {
+        state.bodyFatPercentageHistory = action.payload;
+        state.isLoadingProfile = false;
+      }
+    );
+    builder.addCase(
+      fetchAsyncListMuscleMassHistory.fulfilled,
+      (state, action) => {
+        state.muscleMassHistory = action.payload;
+        state.isLoadingProfile = false;
+      }
+    );
     builder.addCase(logout, () => initialState);
   },
 });
