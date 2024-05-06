@@ -53,7 +53,7 @@ const SelectTrainingSessionModal: React.FC<SelectTrainingSessionModalProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle className={styles.dialogTitle}>
         <Typography variant="h6" align="center">
-          トレーニングセッションを選択
+          トレーニングセッション選択
         </Typography>
       </DialogTitle>
       <DialogContent className={styles.dialogContent}>

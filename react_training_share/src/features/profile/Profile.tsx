@@ -310,8 +310,13 @@ const Profile = () => {
           <Divider className={styles.divider} />
           <Card className={styles.chartCard}>
             <CardContent>
-              <Typography variant="h5" component="h2" gutterBottom>
-                体重の推移
+              <Typography
+                variant="h5"
+                component="h2"
+                className={styles.graphTitle}
+                gutterBottom
+              >
+                体重推移
               </Typography>
               <div className={styles.historyContainer}>
                 <WeightChart weightHistory={weightHistory} />
@@ -344,8 +349,13 @@ const Profile = () => {
 
           <Card className={styles.chartCard}>
             <CardContent>
-              <Typography variant="h5" component="h2" gutterBottom>
-                体脂肪率の推移
+              <Typography
+                variant="h5"
+                component="h2"
+                className={styles.graphTitle}
+                gutterBottom
+              >
+                体脂肪率推移
               </Typography>
               <div className={styles.historyContainer}>
                 <BodyFatPercentageChart
@@ -380,8 +390,13 @@ const Profile = () => {
 
           <Card className={styles.chartCard}>
             <CardContent>
-              <Typography variant="h5" component="h2" gutterBottom>
-                筋肉量の推移
+              <Typography
+                variant="h5"
+                component="h2"
+                className={styles.graphTitle}
+                gutterBottom
+              >
+                筋肉量推移
               </Typography>
               <div className={styles.historyContainer}>
                 <MuscleMassChart muscleMassHistory={muscleMassHistory} />

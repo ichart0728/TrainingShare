@@ -61,6 +61,7 @@ const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
             />
           </div>
         </Grid>
+
         <Grid item xs={12} md={6}>
           <div className={styles.chartHeader}>
             <Typography variant="h6" className={styles.chartTitle}>
