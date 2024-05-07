@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { clearWorkouts, startTimer, stopTimer } from "./workoutSlice";
+import {
+  clearWorkouts,
+  startTimer,
+  stopTimer,
+  pauseTimer,
+  selectTimer,
+  selectTimerTime,
+  updateTimerTime,
+} from "./workoutSlice";
 import { fetchAsyncPostTrainingSessions } from "../api/workoutApi";
 import { fetchAsyncGetTrainingSessions } from "../api/workoutApi";
 import { WORKOUT_POST } from "../types";
@@ -25,9 +33,9 @@ import WorkoutItemEdit from "../components/WorkoutItemEdit";
 import { useNavigate } from "react-router-dom";
 
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import ClearIcon from "@material-ui/icons/Clear";
+import StopIcon from "@material-ui/icons/Stop";
 import PauseIcon from "@material-ui/icons/Pause";
-import ReplayIcon from "@material-ui/icons/Replay";
+import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 
 const Workout = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -57,49 +65,55 @@ const Workout = () => {
     );
   }, 0);
   const [openModal, setOpenModal] = useState(false);
-  const [trainingActive, setTrainingActive] = useState(false);
-  const [paused, setPaused] = useState(true);
-  const [time, setTime] = useState(0);
+  const timer = useSelector(selectTimer);
+  const time = useSelector(selectTimerTime);
 
   useEffect(() => {
-    let interval: any = null;
+    let timerId: NodeJS.Timeout;
 
-    if (trainingActive && !paused) {
-      interval = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
+    if (timer.active && !timer.paused) {
+      timerId = setInterval(() => {
+        dispatch(updateTimerTime());
       }, 1000);
-    } else {
-      clearInterval(interval);
     }
 
     return () => {
-      clearInterval(interval);
+      clearInterval(timerId);
     };
-  }, [trainingActive, paused]);
+  }, [timer.active, timer.paused, dispatch]);
 
-  const handleStartOrEnd = () => {
+  const handleStartTimer = () => {
+    dispatch(startTimer());
+  };
+
+  const handlePauseTimer = () => {
+    dispatch(pauseTimer());
+  };
+
+  const handleStopTimer = () => {
     const anyIncompleteSets = selectedWorkouts.some((workout) =>
       workout.sets.some((set) => !set.completed)
     );
-    if (trainingActive) {
-      setModalContent(
-        anyIncompleteSets
-          ? "完了していないセットがあります。トレーニングを終了しますか？"
-          : "トレーニングを終了しますか？"
-      );
-      setOpenEndModal(true);
-    } else {
-      dispatch(startTimer());
-      setTrainingActive(true);
-      setPaused(false);
-    }
+    setModalContent(
+      anyIncompleteSets
+        ? "完了していないセットがあります。トレーニングを終了しますか？"
+        : "トレーニングを終了しますか？"
+    );
+    setOpenEndModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
   };
 
-  const confirmEndTraining = () => {
+  const confirmEndTrainingWithoutSaving = () => {
+    dispatch(stopTimer());
+    setOpenEndModal(false);
+    dispatch(clearWorkouts());
+    navigate("/workout_history");
+  };
+
+  const confirmEndTrainingWithSaving = () => {
     dispatch(stopTimer());
     // トレーニングデータを整形
     const workouts = selectedWorkouts
@@ -123,8 +137,6 @@ const Workout = () => {
     };
     console.log("送信するトレーニングデータ:", workoutData);
     dispatch(fetchAsyncPostTrainingSessions(workoutData) as any);
-    setTrainingActive(false);
-    setTime(0);
     setOpenEndModal(false);
     dispatch(clearWorkouts());
     dispatch(fetchAsyncGetTrainingSessions());
@@ -176,32 +188,38 @@ const Workout = () => {
           </div>
         </div>{" "}
         <div className={styles.fixedWidthButtonContainer}>
-          <Tooltip title={trainingActive ? "End Training" : "Start Training"}>
-            <IconButton
-              color={trainingActive ? "secondary" : "primary"}
-              onClick={handleStartOrEnd}
-              disabled={!selectedWorkouts.length}
-            >
-              {trainingActive ? (
-                <ClearIcon fontSize="large" />
-              ) : (
+          {!timer.active && (
+            <Tooltip title="Start Training">
+              <IconButton
+                color="primary"
+                onClick={handleStartTimer}
+                disabled={!selectedWorkouts.length}
+              >
                 <PlayArrowIcon fontSize="large" />
-              )}
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={paused ? "Resume Training" : "Pause Training"}>
-            <IconButton
-              color="primary"
-              onClick={() => setPaused(!paused)}
-              disabled={!trainingActive}
-            >
-              {paused ? (
-                <ReplayIcon fontSize="large" />
-              ) : (
+              </IconButton>
+            </Tooltip>
+          )}
+          {timer.active && !timer.paused && (
+            <Tooltip title="Pause Training">
+              <IconButton color="primary" onClick={handlePauseTimer}>
                 <PauseIcon fontSize="large" />
-              )}
-            </IconButton>
-          </Tooltip>
+              </IconButton>
+            </Tooltip>
+          )}
+          {timer.active && timer.paused && (
+            <Tooltip title="Resume Training">
+              <IconButton color="primary" onClick={handlePauseTimer}>
+                <PlayCircleOutlineIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
+          )}
+          {timer.active && (
+            <Tooltip title="Stop Training">
+              <IconButton color="secondary" onClick={handleStopTimer}>
+                <StopIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
+          )}
         </div>
       </div>
       <div className={styles.content}>
@@ -233,8 +251,11 @@ const Workout = () => {
           <Button onClick={handleCloseEndModal} color="primary">
             キャンセル
           </Button>
-          <Button onClick={confirmEndTraining} color="primary" autoFocus>
-            終了
+          <Button onClick={confirmEndTrainingWithSaving} color="primary">
+            保存して終了
+          </Button>
+          <Button onClick={confirmEndTrainingWithoutSaving} color="secondary">
+            保存せずに終了
           </Button>
         </DialogActions>
       </Dialog>

@@ -8,9 +8,12 @@ const initialState: PROPS_WORKOUT_STATE = {
   workouts: [],
   totalVolume: 0,
   completedTotalVolume: 0,
-  timer: 0,
-  isActive: false,
-  isPaused: false,
+  timer: {
+    active: false,
+    paused: true,
+    startTime: null,
+    time: 0,
+  },
 };
 
 export const workoutSlice = createSlice({
@@ -82,20 +85,34 @@ export const workoutSlice = createSlice({
       state.workouts = [];
     },
     startTimer: (state) => {
-      state.isActive = true;
-      state.isPaused = false;
+      state.timer.active = true;
+      state.timer.paused = false;
+      state.timer.startTime = new Date().getTime();
     },
     pauseTimer: (state) => {
-      state.isPaused = !state.isPaused;
+      state.timer.paused = !state.timer.paused;
     },
     stopTimer: (state) => {
-      state.isActive = false;
-      state.timer = 0;
+      state.timer.active = false;
+      state.timer.paused = true;
+      state.timer.startTime = null;
+      state.timer.time = 0;
+    },
+    updateTimerTime: (state) => {
+      if (state.timer.active && !state.timer.paused && state.timer.startTime) {
+        const currentTime = new Date().getTime();
+        state.timer.time = Math.floor(
+          (currentTime - state.timer.startTime) / 1000
+        );
+      }
     },
     incrementTimer: (state) => {
-      if (state.isActive && !state.isPaused) {
-        state.timer += 1;
+      if (state.timer.active && !state.timer.paused) {
+        state.timer.time += 1;
       }
+    },
+    setTimerTime: (state, action: PayloadAction<number>) => {
+      state.timer.time = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -113,9 +130,17 @@ export const {
   startTimer,
   pauseTimer,
   stopTimer,
+  updateTimerTime,
   incrementTimer,
+  setTimerTime,
   clearWorkouts,
 } = workoutSlice.actions;
 export default workoutSlice.reducer;
 
 export const selectTimer = (state: RootState) => state.workout.timer;
+export const selectWorkouts = (state: RootState) => state.workout.workouts;
+export const selectTimerActive = (state: RootState) =>
+  state.workout.timer.active;
+export const selectTimerPaused = (state: RootState) =>
+  state.workout.timer.paused;
+export const selectTimerTime = (state: RootState) => state.workout.timer.time;

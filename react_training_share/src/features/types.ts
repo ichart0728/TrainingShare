@@ -110,6 +110,17 @@ export interface PROPS_WORKOUT_HISTORY_STATE {
   error: string | null;
 }
 
+export interface PROPS_TIMER {
+  // タイマーが動いているか
+  active: boolean;
+  // タイマーが一時停止中か
+  paused: boolean;
+  // タイマーの開始時間
+  startTime: number | null;
+  // タイマーの時間
+  time: number;
+}
+
 // トレーニングメニュー全体の状態の型
 export interface PROPS_WORKOUT_STATE {
   // トレーニングメニュー
@@ -119,11 +130,7 @@ export interface PROPS_WORKOUT_STATE {
   // 完了済みトータルボリューム
   completedTotalVolume: number;
   // タイマー
-  timer: number;
-  // タイマーの状態
-  isActive: boolean;
-  // タイマーが一時停止しているか
-  isPaused: boolean;
+  timer: PROPS_TIMER;
 }
 
 interface PROPS_PROFILE {
