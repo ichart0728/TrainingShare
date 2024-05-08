@@ -58,6 +58,12 @@ const Profile = () => {
   const [weight, setWeight] = useState("");
   const [bodyFatPercentage, setBodyFatPercentage] = useState("");
   const [muscleMass, setMuscleMass] = useState("");
+  const [selectedWeightMonth, setSelectedWeightMonth] = useState(new Date());
+  const [selectedBodyFatPercentageMonth, setSelectedBodyFatPercentageMonth] =
+    useState(new Date());
+  const [selectedMuscleMassMonth, setSelectedMuscleMassMonth] = useState(
+    new Date()
+  );
 
   useEffect(() => {
     if (profileId) {
@@ -136,6 +142,156 @@ const Profile = () => {
       );
       setMuscleMass("");
     }
+  };
+
+  const getOldestWeightMonth = () => {
+    const allDates = [...weightHistory.map((item) => new Date(item.date))];
+    return allDates.length > 0
+      ? new Date(Math.min(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const getLatestWeightMonth = () => {
+    const allDates = [...weightHistory.map((item) => new Date(item.date))];
+    return allDates.length > 0
+      ? new Date(Math.max(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const handlePreviousWeightMonth = () => {
+    setSelectedWeightMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() - 1);
+      return newMonth;
+    });
+  };
+
+  const handleNextWeightMonth = () => {
+    setSelectedWeightMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() + 1);
+      return newMonth;
+    });
+  };
+
+  const getOldestBodyFatPercentageMonth = () => {
+    const allDates = [
+      ...bodyFatPercentageHistory.map((item) => new Date(item.date)),
+    ];
+    return allDates.length > 0
+      ? new Date(Math.min(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const getLatestBodyFatPercentageMonth = () => {
+    const allDates = [
+      ...bodyFatPercentageHistory.map((item) => new Date(item.date)),
+    ];
+    return allDates.length > 0
+      ? new Date(Math.max(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const handlePreviousBodyFatPercentageMonth = () => {
+    setSelectedBodyFatPercentageMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() - 1);
+      return newMonth;
+    });
+  };
+
+  const handleNextBodyFatPercentageMonth = () => {
+    setSelectedBodyFatPercentageMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() + 1);
+      return newMonth;
+    });
+  };
+
+  const getOldestMuscleMassMonth = () => {
+    const allDates = [...muscleMassHistory.map((item) => new Date(item.date))];
+    return allDates.length > 0
+      ? new Date(Math.min(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const getLatestMuscleMassMonth = () => {
+    const allDates = [...muscleMassHistory.map((item) => new Date(item.date))];
+    return allDates.length > 0
+      ? new Date(Math.max(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const handlePreviousMuscleMassMonth = () => {
+    setSelectedMuscleMassMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() - 1);
+      return newMonth;
+    });
+  };
+
+  const handleNextMuscleMassMonth = () => {
+    setSelectedMuscleMassMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() + 1);
+      return newMonth;
+    });
+  };
+
+  const isPreviousWeightMonthDisabled = () => {
+    const oldestMonth = getOldestWeightMonth();
+    return (
+      !oldestMonth ||
+      (oldestMonth.getFullYear() >= selectedWeightMonth.getFullYear() &&
+        oldestMonth.getMonth() >= selectedWeightMonth.getMonth())
+    );
+  };
+
+  const isNextWeightMonthDisabled = () => {
+    const latestMonth = getLatestWeightMonth();
+    return (
+      !latestMonth ||
+      (latestMonth.getFullYear() <= selectedWeightMonth.getFullYear() &&
+        latestMonth.getMonth() <= selectedWeightMonth.getMonth())
+    );
+  };
+
+  const isPreviousBodyFatPercentageMonthDisabled = () => {
+    const oldestMonth = getOldestBodyFatPercentageMonth();
+    return (
+      !oldestMonth ||
+      (oldestMonth.getFullYear() >=
+        selectedBodyFatPercentageMonth.getFullYear() &&
+        oldestMonth.getMonth() >= selectedBodyFatPercentageMonth.getMonth())
+    );
+  };
+
+  const isNextBodyFatPercentageMonthDisabled = () => {
+    const latestMonth = getLatestBodyFatPercentageMonth();
+    return (
+      !latestMonth ||
+      (latestMonth.getFullYear() <=
+        selectedBodyFatPercentageMonth.getFullYear() &&
+        latestMonth.getMonth() <= selectedBodyFatPercentageMonth.getMonth())
+    );
+  };
+
+  const isPreviousMuscleMassMonthDisabled = () => {
+    const oldestMonth = getOldestMuscleMassMonth();
+    return (
+      !oldestMonth ||
+      (oldestMonth.getFullYear() >= selectedMuscleMassMonth.getFullYear() &&
+        oldestMonth.getMonth() >= selectedMuscleMassMonth.getMonth())
+    );
+  };
+
+  const isNextMuscleMassMonthDisabled = () => {
+    const latestMonth = getLatestMuscleMassMonth();
+    return (
+      !latestMonth ||
+      (latestMonth.getFullYear() <= selectedMuscleMassMonth.getFullYear() &&
+        latestMonth.getMonth() <= selectedMuscleMassMonth.getMonth())
+    );
   };
 
   if (isLoading) {
@@ -310,16 +466,25 @@ const Profile = () => {
           <Divider className={styles.divider} />
           <Card className={styles.chartCard}>
             <CardContent>
-              <Typography
-                variant="h5"
-                component="h2"
-                className={styles.graphTitle}
-                gutterBottom
-              >
-                体重推移
-              </Typography>
+              <div className={styles.graphHeader}>
+                <Typography
+                  variant="h5"
+                  component="h2"
+                  className={styles.graphTitle}
+                  gutterBottom
+                >
+                  体重推移
+                </Typography>
+              </div>
               <div className={styles.historyContainer}>
-                <WeightChart weightHistory={weightHistory} />
+                <WeightChart
+                  weightHistory={weightHistory}
+                  selectedMonth={selectedWeightMonth}
+                  onPreviousMonth={handlePreviousWeightMonth}
+                  onNextMonth={handleNextWeightMonth}
+                  isPreviousMonthDisabled={isPreviousWeightMonthDisabled()}
+                  isNextMonthDisabled={isNextWeightMonthDisabled()}
+                />
               </div>
               <div className={styles.inputContainer}>
                 <TextField
@@ -349,17 +514,24 @@ const Profile = () => {
 
           <Card className={styles.chartCard}>
             <CardContent>
-              <Typography
-                variant="h5"
-                component="h2"
-                className={styles.graphTitle}
-                gutterBottom
-              >
-                体脂肪率推移
-              </Typography>
+              <div className={styles.graphHeader}>
+                <Typography
+                  variant="h5"
+                  component="h2"
+                  className={styles.graphTitle}
+                  gutterBottom
+                >
+                  体脂肪率推移
+                </Typography>
+              </div>
               <div className={styles.historyContainer}>
                 <BodyFatPercentageChart
                   bodyFatPercentageHistory={bodyFatPercentageHistory}
+                  selectedMonth={selectedBodyFatPercentageMonth}
+                  onPreviousMonth={handlePreviousBodyFatPercentageMonth}
+                  onNextMonth={handleNextBodyFatPercentageMonth}
+                  isPreviousMonthDisabled={isPreviousBodyFatPercentageMonthDisabled()}
+                  isNextMonthDisabled={isNextBodyFatPercentageMonthDisabled()}
                 />
               </div>
               <div className={styles.inputContainer}>
@@ -390,16 +562,25 @@ const Profile = () => {
 
           <Card className={styles.chartCard}>
             <CardContent>
-              <Typography
-                variant="h5"
-                component="h2"
-                className={styles.graphTitle}
-                gutterBottom
-              >
-                筋肉量推移
-              </Typography>
+              <div className={styles.graphHeader}>
+                <Typography
+                  variant="h5"
+                  component="h2"
+                  className={styles.graphTitle}
+                  gutterBottom
+                >
+                  筋肉量推移
+                </Typography>
+              </div>
               <div className={styles.historyContainer}>
-                <MuscleMassChart muscleMassHistory={muscleMassHistory} />
+                <MuscleMassChart
+                  muscleMassHistory={muscleMassHistory}
+                  selectedMonth={selectedMuscleMassMonth}
+                  onPreviousMonth={handlePreviousMuscleMassMonth}
+                  onNextMonth={handleNextMuscleMassMonth}
+                  isPreviousMonthDisabled={isPreviousMuscleMassMonthDisabled()}
+                  isNextMonthDisabled={isNextMuscleMassMonthDisabled()}
+                />
               </div>
               <div className={styles.inputContainer}>
                 <TextField
