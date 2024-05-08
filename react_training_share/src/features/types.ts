@@ -116,9 +116,11 @@ export interface PROPS_TIMER {
   // タイマーが一時停止中か
   paused: boolean;
   // タイマーの開始時間
-  startTime: number | null;
-  // タイマーの時間
-  time: number;
+  startTime: number;
+  // タイマーが一時停止された時刻
+  pausedTime: number;
+  // タイマーの経過時間
+  elapsedTime: number;
 }
 
 // トレーニングメニュー全体の状態の型

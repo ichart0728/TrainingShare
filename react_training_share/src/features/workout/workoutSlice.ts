@@ -11,8 +11,9 @@ const initialState: PROPS_WORKOUT_STATE = {
   timer: {
     active: false,
     paused: true,
-    startTime: null,
-    time: 0,
+    startTime: 0,
+    pausedTime: 0,
+    elapsedTime: 0,
   },
 };
 
@@ -87,32 +88,40 @@ export const workoutSlice = createSlice({
     startTimer: (state) => {
       state.timer.active = true;
       state.timer.paused = false;
-      state.timer.startTime = new Date().getTime();
+      state.timer.startTime = Date.now();
+      state.timer.pausedTime = 0;
+      state.timer.elapsedTime = 0;
     },
     pauseTimer: (state) => {
-      state.timer.paused = !state.timer.paused;
+      if (state.timer.active && !state.timer.paused) {
+        state.timer.paused = true;
+        state.timer.pausedTime = Date.now();
+      }
+    },
+    resumeTimer: (state) => {
+      if (state.timer.active && state.timer.paused) {
+        state.timer.paused = false;
+        state.timer.startTime += Date.now() - state.timer.pausedTime;
+        state.timer.pausedTime = 0;
+      }
     },
     stopTimer: (state) => {
       state.timer.active = false;
       state.timer.paused = true;
-      state.timer.startTime = null;
-      state.timer.time = 0;
+      state.timer.startTime = 0;
+      state.timer.pausedTime = 0;
+      state.timer.elapsedTime = 0;
     },
-    updateTimerTime: (state) => {
-      if (state.timer.active && !state.timer.paused && state.timer.startTime) {
-        const currentTime = new Date().getTime();
-        state.timer.time = Math.floor(
-          (currentTime - state.timer.startTime) / 1000
-        );
-      }
-    },
-    incrementTimer: (state) => {
+    updateElapsedTime: (state) => {
       if (state.timer.active && !state.timer.paused) {
-        state.timer.time += 1;
+        state.timer.elapsedTime = Date.now() - state.timer.startTime;
+      } else if (state.timer.active && state.timer.paused) {
+        state.timer.elapsedTime =
+          state.timer.pausedTime - state.timer.startTime;
       }
     },
     setTimerTime: (state, action: PayloadAction<number>) => {
-      state.timer.time = action.payload;
+      state.timer.elapsedTime = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -129,9 +138,9 @@ export const {
   deleteSet,
   startTimer,
   pauseTimer,
+  resumeTimer,
   stopTimer,
-  updateTimerTime,
-  incrementTimer,
+  updateElapsedTime,
   setTimerTime,
   clearWorkouts,
 } = workoutSlice.actions;
@@ -143,4 +152,5 @@ export const selectTimerActive = (state: RootState) =>
   state.workout.timer.active;
 export const selectTimerPaused = (state: RootState) =>
   state.workout.timer.paused;
-export const selectTimerTime = (state: RootState) => state.workout.timer.time;
+export const selectElapsedTime = (state: RootState) =>
+  state.workout.timer.elapsedTime;

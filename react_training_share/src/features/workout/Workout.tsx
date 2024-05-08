@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   clearWorkouts,
   startTimer,
-  stopTimer,
   pauseTimer,
+  resumeTimer,
+  stopTimer,
+  updateElapsedTime,
   selectTimer,
-  selectTimerTime,
-  updateTimerTime,
+  selectElapsedTime,
 } from "./workoutSlice";
 import { fetchAsyncPostTrainingSessions } from "../api/workoutApi";
 import { fetchAsyncGetTrainingSessions } from "../api/workoutApi";
@@ -66,14 +67,14 @@ const Workout = () => {
   }, 0);
   const [openModal, setOpenModal] = useState(false);
   const timer = useSelector(selectTimer);
-  const time = useSelector(selectTimerTime);
+  const elapsedTime = useSelector(selectElapsedTime);
 
   useEffect(() => {
     let timerId: NodeJS.Timeout;
 
     if (timer.active && !timer.paused) {
       timerId = setInterval(() => {
-        dispatch(updateTimerTime());
+        dispatch(updateElapsedTime());
       }, 1000);
     }
 
@@ -82,12 +83,22 @@ const Workout = () => {
     };
   }, [timer.active, timer.paused, dispatch]);
 
+  useEffect(() => {
+    if (timer.active && !timer.paused) {
+      dispatch(updateElapsedTime());
+    }
+  }, [timer.active, timer.paused, dispatch]);
+
   const handleStartTimer = () => {
     dispatch(startTimer());
   };
 
   const handlePauseTimer = () => {
     dispatch(pauseTimer());
+  };
+
+  const handleResumeTimer = () => {
+    dispatch(resumeTimer());
   };
 
   const handleStopTimer = () => {
@@ -132,7 +143,7 @@ const Workout = () => {
     const workoutData: WORKOUT_POST = {
       // YYYY-MM-DD形式の日付文字列
       date: new Date().toISOString().split("T")[0],
-      duration: time,
+      duration: Math.floor(elapsedTime / 1000), // ミリ秒を秒に変換
       workouts: workouts,
     };
     console.log("送信するトレーニングデータ:", workoutData);
@@ -152,8 +163,8 @@ const Workout = () => {
   };
 
   const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
+    const minutes = Math.floor(time / 60000);
+    const seconds = Math.floor((time % 60000) / 1000);
     return `${minutes.toString().padStart(2, "0")}:${seconds
       .toString()
       .padStart(2, "0")}`;
@@ -183,7 +194,7 @@ const Workout = () => {
               タイマー
             </Typography>
             <Typography variant="h6" gutterBottom>
-              {formatTime(time)}
+              {formatTime(elapsedTime)}
             </Typography>
           </div>
         </div>{" "}
@@ -208,7 +219,7 @@ const Workout = () => {
           )}
           {timer.active && timer.paused && (
             <Tooltip title="Resume Training">
-              <IconButton color="primary" onClick={handlePauseTimer}>
+              <IconButton color="primary" onClick={handleResumeTimer}>
                 <PlayCircleOutlineIcon fontSize="large" />
               </IconButton>
             </Tooltip>
