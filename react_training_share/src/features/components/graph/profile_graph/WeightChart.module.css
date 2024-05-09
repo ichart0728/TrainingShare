@@ -39,7 +39,7 @@
   color: #ccc;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 430px) {
   .container {
     max-width: 350px;
     padding: 16px;

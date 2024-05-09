@@ -32,9 +32,10 @@ import {
 } from "../api/profileApi";
 import { fetchAsyncGetUserPosts } from "../api/postApi";
 import { AppDispatch } from "../../app/store";
-import WeightChart from "../components/graph/WeightChart";
-import BodyFatPercentageChart from "../components/graph/BodyFatPercentageChart";
-import MuscleMassChart from "../components/graph/MuscleMassChart";
+import WeightChart from "../components/graph/profile_graph/WeightChart";
+import BodyFatPercentageChart from "../components/graph/profile_graph/BodyFatPercentageChart";
+import MuscleMassChart from "../components/graph/profile_graph/MuscleMassChart";
+import { getMax, getMin } from "../components/graph/chartUtils";
 
 const Profile = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -64,6 +65,14 @@ const Profile = () => {
   const [selectedMuscleMassMonth, setSelectedMuscleMassMonth] = useState(
     new Date()
   );
+  // 過去データの最大値を取得
+  const [maxWeight, setMaxWeight] = useState(0);
+  const [maxBodyFatPercentage, setMaxBodyFatPercentage] = useState(0);
+  const [maxMuscleMass, setMaxMuscleMass] = useState(0);
+  // 過去データの最小値を取得
+  const [minWeight, setMinWeight] = useState(0);
+  const [minBodyFatPercentage, setMinBodyFatPercentage] = useState(0);
+  const [minMuscleMass, setMinMuscleMass] = useState(0);
 
   useEffect(() => {
     if (profileId) {
@@ -78,6 +87,21 @@ const Profile = () => {
   useEffect(() => {
     setUpdatedProfile(profile);
   }, [profile]);
+
+  useEffect(() => {
+    setMaxWeight(getMax(weightHistory));
+    setMinWeight(getMin(weightHistory));
+  }, [weightHistory]);
+
+  useEffect(() => {
+    setMaxBodyFatPercentage(getMax(bodyFatPercentageHistory));
+    setMinBodyFatPercentage(getMin(bodyFatPercentageHistory));
+  }, [bodyFatPercentageHistory]);
+
+  useEffect(() => {
+    setMaxMuscleMass(getMax(muscleMassHistory));
+    setMinMuscleMass(getMin(muscleMassHistory));
+  }, [muscleMassHistory]);
 
   const handleInputChange = (
     event: React.ChangeEvent<{ name: string; value: unknown }>
@@ -484,6 +508,8 @@ const Profile = () => {
                   onNextMonth={handleNextWeightMonth}
                   isPreviousMonthDisabled={isPreviousWeightMonthDisabled()}
                   isNextMonthDisabled={isNextWeightMonthDisabled()}
+                  maxWeight={maxWeight}
+                  minWeight={minWeight}
                 />
               </div>
               <div className={styles.inputContainer}>
@@ -532,6 +558,8 @@ const Profile = () => {
                   onNextMonth={handleNextBodyFatPercentageMonth}
                   isPreviousMonthDisabled={isPreviousBodyFatPercentageMonthDisabled()}
                   isNextMonthDisabled={isNextBodyFatPercentageMonthDisabled()}
+                  maxBodyFatPercentage={maxBodyFatPercentage}
+                  minBodyFatPercentage={minBodyFatPercentage}
                 />
               </div>
               <div className={styles.inputContainer}>
@@ -580,6 +608,8 @@ const Profile = () => {
                   onNextMonth={handleNextMuscleMassMonth}
                   isPreviousMonthDisabled={isPreviousMuscleMassMonthDisabled()}
                   isNextMonthDisabled={isNextMuscleMassMonthDisabled()}
+                  maxMuscleMass={maxMuscleMass}
+                  minMuscleMass={minMuscleMass}
                 />
               </div>
               <div className={styles.inputContainer}>

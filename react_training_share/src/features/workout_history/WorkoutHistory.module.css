@@ -5,7 +5,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 430px) {
   .historyContainer {
     width: 100%;
     box-sizing: border-box;

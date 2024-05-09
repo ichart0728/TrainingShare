@@ -1,6 +1,6 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
-import styles from "./WeightChart.module.css";
+import styles from "./BodyFatPercentageChart.module.css";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
   Chart as ChartJS,
@@ -24,22 +24,26 @@ ChartJS.register(
   Tooltip
 );
 
-interface WeightChartProps {
-  weightHistory: { weight: number; date: string }[];
+interface BodyFatPercentageChartProps {
+  bodyFatPercentageHistory: { bodyFatPercentage: number; date: string }[];
   selectedMonth: Date;
   onPreviousMonth: () => void;
   onNextMonth: () => void;
   isPreviousMonthDisabled: boolean;
   isNextMonthDisabled: boolean;
+  maxBodyFatPercentage: number;
+  minBodyFatPercentage: number;
 }
 
-const WeightChart: React.FC<WeightChartProps> = ({
-  weightHistory,
+const BodyFatPercentageChart: React.FC<BodyFatPercentageChartProps> = ({
+  bodyFatPercentageHistory,
   selectedMonth,
   onPreviousMonth,
   onNextMonth,
   isPreviousMonthDisabled,
   isNextMonthDisabled,
+  maxBodyFatPercentage,
+  minBodyFatPercentage,
 }) => {
   const calculateChartData = () => {
     const monthStart = new Date(
@@ -58,8 +62,8 @@ const WeightChart: React.FC<WeightChartProps> = ({
       labels.push(new Date(d).toLocaleDateString("ja-JP", { day: "numeric" }));
     }
 
-    const weightData = labels.map((label) => {
-      const data = weightHistory.find(
+    const bodyFatPercentageData = labels.map((label) => {
+      const data = bodyFatPercentageHistory.find(
         (item) =>
           new Date(item.date).getMonth() === selectedMonth.getMonth() &&
           new Date(item.date).getFullYear() === selectedMonth.getFullYear() &&
@@ -67,14 +71,14 @@ const WeightChart: React.FC<WeightChartProps> = ({
             day: "numeric",
           }) === label
       );
-      return data ? data.weight : null;
+      return data ? data.bodyFatPercentage : null;
     });
 
     return {
       labels,
       datasets: [
         {
-          data: weightData,
+          data: bodyFatPercentageData,
           borderColor: "rgba(75, 192, 192, 1)",
           backgroundColor: "rgba(75, 192, 192, 0.2)",
           fill: false,
@@ -123,6 +127,12 @@ const WeightChart: React.FC<WeightChartProps> = ({
               },
               y: {
                 beginAtZero: true,
+                // グラフの上下を余分に表示する
+                max: maxBodyFatPercentage + 10,
+                min: minBodyFatPercentage - 10,
+                ticks: {
+                  stepSize: 5,
+                },
               },
             },
             plugins: {
@@ -141,4 +151,4 @@ const WeightChart: React.FC<WeightChartProps> = ({
   );
 };
 
-export default WeightChart;
+export default BodyFatPercentageChart;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
-import styles from "./MuscleMassChart.module.css";
+import styles from "./WeightChart.module.css";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
   Chart as ChartJS,
@@ -24,22 +24,26 @@ ChartJS.register(
   Tooltip
 );
 
-interface MuscleMassChartProps {
-  muscleMassHistory: { muscleMass: number; date: string }[];
+interface WeightChartProps {
+  weightHistory: { weight: number; date: string }[];
   selectedMonth: Date;
   onPreviousMonth: () => void;
   onNextMonth: () => void;
   isPreviousMonthDisabled: boolean;
   isNextMonthDisabled: boolean;
+  maxWeight: number;
+  minWeight: number;
 }
 
-const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
-  muscleMassHistory,
+const WeightChart: React.FC<WeightChartProps> = ({
+  weightHistory,
   selectedMonth,
   onPreviousMonth,
   onNextMonth,
   isPreviousMonthDisabled,
   isNextMonthDisabled,
+  maxWeight,
+  minWeight,
 }) => {
   const calculateChartData = () => {
     const monthStart = new Date(
@@ -58,8 +62,8 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
       labels.push(new Date(d).toLocaleDateString("ja-JP", { day: "numeric" }));
     }
 
-    const muscleMassData = labels.map((label) => {
-      const data = muscleMassHistory.find(
+    const weightData = labels.map((label) => {
+      const data = weightHistory.find(
         (item) =>
           new Date(item.date).getMonth() === selectedMonth.getMonth() &&
           new Date(item.date).getFullYear() === selectedMonth.getFullYear() &&
@@ -67,14 +71,14 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
             day: "numeric",
           }) === label
       );
-      return data ? data.muscleMass : null;
+      return data ? data.weight : null;
     });
 
     return {
       labels,
       datasets: [
         {
-          data: muscleMassData,
+          data: weightData,
           borderColor: "rgba(75, 192, 192, 1)",
           backgroundColor: "rgba(75, 192, 192, 0.2)",
           fill: false,
@@ -123,6 +127,12 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
               },
               y: {
                 beginAtZero: true,
+                // グラフの上下を余分に表示する
+                max: maxWeight + 10,
+                min: minWeight - 10,
+                ticks: {
+                  stepSize: 5,
+                },
               },
             },
             plugins: {
@@ -141,4 +151,4 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
   );
 };
 
-export default MuscleMassChart;
+export default WeightChart;

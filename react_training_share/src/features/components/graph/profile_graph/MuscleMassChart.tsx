@@ -1,6 +1,6 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
-import styles from "./BodyFatPercentageChart.module.css";
+import styles from "./MuscleMassChart.module.css";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
   Chart as ChartJS,
@@ -24,22 +24,26 @@ ChartJS.register(
   Tooltip
 );
 
-interface BodyFatPercentageChartProps {
-  bodyFatPercentageHistory: { bodyFatPercentage: number; date: string }[];
+interface MuscleMassChartProps {
+  muscleMassHistory: { muscleMass: number; date: string }[];
   selectedMonth: Date;
   onPreviousMonth: () => void;
   onNextMonth: () => void;
   isPreviousMonthDisabled: boolean;
   isNextMonthDisabled: boolean;
+  maxMuscleMass: number;
+  minMuscleMass: number;
 }
 
-const BodyFatPercentageChart: React.FC<BodyFatPercentageChartProps> = ({
-  bodyFatPercentageHistory,
+const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
+  muscleMassHistory,
   selectedMonth,
   onPreviousMonth,
   onNextMonth,
   isPreviousMonthDisabled,
   isNextMonthDisabled,
+  maxMuscleMass,
+  minMuscleMass,
 }) => {
   const calculateChartData = () => {
     const monthStart = new Date(
@@ -58,8 +62,8 @@ const BodyFatPercentageChart: React.FC<BodyFatPercentageChartProps> = ({
       labels.push(new Date(d).toLocaleDateString("ja-JP", { day: "numeric" }));
     }
 
-    const bodyFatPercentageData = labels.map((label) => {
-      const data = bodyFatPercentageHistory.find(
+    const muscleMassData = labels.map((label) => {
+      const data = muscleMassHistory.find(
         (item) =>
           new Date(item.date).getMonth() === selectedMonth.getMonth() &&
           new Date(item.date).getFullYear() === selectedMonth.getFullYear() &&
@@ -67,14 +71,14 @@ const BodyFatPercentageChart: React.FC<BodyFatPercentageChartProps> = ({
             day: "numeric",
           }) === label
       );
-      return data ? data.bodyFatPercentage : null;
+      return data ? data.muscleMass : null;
     });
 
     return {
       labels,
       datasets: [
         {
-          data: bodyFatPercentageData,
+          data: muscleMassData,
           borderColor: "rgba(75, 192, 192, 1)",
           backgroundColor: "rgba(75, 192, 192, 0.2)",
           fill: false,
@@ -123,6 +127,12 @@ const BodyFatPercentageChart: React.FC<BodyFatPercentageChartProps> = ({
               },
               y: {
                 beginAtZero: true,
+                // グラフの上下を余分に表示する
+                max: maxMuscleMass + 10,
+                min: minMuscleMass - 10,
+                ticks: {
+                  stepSize: 5,
+                },
               },
             },
             plugins: {
@@ -141,4 +151,4 @@ const BodyFatPercentageChart: React.FC<BodyFatPercentageChartProps> = ({
   );
 };
 
-export default BodyFatPercentageChart;
+export default MuscleMassChart;

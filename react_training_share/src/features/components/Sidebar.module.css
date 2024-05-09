@@ -20,7 +20,7 @@
   padding: 8px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 430px) {
   .drawer {
     width: 0;
     flex-shrink: 0;

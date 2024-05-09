@@ -64,7 +64,7 @@
   background-color: #ccc;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 430px) {
   .container {
     /* どうしてもスマホ表示の時に横スクロールが発生してしまうので、最大幅を指定 */
     max-width: 350px;
