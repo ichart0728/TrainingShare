@@ -13,38 +13,34 @@ import CalendarScreen from "./features/calendar/CalendarScreen";
 function App() {
   const userId = useSelector((state: RootState) => state.auth.myprofile.id);
 
-  return (
-    <BrowserRouter>
-      <div style={{ display: "flex" }}>
-        {userId && <Sidebar />}
-        <main style={{ flexGrow: 1, padding: "20px" }}>
-          <Routes>
-            <Route path="/" element={<Auth />} />
-            <Route
-              path="/home"
-              element={userId ? <Home /> : <Navigate to="/" />}
-            />
-            <Route
-              path="/workout"
-              element={userId ? <Workout /> : <Navigate to="/" />}
-            />
-            <Route
-              path="/profile/:nickname"
-              element={userId ? <Profile /> : <Navigate to="/" />}
-            />
-            <Route
-              path="/workout_history"
-              element={userId ? <WorkoutHistory /> : <Navigate to="/" />}
-            />
-            <Route
-              path="/calendar"
-              element={userId ? <CalendarScreen /> : <Navigate to="/" />}
-            />
-          </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
-  );
+  if (!userId) {
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Auth />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </BrowserRouter>
+    );
+  } else {
+    return (
+      <BrowserRouter>
+        <div style={{ display: "flex" }}>
+          {userId && <Sidebar />}
+          <main style={{ flexGrow: 1, padding: "20px" }}>
+            <Routes>
+              <Route path="/" element={<Auth />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/workout" element={<Workout />} />
+              <Route path="/profile/:nickname" element={<Profile />} />
+              <Route path="/workout_history" element={<WorkoutHistory />} />
+              <Route path="/calendar" element={<CalendarScreen />} />
+            </Routes>
+          </main>
+        </div>
+      </BrowserRouter>
+    );
+  }
 }
 
 export default App;
