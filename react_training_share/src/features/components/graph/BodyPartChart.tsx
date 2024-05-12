@@ -20,6 +20,11 @@ const bodyPartColors: { [key: number]: string } = {
 const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
   trainingSessions,
   trainingMenus,
+  selectedMonth,
+  onPreviousMonth,
+  onNextMonth,
+  isPreviousMonthDisabled,
+  isNextMonthDisabled,
 }) => {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -58,6 +63,11 @@ const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
               trainingMenus={trainingMenus}
               selectedTab={selectedTab}
               bodyPartColors={bodyPartColors}
+              selectedMonth={selectedMonth}
+              onPreviousMonth={onPreviousMonth}
+              onNextMonth={onNextMonth}
+              isPreviousMonthDisabled={isPreviousMonthDisabled}
+              isNextMonthDisabled={isNextMonthDisabled}
             />
           </div>
         </Grid>

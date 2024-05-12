@@ -84,6 +84,11 @@ export interface PROPS_TRAINING_SESSION {
 export interface PROPS_WORKOUT_CHART {
   trainingSessions: PROPS_TRAINING_SESSION[];
   trainingMenus: PROPS_TRAINING_MENU[];
+  selectedMonth: Date;
+  onPreviousMonth: () => void;
+  onNextMonth: () => void;
+  isPreviousMonthDisabled: boolean;
+  isNextMonthDisabled: boolean;
 }
 
 export interface PROPS_LINE_CHART {
@@ -91,6 +96,11 @@ export interface PROPS_LINE_CHART {
   trainingMenus: PROPS_TRAINING_MENU[];
   selectedTab: number;
   bodyPartColors: { [key: number]: string };
+  selectedMonth: Date;
+  onPreviousMonth: () => void;
+  onNextMonth: () => void;
+  isPreviousMonthDisabled: boolean;
+  isNextMonthDisabled: boolean;
 }
 
 export interface PROPS_PIE_CHART {
