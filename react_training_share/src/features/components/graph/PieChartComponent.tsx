@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip } from "chart.js";
 import styles from "./BodyPartChart.module.css";
-import { PROPS_PIE_CHART } from "../../types";
+import { PROPS_PIE_CHART, PROPS_TRAINING_SESSION } from "../../types";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { IconButton } from "@material-ui/core";
+import { ChevronLeft, ChevronRight } from "@material-ui/icons";
 
 ChartJS.register(ArcElement, Tooltip, ChartDataLabels);
 
@@ -12,10 +14,76 @@ const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
   trainingMenus,
   bodyPartColors,
 }) => {
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  const getOldestMonth = (trainingSessions: PROPS_TRAINING_SESSION[]) => {
+    const allDates = trainingSessions.map((session) => new Date(session.date));
+    return allDates.length > 0
+      ? new Date(Math.min(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const getLatestMonth = (trainingSessions: PROPS_TRAINING_SESSION[]) => {
+    const allDates = trainingSessions.map((session) => new Date(session.date));
+    return allDates.length > 0
+      ? new Date(Math.max(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const handlePreviousMonth = () => {
+    setSelectedMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() - 1);
+      return newMonth;
+    });
+  };
+
+  const handleNextMonth = () => {
+    setSelectedMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() + 1);
+      return newMonth;
+    });
+  };
+
+  const isPreviousMonthDisabled = () => {
+    const oldestMonth = getOldestMonth(trainingSessions);
+    return (
+      !oldestMonth ||
+      (oldestMonth.getFullYear() >= selectedMonth.getFullYear() &&
+        oldestMonth.getMonth() >= selectedMonth.getMonth())
+    );
+  };
+
+  const isNextMonthDisabled = () => {
+    const latestMonth = getLatestMonth(trainingSessions);
+    return (
+      !latestMonth ||
+      (latestMonth.getFullYear() <= selectedMonth.getFullYear() &&
+        latestMonth.getMonth() <= selectedMonth.getMonth())
+    );
+  };
   // 各トレーニングメニューごとの集計データを計算する
+  // 選択した月のデータを集計
   const calculateData = () => {
+    const monthStart = new Date(
+      selectedMonth.getFullYear(),
+      selectedMonth.getMonth(),
+      1
+    );
+    const monthEnd = new Date(
+      selectedMonth.getFullYear(),
+      selectedMonth.getMonth() + 1,
+      0
+    );
+
+    const filteredSessions = trainingSessions.filter((session) => {
+      const sessionDate = new Date(session.date);
+      return sessionDate >= monthStart && sessionDate <= monthEnd;
+    });
+
     const data = trainingMenus.map((menu) => {
-      const total = trainingSessions.reduce((acc, session) => {
+      const total = filteredSessions.reduce((acc, session) => {
         return (
           acc +
           session.workouts.reduce((workoutAcc, workout) => {
@@ -58,55 +126,79 @@ const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
   const chartData = calculateData();
 
   return (
-    <div className={styles.chartContainer}>
-      <Pie
-        data={chartData}
-        options={{
-          maintainAspectRatio: false,
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: function (tooltipItem) {
+    <div className={styles.container}>
+      <div className={styles.chartHeader}>
+        <IconButton
+          onClick={handlePreviousMonth}
+          disabled={isPreviousMonthDisabled()}
+          className={styles.navigationButton}
+        >
+          <ChevronLeft />
+        </IconButton>
+        <div className={styles.chartTitle}>
+          {selectedMonth.toLocaleDateString("ja-JP", {
+            year: "numeric",
+            month: "long",
+          })}
+        </div>
+        <IconButton
+          onClick={handleNextMonth}
+          disabled={isNextMonthDisabled()}
+          className={styles.navigationButton}
+        >
+          <ChevronRight />
+        </IconButton>
+      </div>
+      <div className={styles.chartContainer}>
+        <Pie
+          data={chartData}
+          options={{
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function (tooltipItem) {
+                    if (!chartData.hasData) {
+                      return "";
+                    }
+                    return `${tooltipItem.label}: ${tooltipItem.raw} kg`;
+                  },
+                },
+              },
+              datalabels: {
+                formatter: (value, ctx) => {
                   if (!chartData.hasData) {
                     return "";
                   }
-                  return `${tooltipItem.label}: ${tooltipItem.raw} kg`;
+                  const label = ctx.chart.data.labels?.[ctx.dataIndex];
+                  const percentage = (
+                    (value / chartData.totalData) *
+                    100
+                  ).toFixed(1);
+                  return `${label}\n${percentage}%`;
+                },
+                color: "#fff",
+                font: {
+                  size: 12,
+                  weight: "bold",
+                },
+                textAlign: "center",
+                padding: {
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                },
+                offset: 0,
+                display: function (ctx) {
+                  const value = ctx.dataset.data[ctx.dataIndex];
+                  return value !== 0;
                 },
               },
             },
-            datalabels: {
-              formatter: (value, ctx) => {
-                if (!chartData.hasData) {
-                  return "";
-                }
-                const label = ctx.chart.data.labels?.[ctx.dataIndex];
-                const percentage = (
-                  (value / chartData.totalData) *
-                  100
-                ).toFixed(1);
-                return `${label}\n${percentage}%`;
-              },
-              color: "#fff",
-              font: {
-                size: 12,
-                weight: "bold",
-              },
-              textAlign: "center",
-              padding: {
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0,
-              },
-              offset: 0,
-              display: function (ctx) {
-                const value = ctx.dataset.data[ctx.dataIndex];
-                return value !== 0;
-              },
-            },
-          },
-        }}
-      />
+          }}
+        />
+      </div>
     </div>
   );
 };

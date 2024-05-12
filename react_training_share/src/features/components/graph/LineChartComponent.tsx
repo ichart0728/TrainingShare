@@ -30,14 +30,58 @@ ChartJS.register(
 const LineChartComponent: React.FC<PROPS_LINE_CHART> = ({
   trainingSessions,
   trainingMenus,
-  selectedTab,
   bodyPartColors,
-  selectedMonth,
-  onPreviousMonth,
-  onNextMonth,
-  isPreviousMonthDisabled,
-  isNextMonthDisabled,
+  selectedTab,
 }) => {
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  const getOldestMonth = (trainingSessions: PROPS_TRAINING_SESSION[]) => {
+    const allDates = trainingSessions.map((session) => new Date(session.date));
+    return allDates.length > 0
+      ? new Date(Math.min(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const getLatestMonth = (trainingSessions: PROPS_TRAINING_SESSION[]) => {
+    const allDates = trainingSessions.map((session) => new Date(session.date));
+    return allDates.length > 0
+      ? new Date(Math.max(...allDates.map((date) => date.getTime())))
+      : null;
+  };
+
+  const handlePreviousMonth = () => {
+    setSelectedMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() - 1);
+      return newMonth;
+    });
+  };
+
+  const handleNextMonth = () => {
+    setSelectedMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
+      newMonth.setMonth(newMonth.getMonth() + 1);
+      return newMonth;
+    });
+  };
+
+  const isPreviousMonthDisabled = () => {
+    const oldestMonth = getOldestMonth(trainingSessions);
+    return (
+      !oldestMonth ||
+      (oldestMonth.getFullYear() >= selectedMonth.getFullYear() &&
+        oldestMonth.getMonth() >= selectedMonth.getMonth())
+    );
+  };
+
+  const isNextMonthDisabled = () => {
+    const latestMonth = getLatestMonth(trainingSessions);
+    return (
+      !latestMonth ||
+      (latestMonth.getFullYear() <= selectedMonth.getFullYear() &&
+        latestMonth.getMonth() <= selectedMonth.getMonth())
+    );
+  };
   // 日付ごとにトレーニングセッションを集計する
   const aggregateSessionsByDate = (sessions: PROPS_TRAINING_SESSION[]) => {
     return sessions.reduce(
@@ -69,15 +113,17 @@ const LineChartComponent: React.FC<PROPS_LINE_CHART> = ({
       0
     );
 
+    const dates: string[] = [];
     const labels: string[] = [];
     for (let d = monthStart; d <= monthEnd; d.setDate(d.getDate() + 1)) {
-      labels.push(new Date(d).toISOString().split("T")[0]);
+      dates.push(new Date(d).toISOString().split("T")[0]);
+      labels.push(new Date(d).toLocaleDateString("ja-JP", { day: "numeric" }));
     }
 
     // 選択した月のデータを日付ごとに集計
     const datasets = trainingMenus.map((menu) => {
-      const data = labels.map((label) => {
-        const session = aggregatedSessions[label];
+      const data = dates.map((date) => {
+        const session = aggregatedSessions[date];
         if (session) {
           const workouts = session.workouts.filter(
             (workout) => Number(workout.body_part) === menu.id
@@ -115,66 +161,12 @@ const LineChartComponent: React.FC<PROPS_LINE_CHART> = ({
 
   const chartData = calculateChartData();
 
-  // 過去1年間の最大値を計算
-  // const [maxValue, setMaxValue] = useState(0);
-
-  useEffect(() => {
-    const oneYearAgo = new Date(selectedMonth);
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-
-    const filteredSessions = trainingSessions.filter((session) => {
-      const sessionDate = new Date(session.date);
-      return sessionDate >= oneYearAgo && sessionDate <= selectedMonth;
-    });
-
-    // const maxValues = trainingMenus.map((menu) => {
-    //   const menuSessions = filteredSessions.flatMap((session) =>
-    //     session.workouts.filter(
-    //       (workout) => Number(workout.body_part) === menu.id
-    //     )
-    //   );
-    //   const menuMaxValue = menuSessions.reduce((max, workout) => {
-    //     const workoutValue = workout.sets.reduce(
-    //       (sum, set) => sum + set.weight * set.reps,
-    //       0
-    //     );
-    //     return Math.max(max, workoutValue);
-    //   }, 0);
-    //   return menuMaxValue;
-    // });
-
-    // const overallMaxValue = Math.max(...maxValues);
-
-    // setMaxValue(overallMaxValue);
-  }, [selectedMonth, trainingSessions, trainingMenus]);
-
-  const MaxValueDatasets = chartData.datasets.map((dataset) => {
-    const data = dataset.data.map((value) => (value !== null ? value : 0));
-    return {
-      ...dataset,
-      data: data,
-    };
-  });
-
-  // 選択された部位の最大値を計算
-  // const selectedPartMaxValue =
-  //   selectedTab === 0
-  //     ? maxValue
-  //     : chartData.MaxValueDatasets[selectedTab - 1].data.reduce(
-  //         (max, value) => {
-  //           return value !== null && value !== undefined
-  //             ? Math.max(max, value)
-  //             : max;
-  //         },
-  //         0
-  //       );
-
   return (
     <div className={styles.container}>
       <div className={styles.chartHeader}>
         <IconButton
-          onClick={onPreviousMonth}
-          disabled={isPreviousMonthDisabled}
+          onClick={handlePreviousMonth}
+          disabled={isPreviousMonthDisabled()}
           className={styles.navigationButton}
         >
           <ChevronLeft />
@@ -186,8 +178,8 @@ const LineChartComponent: React.FC<PROPS_LINE_CHART> = ({
           })}
         </div>
         <IconButton
-          onClick={onNextMonth}
-          disabled={isNextMonthDisabled}
+          onClick={handleNextMonth}
+          disabled={isNextMonthDisabled()}
           className={styles.navigationButton}
         >
           <ChevronRight />
@@ -205,19 +197,10 @@ const LineChartComponent: React.FC<PROPS_LINE_CHART> = ({
           options={{
             scales: {
               x: {
-                type: "time",
-                time: {
-                  unit: "day",
-                  displayFormats: {
-                    day: "yyyy-MM-dd",
-                  },
-                  tooltipFormat: "MMM dd",
-                },
                 display: true,
               },
               y: {
                 beginAtZero: true,
-                // max: selectedPartMaxValue,
               },
             },
             plugins: {

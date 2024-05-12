@@ -16,15 +16,9 @@ const bodyPartColors: { [key: number]: string } = {
   5: "#9B59B6",
   6: "#34495E",
 };
-
 const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
   trainingSessions,
   trainingMenus,
-  selectedMonth,
-  onPreviousMonth,
-  onNextMonth,
-  isPreviousMonthDisabled,
-  isNextMonthDisabled,
 }) => {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -33,14 +27,14 @@ const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
 
   return (
     <div className={styles.container}>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <div className={styles.chartHeader}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              成長グラフ
-            </Typography>
-          </div>
-          <div className={styles.tabsWrapper}>
+      <Grid container spacing={4}>
+        <Grid item xs={12} className={styles.gridContainer}>
+          <div className={styles.chartWrapper}>
+            <div className={styles.chartHeader}>
+              <Typography variant="h6" className={styles.chartTitle}>
+                トレーニングボリューム遷移
+              </Typography>
+            </div>
             <Tabs
               value={selectedTab}
               onChange={handleTabChange}
@@ -54,59 +48,60 @@ const WorkoutChart: React.FC<PROPS_WORKOUT_CHART> = ({
                 <Tab label={part.name} key={part.id} className={styles.tab} />
               ))}
             </Tabs>
-          </div>
-        </Grid>
-        <Grid item xs={12}>
-          <div className={styles.chartContainer}>
-            <LineChartComponent
-              trainingSessions={trainingSessions}
-              trainingMenus={trainingMenus}
-              selectedTab={selectedTab}
-              bodyPartColors={bodyPartColors}
-              selectedMonth={selectedMonth}
-              onPreviousMonth={onPreviousMonth}
-              onNextMonth={onNextMonth}
-              isPreviousMonthDisabled={isPreviousMonthDisabled}
-              isNextMonthDisabled={isNextMonthDisabled}
-            />
+            <div className={styles.chartContainer}>
+              <LineChartComponent
+                trainingSessions={trainingSessions}
+                trainingMenus={trainingMenus}
+                bodyPartColors={bodyPartColors}
+                selectedTab={selectedTab}
+              />
+            </div>
           </div>
         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <div className={styles.chartHeader}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              部位別トレーニング分布
-            </Typography>
-          </div>
-          <div className={styles.chartContainer}>
-            <PieChartComponent
-              trainingSessions={trainingSessions}
-              trainingMenus={trainingMenus}
-              bodyPartColors={bodyPartColors}
-            />
-          </div>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <div className={styles.chartHeader}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              トレーニングバランス
-            </Typography>
-          </div>
-          <div className={styles.chartContainer}>
-            <RadarChartComponent
-              trainingSessions={trainingSessions}
-              trainingMenus={trainingMenus}
-            />
+        <Grid item xs={12} md={6} className={styles.gridContainer}>
+          <div className={styles.chartWrapper}>
+            <div className={styles.chartHeader}>
+              <Typography variant="h6" className={styles.chartTitle}>
+                部位別トレーニング分布
+              </Typography>
+            </div>
+            <div className={styles.chartContainer}>
+              <PieChartComponent
+                trainingSessions={trainingSessions}
+                trainingMenus={trainingMenus}
+                bodyPartColors={bodyPartColors}
+              />
+            </div>
           </div>
         </Grid>
-        <Grid item xs={12} md={12}>
-          <div className={styles.chartHeader}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              曜日別トレーニング回数
-            </Typography>
+        <Grid item xs={12} md={6} className={styles.gridContainer}>
+          <div className={styles.chartWrapper}>
+            <div className={styles.chartHeader}>
+              <Typography variant="h6" className={styles.chartTitle}>
+                トレーニングバランス
+              </Typography>
+            </div>
+            <div className={styles.chartContainer}>
+              <RadarChartComponent
+                trainingSessions={trainingSessions}
+                trainingMenus={trainingMenus}
+              />
+            </div>
           </div>
-          <div className={styles.chartContainer}>
-            <WeeklyTrainingFrequencyChart trainingSessions={trainingSessions} />
+        </Grid>
+        <Grid item xs={12} className={styles.gridContainer}>
+          <div className={styles.chartWrapper}>
+            <div className={styles.chartHeader}>
+              <Typography variant="h6" className={styles.chartTitle}>
+                曜日別トレーニング回数
+              </Typography>
+            </div>
+            <div className={styles.chartContainer}>
+              <WeeklyTrainingFrequencyChart
+                trainingSessions={trainingSessions}
+              />
+            </div>
           </div>
         </Grid>
       </Grid>

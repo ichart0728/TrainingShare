@@ -64,6 +64,16 @@
   background-color: #ccc;
 }
 
+.chartWrapper {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+.gridContainer {
+  height: 800px;
+}
+
 @media (max-width: 430px) {
   .container {
     /* どうしてもスマホ表示の時に横スクロールが発生してしまうので、最大幅を指定 */
@@ -80,5 +90,8 @@
     flex-shrink: 0;
     flex-basis: auto;
     white-space: nowrap;
+  }
+  .gridContainer {
+    height: 550px;
   }
 }
