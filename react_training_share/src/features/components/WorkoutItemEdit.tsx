@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Paper,
@@ -29,6 +29,18 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   const dispatch: AppDispatch = useDispatch();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [completed, setCompleted] = useState(workout.sets.map(() => false));
+  const [weights, setWeights] = useState(
+    workout.sets.map((set) => set.weight.toString())
+  );
+  const [reps, setReps] = useState(
+    workout.sets.map((set) => set.reps.toString())
+  );
+
+  useEffect(() => {
+    setWeights(workout.sets.map((set) => set.weight.toString()));
+    setReps(workout.sets.map((set) => set.reps.toString()));
+  }, [workout.sets]);
+
   // store.training.trainingMenuを取得する
   const trainingMenus = useSelector(
     (state: RootState) => state.training.trainingMenus
@@ -52,41 +64,69 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   const handleWeightChange = (
     workoutId: string,
     setIndex: number,
-    newWeight: number,
-    reps: number,
-    completed: boolean
+    newWeight: string
   ) => {
+    const updatedWeights = [...weights];
+    updatedWeights[setIndex] = newWeight;
+    setWeights(updatedWeights);
+
+    const weightValue = newWeight !== "" ? parseFloat(newWeight) : 0;
+
     dispatch(
       updateSet({
         workoutId,
         setIndex,
-        weight: newWeight,
-        reps,
-        completed,
+        weight: weightValue,
+        reps: parseFloat(reps[setIndex] || "0"),
+        completed: completed[setIndex],
       })
     );
-  };
-  const handleConfirmDelete = () => {
-    dispatch(removeWorkout(workout.id)); // 対象のトレーニングメニューを削除するアクションをディスパッチ
-    setOpenDeleteModal(false); // モーダルを閉じる
   };
 
   const handleRepsChange = (
     workoutId: string,
     setIndex: number,
-    weight: number,
-    newReps: number
+    newReps: string
   ) => {
+    const updatedReps = [...reps];
+    updatedReps[setIndex] = newReps;
+    setReps(updatedReps);
+
+    const repsValue = newReps !== "" ? parseFloat(newReps) : 0;
+
     dispatch(
       updateSet({
         workoutId,
         setIndex,
-        weight,
-        reps: newReps,
+        weight: parseFloat(weights[setIndex] || "0"),
+        reps: repsValue,
         completed: completed[setIndex],
       })
     );
   };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    setIndex: number,
+    type: "weight" | "reps"
+  ) => {
+    const inputValue = e.target.value;
+    const regex = /^(\d*\.?\d*)?$/;
+
+    if (regex.test(inputValue)) {
+      if (type === "weight") {
+        handleWeightChange(workout.id, setIndex, inputValue);
+      } else if (type === "reps") {
+        handleRepsChange(workout.id, setIndex, inputValue);
+      }
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    dispatch(removeWorkout(workout.id)); // 対象のトレーニングメニューを削除するアクションをディスパッチ
+    setOpenDeleteModal(false); // モーダルを閉じる
+  };
+
   const handleDeleteWorkout = () => {
     setOpenDeleteModal(true);
   };
@@ -186,17 +226,9 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
                 variant="outlined"
                 size="small"
                 className={styles.input}
-                value={set.weight}
-                onChange={(e) =>
-                  handleWeightChange(
-                    workout.id,
-                    setIndex, // 正しいインデックスを使用
-                    Number(e.target.value),
-                    set.reps,
-                    completed[setIndex]
-                  )
-                }
-                InputProps={{ inputProps: { min: 0, step: "0.05" } }}
+                value={weights[setIndex] || ""}
+                onChange={(e) => handleInputChange(e, setIndex, "weight")}
+                InputProps={{ inputProps: { min: 0 } }}
               />
             </Grid>
             <Grid item xs={4} sm={4} className={styles.inputContainer}>
@@ -205,16 +237,9 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
                 variant="outlined"
                 size="small"
                 className={styles.input}
-                value={set.reps}
-                onChange={(e) => {
-                  handleRepsChange(
-                    workout.id,
-                    setIndex, // 正しいインデックスを使用
-                    set.weight,
-                    Number(e.target.value)
-                  );
-                }}
-                InputProps={{ inputProps: { min: 0 } }}
+                value={reps[setIndex] || ""}
+                onChange={(e) => handleInputChange(e, setIndex, "reps")}
+                InputProps={{ inputProps: { min: 0, step: 1 } }}
               />
             </Grid>
 

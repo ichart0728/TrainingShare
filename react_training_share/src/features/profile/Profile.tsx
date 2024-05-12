@@ -124,9 +124,11 @@ const Profile = () => {
     if (weight) {
       const date = new Date();
       const formattedDate = date.toISOString().split("T")[0];
+      // 小数点第2位まで四捨五入
+      const newWeight = Math.round(parseFloat(weight) * 100) / 100;
       dispatch(
         fetchAsyncAddWeightHistory({
-          weight: parseFloat(weight),
+          weight: newWeight,
           date: formattedDate,
         })
       );
@@ -138,9 +140,12 @@ const Profile = () => {
     if (bodyFatPercentage) {
       const date = new Date();
       const formattedDate = date.toISOString().split("T")[0];
+      // 小数点第2位まで四捨五入
+      const newBodyFatPercentage =
+        Math.round(parseFloat(bodyFatPercentage) * 100) / 100;
       dispatch(
         fetchAsyncAddBodyFatPercentageHistory({
-          bodyFatPercentage: parseFloat(bodyFatPercentage),
+          bodyFatPercentage: newBodyFatPercentage,
           date: formattedDate,
         })
       );
@@ -152,9 +157,11 @@ const Profile = () => {
     if (muscleMass) {
       const date = new Date();
       const formattedDate = date.toISOString().split("T")[0];
+      // 小数点第2位まで四捨五入
+      const newMuscleMass = Math.round(parseFloat(muscleMass) * 100) / 100;
       dispatch(
         fetchAsyncAddMuscleMassHistory({
-          muscleMass: parseFloat(muscleMass),
+          muscleMass: newMuscleMass,
           date: formattedDate,
         })
       );

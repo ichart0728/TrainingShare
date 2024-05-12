@@ -128,7 +128,7 @@ const Workout = () => {
         body_part: workout.body_part,
         sets: workout.sets.map((set) => ({
           id: set.id,
-          weight: set.weight,
+          weight: Math.round(set.weight * 100) / 100,
           reps: set.reps,
           completed: set.completed,
         })),
