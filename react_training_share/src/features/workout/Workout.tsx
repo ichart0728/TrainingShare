@@ -25,18 +25,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  IconButton,
-  Tooltip,
 } from "@material-ui/core";
 
 import { RootState } from "../../app/store";
 import WorkoutItemEdit from "../components/WorkoutItemEdit";
 import { useNavigate } from "react-router-dom";
-
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import StopIcon from "@material-ui/icons/Stop";
-import PauseIcon from "@material-ui/icons/Pause";
-import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 
 const Workout = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -165,6 +158,7 @@ const Workout = () => {
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
     const seconds = Math.floor((time % 60000) / 1000);
+
     return `${minutes.toString().padStart(2, "0")}:${seconds
       .toString()
       .padStart(2, "0")}`;
@@ -173,64 +167,19 @@ const Workout = () => {
   return (
     <div className={styles.container}>
       <div className={styles.topControls}>
-        <div className={styles.volumeAndTimerContainer}>
-          <div className={styles.totalVolume}>
-            <Typography variant="subtitle1" gutterBottom>
-              合計ボリューム
-              <br />
-            </Typography>
-            <Typography variant="h6" gutterBottom>
-              {completedTotalVolume.toFixed(2)}/{totalVolume.toFixed(2)}kg
-              <br />(
-              {totalVolume > 0
-                ? ((completedTotalVolume / totalVolume) * 100).toFixed(1)
-                : "0"}
-              %)
-            </Typography>
-          </div>
-
-          <div className={styles.timer}>
-            <Typography variant="subtitle1" gutterBottom>
-              タイマー
-            </Typography>
-            <Typography variant="h6" gutterBottom>
-              {formatTime(elapsedTime)}
-            </Typography>
-          </div>
-        </div>{" "}
-        <div className={styles.fixedWidthButtonContainer}>
-          {!timer.active && (
-            <Tooltip title="Start Training">
-              <IconButton
-                color="primary"
-                onClick={handleStartTimer}
-                disabled={!selectedWorkouts.length}
-              >
-                <PlayArrowIcon fontSize="large" />
-              </IconButton>
-            </Tooltip>
-          )}
-          {timer.active && !timer.paused && (
-            <Tooltip title="Pause Training">
-              <IconButton color="primary" onClick={handlePauseTimer}>
-                <PauseIcon fontSize="large" />
-              </IconButton>
-            </Tooltip>
-          )}
-          {timer.active && timer.paused && (
-            <Tooltip title="Resume Training">
-              <IconButton color="primary" onClick={handleResumeTimer}>
-                <PlayCircleOutlineIcon fontSize="large" />
-              </IconButton>
-            </Tooltip>
-          )}
-          {timer.active && (
-            <Tooltip title="Stop Training">
-              <IconButton color="secondary" onClick={handleStopTimer}>
-                <StopIcon fontSize="large" />
-              </IconButton>
-            </Tooltip>
-          )}
+        <div className={styles.totalVolume}>
+          <Typography variant="subtitle2" gutterBottom>
+            合計ボリューム
+            <br />
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            {completedTotalVolume.toFixed(2)}/{totalVolume.toFixed(2)}kg
+            <br />(
+            {totalVolume > 0
+              ? ((completedTotalVolume / totalVolume) * 100).toFixed(1)
+              : "0"}
+            %)
+          </Typography>
         </div>
       </div>
       <div className={styles.content}>
@@ -242,16 +191,98 @@ const Workout = () => {
             <WorkoutItemEdit key={index} workout={workout} />
           ))}
         </div>
+        <div className={styles.AddTrainingButton}>
+          <Button
+            className={styles.bottomButton}
+            variant="contained"
+            color="primary"
+            onClick={handleOpenModal}
+          >
+            トレーニングを追加
+          </Button>
+        </div>
       </div>
       <div className={styles.bottomControls}>
-        <Button
-          className={styles.bottomButton}
-          variant="contained"
-          color="primary"
-          onClick={handleOpenModal}
-        >
-          トレーニングを追加
-        </Button>
+        <div className={styles.timerAndButtonContainer}>
+          <div className={styles.timer}>
+            <Typography variant="subtitle2" gutterBottom>
+              経過時間
+            </Typography>
+            <Typography
+              variant="h6"
+              gutterBottom
+              className={`${styles.timerTextContainer} ${
+                timer.paused ? styles.pausedTimer : ""
+              }`}
+            >
+              {formatTime(elapsedTime)}
+            </Typography>
+          </div>
+          <div className={styles.buttonContainer}>
+            {!timer.active && (
+              <>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handlePauseTimer}
+                  disabled
+                  className={styles.fixedWidthButton}
+                >
+                  PAUSE
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleStartTimer}
+                  disabled={!selectedWorkouts.length}
+                  className={styles.fixedWidthButton}
+                >
+                  START
+                </Button>
+              </>
+            )}
+            {timer.active && !timer.paused && (
+              <>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handlePauseTimer}
+                  className={styles.fixedWidthButton}
+                >
+                  PAUSE
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleStopTimer}
+                  className={styles.fixedWidthButton}
+                >
+                  FINISH
+                </Button>
+              </>
+            )}
+            {timer.active && timer.paused && (
+              <>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleResumeTimer}
+                  className={styles.fixedWidthButton}
+                >
+                  RESUME
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleStopTimer}
+                  className={styles.fixedWidthButton}
+                >
+                  FINISH
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
       <Dialog open={openEndModal} onClose={handleCloseEndModal}>
         <DialogTitle>トレーニング終了</DialogTitle>

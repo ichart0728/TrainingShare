@@ -27,19 +27,35 @@
   }
 
   .drawerContent {
-    width: 80px; /* Adjust width for smaller screens */
+    width: 100%;
   }
 
   .menuButton {
-    display: block; /* Show menu button on smaller screens */
+    display: none;
   }
 
   .listItemText {
-    display: none; /* Hide ListItemText on smaller screens */
+    display: none;
   }
 
   .sidebar_title {
     display: none;
+  }
+
+  .bottomNavigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1200;
+    background-color: #ffffff;
+    box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
+    height: 1000px;
+  }
+
+  .avatar {
+    width: 35px;
+    height: 35px;
   }
 }
 
