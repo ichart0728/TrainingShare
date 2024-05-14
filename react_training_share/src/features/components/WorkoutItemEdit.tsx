@@ -41,17 +41,14 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
     setReps(workout.sets.map((set) => set.reps.toString()));
   }, [workout.sets]);
 
-  // store.training.trainingMenuを取得する
   const trainingMenus = useSelector(
     (state: RootState) => state.training.trainingMenus
   );
 
-  // trainingMenuskから対象のトレーニングメニューの対象部位を取得する
   const targetName = trainingMenus.find(
     (menu) => menu.id === workout.body_part
   )?.name;
 
-  // trainingMenuskから対象のトレーニングメニュー名を取得する
   const menuName = trainingMenus
     .find((menu) => Number(menu.id) === workout.body_part)
     ?.training_menus.find(
@@ -61,6 +58,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false);
   };
+
   const handleWeightChange = (
     workoutId: string,
     setIndex: number,
@@ -92,7 +90,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
     updatedReps[setIndex] = newReps;
     setReps(updatedReps);
 
-    const repsValue = newReps !== "" ? parseFloat(newReps) : 0;
+    const repsValue = newReps !== "" ? parseInt(newReps, 10) : 0;
 
     dispatch(
       updateSet({
@@ -123,8 +121,8 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   };
 
   const handleConfirmDelete = () => {
-    dispatch(removeWorkout(workout.id)); // 対象のトレーニングメニューを削除するアクションをディスパッチ
-    setOpenDeleteModal(false); // モーダルを閉じる
+    dispatch(removeWorkout(workout.id));
+    setOpenDeleteModal(false);
   };
 
   const handleDeleteWorkout = () => {
@@ -134,7 +132,6 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
     dispatch(addSet({ workoutId: workout.id }));
   };
   const handleDeleteSet = () => {
-    // セットが1つしかない場合は削除しない
     if (workout.sets.length === 1) {
       return;
     } else {
@@ -142,19 +139,16 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
     }
   };
 
-  // トレーニングボリュームを計算
   const totalVolume = workout.sets.reduce(
     (acc, set) => acc + set.weight * set.reps,
     0
   );
 
-  // 完了したセットの総ボリュームを計算
   const completedVolume = workout.sets.reduce(
     (acc, set, idx) => (completed[idx] ? acc + set.weight * set.reps : acc),
     0
   );
 
-  // 完了状態の切り替え
   const handleToggleCompleted = (setIndex: number) => {
     const updatedCompleted = [...completed];
     updatedCompleted[setIndex] = !updatedCompleted[setIndex];
@@ -239,18 +233,17 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
                 className={styles.input}
                 value={reps[setIndex] || ""}
                 onChange={(e) => handleInputChange(e, setIndex, "reps")}
-                InputProps={{ inputProps: { min: 0, step: 1 } }}
+                InputProps={{ inputProps: { min: 0 } }}
               />
             </Grid>
-
             <Grid item xs={2} sm={2} className={styles.checkboxContainer}>
               <Checkbox
                 icon={<CheckBoxOutlineBlankIcon fontSize="medium" />}
-                onChange={() => handleToggleCompleted(setIndex)} // 正しいインデックスを使用
+                onChange={() => handleToggleCompleted(setIndex)}
                 checked={completed[setIndex]}
                 checkedIcon={<CheckBoxIcon fontSize="medium" />}
                 name="checked"
-              />{" "}
+              />
             </Grid>
           </Grid>
         ))}

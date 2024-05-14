@@ -1,5 +1,7 @@
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+
 from django.utils import timezone
 import datetime
 from . import serializers
@@ -59,8 +61,23 @@ class TrainingSessionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.TrainingSessionSerializer
     permission_classes = [IsAuthenticated]
 
+    def create(self, request, *args, **kwargs):
+        print("Request data:", request.data)  # デバッグ情報を追加
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            print(f"Validation error: {e.detail}")  # 詳細なエラーメッセージを表示
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     def perform_create(self, serializer):
+        print("Performing create with data:", serializer.validated_data)  # デバッグ情報を追加
         serializer.save(user=self.request.user)
+        print("Creation successful")
+
 
 class TrainingSessionListView(generics.ListAPIView):
     serializer_class = serializers.TrainingSessionSerializer
@@ -70,6 +87,7 @@ class TrainingSessionListView(generics.ListAPIView):
         user = self.request.user
         six_months_ago = timezone.now() - datetime.timedelta(days=180)
         return TrainingSession.objects.filter(user=user, date__gte=six_months_ago).prefetch_related('workouts__sets')
+
 class WeightHistoryViewSet(viewsets.ModelViewSet):
     queryset = WeightHistory.objects.all()
     serializer_class = serializers.WeightHistorySerializer

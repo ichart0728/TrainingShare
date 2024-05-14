@@ -68,7 +68,7 @@ const WorkoutModal = ({
         if (menu) {
           const workoutDisplay: PROPS_WORKOUT = {
             id: uuidv4(),
-            menu: String(menu.id),
+            menu: menu.id,
             body_part: body_part,
             sets: [
               {

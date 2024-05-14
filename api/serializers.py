@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from datetime import timedelta
+
 from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingSession, TrainingRecord, TrainingSet, WeightHistory, BodyFatPercentageHistory, MuscleMassHistory
 
 class UserSerializer(serializers.ModelSerializer):
@@ -98,40 +100,27 @@ class BodyPartSerializer(serializers.ModelSerializer):
 class TrainingSetSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrainingSet
-        fields = ['id', 'weight', 'reps', 'completed']
+        fields = ['id', 'set_number', 'weight', 'reps', 'completed']
         extra_kwargs = {
-            'id': {'read_only': True}
+            'set_number': {'required': False},
         }
-    def validate(self, data):
-        data.pop('Id', None)
-        return data
+
+    def validate_reps(self, value):
+        if not isinstance(value, int) or value < 0:
+            raise serializers.ValidationError("Reps must be a positive integer.")
+        return value
+
+    def validate_weight(self, value):
+        if value is None or value < 0:
+            raise serializers.ValidationError("Weight must be a non-negative number.")
+        return value
 
 class TrainingRecordSerializer(serializers.ModelSerializer):
     sets = TrainingSetSerializer(many=True)
-    menu = serializers.PrimaryKeyRelatedField(
-        queryset=TrainingMenu.objects.all()
-    )
-    body_part = serializers.PrimaryKeyRelatedField(
-        queryset=BodyPart.objects.all(),
-        allow_null=True
-    )
 
     class Meta:
         model = TrainingRecord
         fields = ['id', 'menu', 'body_part', 'sets']
-
-    def create(self, validated_data):
-        sets_data = validated_data.pop('sets', [])
-        record = TrainingRecord.objects.create(**validated_data)
-
-        for index, set_data in enumerate(sets_data, start=1):
-            TrainingSet.objects.create(record=record, set_number=index, **set_data)
-
-        return record
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        return representation
 
 class TrainingSessionSerializer(serializers.ModelSerializer):
     workouts = TrainingRecordSerializer(many=True)
@@ -141,54 +130,45 @@ class TrainingSessionSerializer(serializers.ModelSerializer):
         fields = ['id', 'date', 'duration', 'workouts']
 
     def create(self, validated_data):
-        records_data = validated_data.pop('workouts', [])
+        print("Creating TrainingSession with data:", validated_data)
+        workouts_data = validated_data.pop('workouts', [])
+        duration = validated_data.get('duration')
+        if isinstance(duration, int):
+            validated_data['duration'] = timedelta(seconds=duration)
         session = TrainingSession.objects.create(**validated_data)
 
-        for record_data in records_data:
-            menu_id = record_data.get('menu')
-            body_part_id = record_data.get('body_part')
+        valid_records = []
 
-            if isinstance(menu_id, TrainingMenu):
-                menu_id = menu_id.id
-            if isinstance(body_part_id, BodyPart):
-                body_part_id = body_part_id.id
+        for workout_data in workouts_data:
+            sets_data = workout_data.pop('sets', [])
+            menu_id = workout_data.pop('menu')
+            body_part_id = workout_data.pop('body_part')
 
-            record_data['menu'] = menu_id
-            record_data['body_part'] = body_part_id
+            menu_instance = TrainingMenu.objects.get(id=menu_id.id)
+            body_part_instance = BodyPart.objects.get(id=body_part_id.id)
 
-            record_serializer = TrainingRecordSerializer(data=record_data)
-            record_serializer.is_valid(raise_exception=True)
-            record_serializer.save(session=session)
+            # Correctly set the menu and body_part instances
+            record = TrainingRecord.objects.create(
+                session=session,
+                menu_id=menu_instance.id,
+                body_part_id=body_part_instance.id
+            )
 
+            set_number = 1
+            for set_data in sets_data:
+                set_data['set_number'] = set_number
+                set_serializer = TrainingSetSerializer(data=set_data)
+                if set_serializer.is_valid():
+                    set_serializer.save(record=record)
+                    set_number += 1
+                else:
+                    print(f"Invalid set data: {set_serializer.errors}")
+                    continue
+
+            valid_records.append(record)
+
+        session.workouts.set(valid_records)
         return session
-
-    def update(self, instance, validated_data):
-        records_data = validated_data.pop('workouts', [])
-
-        instance.date = validated_data.get('date', instance.date)
-        instance.duration = validated_data.get('duration', instance.duration)
-        instance.save()
-
-        # 既存のTrainingRecordを削除
-        instance.workouts.all().delete()
-
-        for record_data in records_data:
-            menu_id = record_data.get('menu')
-            body_part_id = record_data.get('body_part')
-
-            if isinstance(menu_id, TrainingMenu):
-                menu_id = menu_id.id
-            if isinstance(body_part_id, BodyPart):
-                body_part_id = body_part_id.id
-
-            record_data['menu'] = menu_id
-            record_data['body_part'] = body_part_id
-
-            record_serializer = TrainingRecordSerializer(data=record_data)
-            record_serializer.is_valid(raise_exception=True)
-            record_serializer.save(session=instance)
-
-        return instance
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

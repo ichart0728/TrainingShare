@@ -57,7 +57,7 @@ export interface WORKOUT_POST {
   workouts: PROPS_WORKOUT[];
 }
 
-interface PROPS_WORKOUT_SET {
+export interface PROPS_WORKOUT_SET {
   id: string;
   //重量
   weight: number;
@@ -69,7 +69,7 @@ interface PROPS_WORKOUT_SET {
 
 export interface PROPS_WORKOUT {
   id: string;
-  menu: string;
+  menu: number;
   body_part: number;
   sets: PROPS_WORKOUT_SET[];
 }

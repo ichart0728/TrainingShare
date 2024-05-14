@@ -12,7 +12,7 @@ import {
 } from "./workoutSlice";
 import { fetchAsyncPostTrainingSessions } from "../api/workoutApi";
 import { fetchAsyncGetTrainingSessions } from "../api/workoutApi";
-import { WORKOUT_POST } from "../types";
+import { WORKOUT_POST, PROPS_WORKOUT_SET } from "../types";
 import { AppDispatch } from "../../app/store";
 import styles from "./Workout.module.css";
 import WorkoutModal from "../components/modal/WorkoutModal";
@@ -126,12 +126,14 @@ const Workout = () => {
         id: workout.id,
         menu: workout.menu,
         body_part: workout.body_part,
-        sets: workout.sets.map((set) => ({
-          id: set.id,
-          weight: Math.round(set.weight * 100) / 100,
-          reps: set.reps,
-          completed: set.completed,
-        })),
+        sets: workout.sets
+          .filter((set) => validateSet(set))
+          .map((set) => ({
+            id: set.id,
+            weight: Math.round(set.weight * 100) / 100,
+            reps: set.reps,
+            completed: set.completed,
+          })),
       }));
     const workoutData: WORKOUT_POST = {
       // YYYY-MM-DD形式の日付文字列
@@ -145,6 +147,10 @@ const Workout = () => {
     dispatch(clearWorkouts());
     dispatch(fetchAsyncGetTrainingSessions());
     navigate("/workout_history");
+  };
+
+  const validateSet = (set: PROPS_WORKOUT_SET) => {
+    return Number.isInteger(set.reps) && set.reps > 0 && set.weight >= 0;
   };
 
   const handleOpenModal = () => {
