@@ -126,6 +126,7 @@ const Workout = () => {
         id: workout.id,
         menu: workout.menu,
         body_part: workout.body_part,
+        memo: workout.memo,
         sets: workout.sets
           .filter((set) => validateSet(set))
           .map((set) => ({

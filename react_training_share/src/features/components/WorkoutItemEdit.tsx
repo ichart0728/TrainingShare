@@ -10,11 +10,16 @@ import {
 import { RootState } from "../../app/store";
 import styles from "./WorkoutItemEdit.module.css";
 import { useSelector, useDispatch } from "react-redux";
-import { updateSet } from "../workout/workoutSlice";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import { addSet, deleteSet, removeWorkout } from "../workout/workoutSlice";
+import {
+  addSet,
+  deleteSet,
+  updateMemo,
+  updateSet,
+  removeWorkout,
+} from "../workout/workoutSlice";
 import { AppDispatch } from "../../app/store";
 import {
   Dialog,
@@ -35,6 +40,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   const [reps, setReps] = useState(
     workout.sets.map((set) => set.reps.toString())
   );
+  const [memo, setMemo] = useState(workout.memo || "");
 
   useEffect(() => {
     setWeights(workout.sets.map((set) => set.weight.toString()));
@@ -120,6 +126,14 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
     }
   };
 
+  const handleMemoChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const newMemo = e.target.value;
+    setMemo(newMemo);
+    dispatch(updateMemo({ workoutId: workout.id, memo: newMemo }));
+  };
+
   const handleConfirmDelete = () => {
     dispatch(removeWorkout(workout.id));
     setOpenDeleteModal(false);
@@ -165,6 +179,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
       })
     );
   };
+
   return (
     <Paper className={styles.workoutItem} elevation={2}>
       <div className={styles.workoutHeader}>
@@ -188,6 +203,18 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
             : "0"}
           %)
         </Typography>
+      </div>
+      <div className={styles.memoContainer}>
+        <TextField
+          label="メモ"
+          multiline
+          minRows={2}
+          maxRows={4}
+          variant="outlined"
+          fullWidth
+          value={memo}
+          onChange={handleMemoChange}
+        />
       </div>
       <div className={styles.setContent}>
         <Grid container alignItems="center" className={styles.setHeader}>

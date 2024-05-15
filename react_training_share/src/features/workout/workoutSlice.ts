@@ -29,6 +29,20 @@ export const workoutSlice = createSlice({
         (workout) => workout.id !== action.payload
       );
     },
+    updateMemo: (
+      state,
+      action: PayloadAction<{
+        workoutId: string;
+        memo: string;
+      }>
+    ) => {
+      const workout = state.workouts.find(
+        (workout) => workout.id === action.payload.workoutId
+      );
+      if (workout) {
+        workout.memo = action.payload.memo;
+      }
+    },
     updateVolume: (state) => {
       state.totalVolume = state.workouts.reduce((total, workout) => {
         return (
@@ -132,6 +146,7 @@ export const workoutSlice = createSlice({
 export const {
   addWorkout,
   removeWorkout,
+  updateMemo,
   updateVolume,
   updateSet,
   addSet,

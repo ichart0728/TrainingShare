@@ -71,6 +71,7 @@ export interface PROPS_WORKOUT {
   id: string;
   menu: number;
   body_part: number;
+  memo?: string;
   sets: PROPS_WORKOUT_SET[];
 }
 

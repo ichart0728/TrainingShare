@@ -55,6 +55,18 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
           総ボリューム: {completedVolume.toFixed(2)}kg
         </Typography>
       </div>
+      <div className={styles.memoContainer}>
+        <TextField
+          label="メモ"
+          multiline
+          minRows={2}
+          maxRows={4}
+          variant="outlined"
+          fullWidth
+          value={workout.memo}
+          disabled={true}
+        />
+      </div>
       <div className={styles.setContent}>
         <Grid container alignItems="center" className={styles.setHeader}>
           <Grid item xs={2} sm={2} className={styles.labelContainer}>

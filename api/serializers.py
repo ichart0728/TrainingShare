@@ -120,7 +120,7 @@ class TrainingRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TrainingRecord
-        fields = ['id', 'menu', 'body_part', 'sets']
+        fields = ['id', 'menu', 'body_part', 'sets', 'memo']  # memoを追加
 
 class TrainingSessionSerializer(serializers.ModelSerializer):
     workouts = TrainingRecordSerializer(many=True)
@@ -135,23 +135,24 @@ class TrainingSessionSerializer(serializers.ModelSerializer):
         duration = validated_data.get('duration')
         if isinstance(duration, int):
             validated_data['duration'] = timedelta(seconds=duration)
-        session = TrainingSession.objects.create(**validated_data)
 
+        session = TrainingSession.objects.create(**validated_data)
         valid_records = []
 
         for workout_data in workouts_data:
             sets_data = workout_data.pop('sets', [])
             menu_id = workout_data.pop('menu')
             body_part_id = workout_data.pop('body_part')
+            memo = workout_data.get('memo', None)
 
             menu_instance = TrainingMenu.objects.get(id=menu_id.id)
             body_part_instance = BodyPart.objects.get(id=body_part_id.id)
 
-            # Correctly set the menu and body_part instances
             record = TrainingRecord.objects.create(
                 session=session,
-                menu_id=menu_instance.id,
-                body_part_id=body_part_instance.id
+                menu=menu_instance,
+                body_part=body_part_instance,
+                memo=memo  # メモを保存
             )
 
             set_number = 1

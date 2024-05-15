@@ -253,15 +253,14 @@ class TrainingSession(models.Model):
 
 # トレーニング記録テーブル (TrainingRecord) のモデル
 class TrainingRecord(models.Model):
-    # トレーニング記録ID
     session = models.ForeignKey(TrainingSession, related_name='workouts', on_delete=models.CASCADE)
-    # トレーニングメニュー
     menu = models.ForeignKey(TrainingMenu, on_delete=models.CASCADE, related_name='workouts')
-    # トレーニング部位
-    body_part = models.ForeignKey(BodyPart, on_delete=models.CASCADE, null=True, blank=True)  # 新たに追加
+    body_part = models.ForeignKey(BodyPart, on_delete=models.CASCADE, null=True, blank=True)
+    memo = models.TextField(null=True, blank=True)  # メモ用フィールドを追加
 
     def __str__(self):
-        return f"{self.session.user.username} - {self.menu.name} on {self.session.date}"
+        return f"{self.session.user.email} - {self.menu.name} on {self.session.date}"
+
 
 # トレーニングセットテーブル (TrainingSet) のモデル
 class TrainingSet(models.Model):

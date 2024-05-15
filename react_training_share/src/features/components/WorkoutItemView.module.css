@@ -104,3 +104,8 @@
     max-width: 80px;
   }
 }
+
+.memoContainer {
+  margin-top: 16px;
+  position: relative;
+}

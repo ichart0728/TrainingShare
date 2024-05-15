@@ -99,6 +99,20 @@
   font-weight: bold;
 }
 
+.memoContainer {
+  margin-top: 16px;
+  position: relative;
+}
+
+.memoLabel {
+  position: absolute;
+  top: -8px;
+  right: 0;
+  background-color: white;
+  padding: 0 4px;
+  color: #999;
+}
+
 @media (max-width: 430px) {
   .input {
     max-width: 80px;
