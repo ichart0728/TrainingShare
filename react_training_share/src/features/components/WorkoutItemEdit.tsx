@@ -191,7 +191,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
           {targetName} | {menuName}
         </Typography>
         <Button onClick={handleDeleteWorkout} className={styles.deleteButton}>
-          <DeleteOutlineIcon />
+          <DeleteOutlineIcon className={styles.deleteIcon} />
         </Button>
       </div>
       <div className={styles.volumeDisplay}>
