@@ -34,14 +34,6 @@
     display: none;
   }
 
-  .listItemText {
-    display: none;
-  }
-
-  .sidebar_title {
-    display: none;
-  }
-
   .bottomNavigation {
     position: fixed;
     bottom: 0;
@@ -50,12 +42,14 @@
     z-index: 1200;
     background-color: #ffffff;
     box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
-    height: 1000px;
+    height: 56px;
   }
 
-  .avatar {
-    width: 35px;
-    height: 35px;
+  .mobileIcon {
+    font-size: 26px;
+  }
+  .mobilePersonIcon {
+    font-size: 34px;
   }
 }
 
@@ -68,10 +62,13 @@
 }
 
 .icon {
+  font-size: 28px;
+}
+
+.PersonIcon {
   font-size: 32px;
 }
 
-.avatar {
-  width: 48px;
-  height: 48px;
+.selected {
+  color: #000000;
 }

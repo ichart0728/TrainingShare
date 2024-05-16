@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../app/store";
-import StyledBadge from "../home/StyledBadge";
 import {
   selectMyProfile,
   setOpenSignIn,
@@ -10,7 +9,6 @@ import {
 } from "../auth/authSlice";
 import { resetOpenNewPost } from "../post/postSlice";
 import {
-  Avatar,
   Button,
   Drawer,
   List,
@@ -24,12 +22,17 @@ import {
   BottomNavigationAction,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
+import HomeOutlinedIcon from "@material-ui/icons/HomeOutlined";
 import HomeIcon from "@material-ui/icons/Home";
-import CalendarToday from "@material-ui/icons/CalendarToday";
+import CalendarTodayOutlinedIcon from "@material-ui/icons/CalendarTodayOutlined";
+import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import FitnessCenter from "@material-ui/icons/FitnessCenter";
+import FitnessCenterOutlinedIcon from "@material-ui/icons/FitnessCenterOutlined";
+import FitnessCenterIcon from "@material-ui/icons/FitnessCenter";
+import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
+import PersonIcon from "@material-ui/icons/Person";
 import styles from "./Sidebar.module.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { setUserProfileId } from "../profile/profileSlice";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 
@@ -37,6 +40,7 @@ const Sidebar = () => {
   const dispatch: AppDispatch = useDispatch();
   const myprofile = useSelector(selectMyProfile);
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -85,52 +89,81 @@ const Sidebar = () => {
     setOpenLogoutModal(true);
   };
 
+  const isSelected = (path: string) => {
+    return location.pathname === path;
+  };
+
   const sidebarContent = (
     <List className={styles.drawerContent}>
-      <ListItem button key="Home" onClick={handleHomeClick}>
+      <ListItem
+        button
+        key="Home"
+        onClick={handleHomeClick}
+        className={isSelected("/workout_history") ? styles.selected : ""}
+      >
         <ListItemIcon>
           <div className={styles.iconWrapper}>
-            <HomeIcon className={styles.icon} />
+            {isSelected("/workout_history") ? (
+              <HomeIcon className={styles.icon} />
+            ) : (
+              <HomeOutlinedIcon className={styles.icon} />
+            )}
           </div>
         </ListItemIcon>
         <ListItemText primary="Home" className={styles.listItemText} />
       </ListItem>
 
-      <ListItem button key="Workout" onClick={handleWorkoutClick}>
+      <ListItem
+        button
+        key="Workout"
+        onClick={handleWorkoutClick}
+        className={isSelected("/workout") ? styles.selected : ""}
+      >
         <ListItemIcon>
           <div className={styles.iconWrapper}>
-            <FitnessCenter className={styles.icon} />
+            {isSelected("/workout") ? (
+              <FitnessCenterIcon className={styles.icon} />
+            ) : (
+              <FitnessCenterOutlinedIcon className={styles.icon} />
+            )}
           </div>
         </ListItemIcon>
-        <ListItemText primary="Workout" className={styles.listItemText} />{" "}
+        <ListItemText primary="Workout" className={styles.listItemText} />
       </ListItem>
 
-      <ListItem button key="Calendar" onClick={handleCalendarClick}>
+      <ListItem
+        button
+        key="Calendar"
+        onClick={handleCalendarClick}
+        className={isSelected("/calendar") ? styles.selected : ""}
+      >
         <ListItemIcon>
           <div className={styles.iconWrapper}>
-            <CalendarToday className={styles.icon} />
+            {isSelected("/calendar") ? (
+              <CalendarTodayIcon className={styles.icon} />
+            ) : (
+              <CalendarTodayOutlinedIcon className={styles.icon} />
+            )}
           </div>
         </ListItemIcon>
-        <ListItemText primary="Calendar" className={styles.listItemText} />{" "}
+        <ListItemText primary="Calendar" className={styles.listItemText} />
       </ListItem>
 
-      <ListItem button key="Profile" onClick={handleMyProfileClick}>
+      <ListItem
+        button
+        key="Profile"
+        onClick={handleMyProfileClick}
+        className={
+          isSelected(`/profile/${myprofile.nickName}`) ? styles.selected : ""
+        }
+      >
         <ListItemIcon>
           <div className={styles.iconWrapper}>
-            <StyledBadge
-              overlap="circular"
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              variant="dot"
-            >
-              <Avatar
-                className={styles.avatar}
-                alt="who?"
-                src={myprofile.img}
-              />
-            </StyledBadge>
+            {isSelected(`/profile/${myprofile.nickName}`) ? (
+              <PersonIcon className={styles.PersonIcon} />
+            ) : (
+              <PersonOutlineIcon className={styles.PersonIcon} />
+            )}
           </div>
         </ListItemIcon>
         <ListItemText primary="Profile" className={styles.listItemText} />
@@ -153,68 +186,72 @@ const Sidebar = () => {
         <BottomNavigation className={styles.bottomNavigation}>
           <BottomNavigationAction
             label="Home"
-            icon={<HomeIcon />}
+            icon={
+              isSelected("/workout_history") ? (
+                <HomeIcon className={styles.mobileIcon} />
+              ) : (
+                <HomeOutlinedIcon className={styles.mobileIcon} />
+              )
+            }
             onClick={handleHomeClick}
+            className={isSelected("/workout_history") ? styles.selected : ""}
           />
           <BottomNavigationAction
             label="Workout"
-            icon={<FitnessCenter />}
+            icon={
+              isSelected("/workout") ? (
+                <FitnessCenterIcon className={styles.mobileIcon} />
+              ) : (
+                <FitnessCenterOutlinedIcon className={styles.mobileIcon} />
+              )
+            }
             onClick={handleWorkoutClick}
+            className={isSelected("/workout") ? styles.selected : ""}
           />
           <BottomNavigationAction
             label="Calendar"
-            icon={<CalendarToday />}
+            icon={
+              isSelected("/calendar") ? (
+                <CalendarTodayIcon className={styles.mobileIcon} />
+              ) : (
+                <CalendarTodayOutlinedIcon className={styles.mobileIcon} />
+              )
+            }
             onClick={handleCalendarClick}
+            className={isSelected("/calendar") ? styles.selected : ""}
           />
           <BottomNavigationAction
             label="Profile"
             icon={
-              <StyledBadge
-                overlap="circular"
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                variant="dot"
-              >
-                <Avatar
-                  className={styles.avatar}
-                  alt="who?"
-                  src={myprofile.img}
-                />
-              </StyledBadge>
+              isSelected(`/profile/${myprofile.nickName}`) ? (
+                <PersonIcon className={styles.mobilePersonIcon} />
+              ) : (
+                <PersonOutlineIcon className={styles.mobilePersonIcon} />
+              )
             }
             onClick={handleMyProfileClick}
+            className={
+              isSelected(`/profile/${myprofile.nickName}`)
+                ? styles.selected
+                : ""
+            }
           />
           <BottomNavigationAction
             label="Logout"
-            icon={<ExitToAppIcon />}
+            icon={<ExitToAppIcon className={styles.mobileIcon} />}
             onClick={handleLogoutClick}
           />
         </BottomNavigation>
-        <Dialog
+        <ConfirmationDialog
           open={openLogoutModal}
           onClose={handleCloseLogoutModal}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"ログアウトしますか？"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              ログアウトしますか？
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseLogoutModal} color="primary">
-              キャンセル
-            </Button>
-            <Button onClick={handleConfirmLogout} color="primary" autoFocus>
-              ログアウト
-            </Button>
-          </DialogActions>
-        </Dialog>
+          title="ログアウトしますか？"
+          content="ログアウトしますか？"
+          cancelText="キャンセル"
+          confirmText="ログアウト"
+          onCancel={handleCloseLogoutModal}
+          onConfirm={handleConfirmLogout}
+        />
       </>
     );
   }
