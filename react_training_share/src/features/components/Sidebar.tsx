@@ -31,13 +31,7 @@ import FitnessCenter from "@material-ui/icons/FitnessCenter";
 import styles from "./Sidebar.module.css";
 import { useNavigate } from "react-router-dom";
 import { setUserProfileId } from "../profile/profileSlice";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from "@material-ui/core";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 
 const Sidebar = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -251,29 +245,16 @@ const Sidebar = () => {
         </div>
         {sidebarContent}
       </Drawer>
-      <Dialog
+      <ConfirmationDialog
         open={openLogoutModal}
         onClose={handleCloseLogoutModal}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"ログアウトしますか？"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            ログアウトしますか？
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseLogoutModal} color="primary">
-            キャンセル
-          </Button>
-          <Button onClick={handleConfirmLogout} color="primary" autoFocus>
-            ログアウト
-          </Button>
-        </DialogActions>
-      </Dialog>
+        title="ログアウトしますか？"
+        content="ログアウトしますか？"
+        cancelText="キャンセル"
+        confirmText="ログアウト"
+        onCancel={handleCloseLogoutModal}
+        onConfirm={handleConfirmLogout}
+      />
     </>
   );
 };

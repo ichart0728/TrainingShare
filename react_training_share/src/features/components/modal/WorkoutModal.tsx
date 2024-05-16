@@ -138,7 +138,7 @@ const WorkoutModal = ({
           )}
           className={styles.addButton}
         >
-          トレーニングを追加する
+          トレーニング追加
         </Button>
       </div>
     </div>

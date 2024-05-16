@@ -16,20 +16,12 @@ import { WORKOUT_POST, PROPS_WORKOUT_SET } from "../types";
 import { AppDispatch } from "../../app/store";
 import styles from "./Workout.module.css";
 import WorkoutModal from "../components/modal/WorkoutModal";
-import {
-  Modal,
-  Button,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-} from "@material-ui/core";
+import { Modal, Button, Typography } from "@material-ui/core";
 
 import { RootState } from "../../app/store";
 import WorkoutItemEdit from "../components/WorkoutItemEdit";
 import { useNavigate } from "react-router-dom";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 
 const Workout = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -40,6 +32,7 @@ const Workout = () => {
   );
   const [openEndModal, setOpenEndModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   // selectedWorkoutsの全体のボリュームを計算
   const totalVolume = selectedWorkouts.reduce((total, workout) => {
     return (
@@ -171,6 +164,19 @@ const Workout = () => {
       .padStart(2, "0")}`;
   };
 
+  const handleOpenDeleteModal = () => {
+    setOpenDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
+  const handleConfirmDeleteWorkouts = () => {
+    dispatch(clearWorkouts());
+    setOpenDeleteModal(false);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.topControls}>
@@ -205,7 +211,17 @@ const Workout = () => {
             color="primary"
             onClick={handleOpenModal}
           >
-            トレーニングを追加
+            トレーニング追加
+          </Button>
+        </div>
+        <div className={styles.AddTrainingButton}>
+          <Button
+            className={styles.bottomButton}
+            variant="contained"
+            color="secondary"
+            onClick={handleOpenDeleteModal}
+          >
+            トレーニングをリセット
           </Button>
         </div>
       </div>
@@ -291,23 +307,28 @@ const Workout = () => {
           </div>
         </div>
       </div>
-      <Dialog open={openEndModal} onClose={handleCloseEndModal}>
-        <DialogTitle>トレーニング終了</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{modalContent}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseEndModal} color="primary">
-            キャンセル
-          </Button>
-          <Button onClick={confirmEndTrainingWithSaving} color="primary">
-            保存して終了
-          </Button>
-          <Button onClick={confirmEndTrainingWithoutSaving} color="secondary">
-            保存せずに終了
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmationDialog
+        open={openEndModal}
+        onClose={handleCloseEndModal}
+        title="トレーニング終了"
+        content={modalContent}
+        cancelText="キャンセル"
+        confirmText="保存して終了"
+        onCancel={handleCloseEndModal}
+        onConfirm={confirmEndTrainingWithSaving}
+        onDelete={confirmEndTrainingWithoutSaving}
+        deleteText="保存せずに終了"
+      />
+      <ConfirmationDialog
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        title="トレーニングをリセット"
+        content="このアクションは元に戻せません。すべてのトレーニングを削除しますか？"
+        cancelText="キャンセル"
+        confirmText="削除"
+        onCancel={handleCloseDeleteModal}
+        onConfirm={handleConfirmDeleteWorkouts}
+      />
     </div>
   );
 };

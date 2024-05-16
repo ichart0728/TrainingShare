@@ -13,6 +13,8 @@ import { useSelector, useDispatch } from "react-redux";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import ConfirmationDialog from "../components/ConfirmationDialog";
+
 import {
   addSet,
   deleteSet,
@@ -21,13 +23,6 @@ import {
   removeWorkout,
 } from "../workout/workoutSlice";
 import { AppDispatch } from "../../app/store";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from "@material-ui/core";
 import { PROPS_WORKOUT_ITEM, Training } from "../types";
 
 const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
@@ -293,27 +288,16 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
           + セット追加
         </Button>
       </div>
-      <Dialog
+      <ConfirmationDialog
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"削除しますか？"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            このアクションは元に戻せません。本当に削除しますか？
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteModal} color="primary">
-            キャンセル
-          </Button>
-          <Button onClick={handleConfirmDelete} color="primary" autoFocus>
-            削除
-          </Button>
-        </DialogActions>
-      </Dialog>
+        title="セットの削除"
+        content="このアクションは元に戻せません。本当に削除しますか？"
+        cancelText="キャンセル"
+        confirmText="削除"
+        onCancel={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
     </Paper>
   );
 };
