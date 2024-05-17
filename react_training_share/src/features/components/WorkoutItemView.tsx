@@ -1,20 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Typography,
   Paper,
   TextField,
   Grid,
   Checkbox,
+  Button,
 } from "@material-ui/core";
 import { RootState } from "../../app/store";
 import styles from "./WorkoutItemView.module.css";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import ConfirmationDialog from "../components/ConfirmationDialog";
+import { AppDispatch } from "../../app/store";
 
-import { PROPS_WORKOUT_ITEM, Training } from "../types";
+import { PROPS_WORKOUT_ITEM, Training, PROPS_TRAINING_SESSION } from "../types";
+import { fetchAsyncDeleteTrainingRecord } from "../api/workoutApi";
 
-const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
+const WorkoutItemView: React.FC<
+  PROPS_WORKOUT_ITEM & { trainingSession: PROPS_TRAINING_SESSION }
+> = ({ workout, trainingSession }) => {
+  const dispatch: AppDispatch = useDispatch();
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
   // store.training.trainingMenuを取得する
   const trainingMenus = useSelector(
     (state: RootState) => state.training.trainingMenus
@@ -39,6 +50,24 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
     0
   );
 
+  const handleDeleteWorkout = () => {
+    setOpenDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    await dispatch(
+      fetchAsyncDeleteTrainingRecord({
+        TrainingRecordId: workout.id,
+        TrainingSessionId: trainingSession.id,
+      })
+    );
+    setOpenDeleteModal(false);
+  };
+
   return (
     <Paper className={styles.workoutItem} elevation={2}>
       <div className={styles.workoutHeader}>
@@ -47,6 +76,14 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
           gutterBottom
           className={styles.workoutTitle}
         >
+          トレーニング内容
+        </Typography>
+        <Button onClick={handleDeleteWorkout} className={styles.deleteButton}>
+          <DeleteOutlineIcon className={styles.deleteIcon} />
+        </Button>
+      </div>
+      <div className={styles.workoutDetails}>
+        <Typography variant="subtitle1" gutterBottom>
           {targetName} | {menuName}
         </Typography>
       </div>
@@ -127,8 +164,18 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
           </Grid>
         ))}
       </div>
+      <ConfirmationDialog
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        title="トレーニングの削除"
+        content="このアクションは元に戻せません。本当に削除しますか？"
+        cancelText="キャンセル"
+        confirmText="削除"
+        onCancel={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
     </Paper>
   );
 };
 
-export default WorkoutItemEdit;
+export default WorkoutItemView;
