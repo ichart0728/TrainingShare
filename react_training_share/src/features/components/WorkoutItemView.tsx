@@ -16,12 +16,20 @@ import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import { AppDispatch } from "../../app/store";
 
-import { PROPS_WORKOUT_ITEM, Training, PROPS_TRAINING_SESSION } from "../types";
+import { PROPS_WORKOUT, Training, PROPS_TRAINING_SESSION } from "../types";
 import { fetchAsyncDeleteTrainingRecord } from "../api/workoutApi";
 
-const WorkoutItemView: React.FC<
-  PROPS_WORKOUT_ITEM & { trainingSession: PROPS_TRAINING_SESSION }
-> = ({ workout, trainingSession }) => {
+interface WorkoutItemViewProps {
+  workout: PROPS_WORKOUT;
+  trainingSession: PROPS_TRAINING_SESSION;
+  onDelete: (workoutId: string) => void;
+}
+
+const WorkoutItemView: React.FC<WorkoutItemViewProps> = ({
+  workout,
+  trainingSession,
+  onDelete,
+}) => {
   const dispatch: AppDispatch = useDispatch();
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -65,6 +73,7 @@ const WorkoutItemView: React.FC<
         TrainingSessionId: trainingSession.id,
       })
     );
+    onDelete(workout.id);
     setOpenDeleteModal(false);
   };
 

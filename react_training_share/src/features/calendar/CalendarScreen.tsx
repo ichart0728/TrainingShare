@@ -28,6 +28,7 @@ const CalendarScreen = () => {
   const [openSessionList, setOpenSessionList] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deletedWorkoutId, setDeletedWorkoutId] = useState<string | null>(null);
 
   const getTrainingTitle = (
     session: PROPS_TRAINING_SESSION,
@@ -125,13 +126,16 @@ const CalendarScreen = () => {
           >
             トレーニングセッションを削除
           </Button>
-          {selectedSession.workouts.map((workout) => (
-            <WorkoutItemView
-              key={workout.id}
-              workout={workout}
-              trainingSession={selectedSession}
-            />
-          ))}{" "}
+          {selectedSession.workouts
+            .filter((workout) => workout.id !== deletedWorkoutId)
+            .map((workout) => (
+              <WorkoutItemView
+                key={workout.id}
+                workout={workout}
+                trainingSession={selectedSession}
+                onDelete={(workoutId) => setDeletedWorkoutId(workoutId)}
+              />
+            ))}{" "}
         </div>
       )}
       <SelectTrainingSessionModal
