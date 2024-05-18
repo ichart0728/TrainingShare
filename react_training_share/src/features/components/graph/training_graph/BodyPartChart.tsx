@@ -6,7 +6,7 @@ import PieChartComponent from "./PieChartComponent";
 import RadarChartComponent from "./RadarChartComponent";
 import WeeklyTrainingFrequencyChart from "./WeeklyTrainingFrequencyChart";
 
-import { PROPS_WORKOUT_CHART } from "../../types";
+import { PROPS_WORKOUT_CHART } from "../../../types";
 
 const bodyPartColors: { [key: number]: string } = {
   1: "#3498DB",

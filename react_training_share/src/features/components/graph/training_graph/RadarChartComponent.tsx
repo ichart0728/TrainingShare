@@ -8,7 +8,7 @@ import {
   PROPS_RADAR_CHART,
   PROPS_TRAINING_SESSION,
   PROPS_TRAINING_MENU,
-} from "../../types";
+} from "../../../types";
 import {
   Chart as ChartJS,
   RadialLinearScale,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
-import { PROPS_TRAINING_SESSION } from "../../types";
+import { PROPS_TRAINING_SESSION } from "../../../types";
 import styles from "./BodyPartChart.module.css";
 import { IconButton } from "@material-ui/core";
 import { ChevronLeft, ChevronRight } from "@material-ui/icons";
