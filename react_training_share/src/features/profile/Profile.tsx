@@ -28,7 +28,7 @@ import { AppDispatch } from "../../app/store";
 import WeightChart from "../components/graph/profile_graph/WeightChart";
 import BodyFatPercentageChart from "../components/graph/profile_graph/BodyFatPercentageChart";
 import MuscleMassChart from "../components/graph/profile_graph/MuscleMassChart";
-import { getMax, getMin } from "../components/graph/chartUtils";
+import { getMax, getMin } from "../components/graph/training_graph/chartUtils";
 import ProfileCard from "../components/ProfileCard";
 
 const Profile = () => {
