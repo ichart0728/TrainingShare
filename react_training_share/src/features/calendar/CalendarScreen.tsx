@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
@@ -29,6 +29,19 @@ const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deletedWorkoutId, setDeletedWorkoutId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedSession) {
+      const updatedSession = trainingSessions.find(
+        (session) => session.id === selectedSession.id
+      );
+      if (updatedSession) {
+        setSelectedSession(updatedSession);
+      } else {
+        setSelectedSession(null);
+      }
+    }
+  }, [trainingSessions, selectedSession]);
 
   const getTrainingTitle = (
     session: PROPS_TRAINING_SESSION,
@@ -116,7 +129,7 @@ const CalendarScreen = () => {
           })}
         />
       </div>
-      {selectedSession && (
+      {selectedSession && selectedSession.workouts.length > 0 && (
         <div className={styles.TrainingContainer}>
           <h3>{formatDate(selectedSession.date)}のトレーニング内容</h3>
           <Button
