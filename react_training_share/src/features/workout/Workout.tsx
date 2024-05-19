@@ -129,9 +129,16 @@ const Workout = () => {
             completed: set.completed,
           })),
       }));
+
+    // 現在の日付をJSTで取得
+    const date = new Date();
+    const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
+    const formattedDate = jstDate.toISOString().split("T")[0];
+    console.log("現在の日付:", formattedDate);
+
     const workoutData: WORKOUT_POST = {
       // YYYY-MM-DD形式の日付文字列
-      date: new Date().toISOString().split("T")[0],
+      date: formattedDate,
       duration: Math.floor(elapsedTime / 1000), // ミリ秒を秒に変換
       workouts: workouts,
     };
