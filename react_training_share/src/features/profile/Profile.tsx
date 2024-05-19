@@ -31,6 +31,7 @@ import MuscleMassChart from "../components/graph/profile_graph/MuscleMassChart";
 import { getMax, getMin } from "../components/graph/training_graph/chartUtils";
 import ProfileCard from "../components/ProfileCard";
 
+// State Management
 const Profile = () => {
   const dispatch: AppDispatch = useDispatch();
   const profileId = useSelector((state: RootState) => state.profile.profile.id);
@@ -48,6 +49,7 @@ const Profile = () => {
     (state: RootState) => state.profile.muscleMassHistory
   );
 
+  // State Variables
   const [editMode, setEditMode] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(profile);
   const [weight, setWeight] = useState("");
@@ -79,6 +81,7 @@ const Profile = () => {
   const [selectedMuscleMassDataPoint, setSelectedMuscleMassDataPoint] =
     useState<string | null>(null);
 
+  // Effect Hooks
   useEffect(() => {
     if (profileId) {
       dispatch(fetchAsyncGetProf());
@@ -108,6 +111,98 @@ const Profile = () => {
     setMinMuscleMass(getMin(muscleMassHistory));
   }, [muscleMassHistory]);
 
+  // Event Handlers
+  const handleAddWeightHistory = async () => {
+    if (weight) {
+      const date = new Date();
+      const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
+      const formattedDate = jstDate.toISOString().split("T")[0];
+      const newWeight = Math.round(parseFloat(weight) * 100) / 100;
+      await dispatch(
+        fetchAsyncAddWeightHistory({
+          weight: newWeight,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListWeightHistory());
+
+      setWeight("");
+    }
+  };
+
+  const handleUpdateWeightHistory = async () => {
+    if (weight && selectedWeightDataPoint) {
+      const newWeight = Math.round(parseFloat(weight) * 100) / 100;
+      const formattedDate = selectedWeightDataPoint;
+
+      await dispatch(
+        fetchAsyncAddWeightHistory({
+          weight: newWeight,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListWeightHistory());
+
+      setWeight("");
+      setSelectedWeightDate("");
+      setSelectedWeightDataPoint(null);
+    }
+  };
+
+  const handleWeightDataPointClick = (date: string, weight: number) => {
+    setSelectedWeightDate(date);
+    setWeight(weight.toString());
+    setSelectedWeightDataPoint(date);
+  };
+
+  const handleAddBodyFatPercentageHistory = async () => {
+    if (bodyFatPercentage) {
+      const date = new Date();
+      const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
+      const formattedDate = jstDate.toISOString().split("T")[0];
+      const newBodyFatPercentage =
+        Math.round(parseFloat(bodyFatPercentage) * 100) / 100;
+      await dispatch(
+        fetchAsyncAddBodyFatPercentageHistory({
+          bodyFatPercentage: newBodyFatPercentage,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListBodyFatPercentageHistory());
+
+      setBodyFatPercentage("");
+    }
+  };
+
+  const handleUpdateBodyFatPercentageHistory = async () => {
+    if (bodyFatPercentage && selectedBodyFatPercentageDataPoint) {
+      const newBodyFatPercentage =
+        Math.round(parseFloat(bodyFatPercentage) * 100) / 100;
+      const formattedDate = selectedBodyFatPercentageDataPoint;
+
+      await dispatch(
+        fetchAsyncAddBodyFatPercentageHistory({
+          bodyFatPercentage: newBodyFatPercentage,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListBodyFatPercentageHistory());
+
+      setBodyFatPercentage("");
+      setSelectedBodyFatPercentageDate("");
+      setSelectedBodyFatPercentageDataPoint(null);
+    }
+  };
+
+  const handleBodyFatPercentageDataPointClick = (
+    date: string,
+    bodyFatPercentage: number
+  ) => {
+    setSelectedBodyFatPercentageDate(date);
+    setBodyFatPercentage(bodyFatPercentage.toString());
+    setSelectedBodyFatPercentageDataPoint(date);
+  };
+
   const handleAddMuscleMassHistory = async () => {
     if (muscleMass) {
       const date = new Date();
@@ -126,6 +221,32 @@ const Profile = () => {
     }
   };
 
+  const handleUpdateMuscleMassHistory = async () => {
+    if (muscleMass && selectedMuscleMassDataPoint) {
+      const newMuscleMass = Math.round(parseFloat(muscleMass) * 100) / 100;
+      const formattedDate = selectedMuscleMassDataPoint;
+
+      await dispatch(
+        fetchAsyncAddMuscleMassHistory({
+          muscleMass: newMuscleMass,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListMuscleMassHistory());
+
+      setMuscleMass("");
+      setSelectedMuscleMassDate("");
+      setSelectedMuscleMassDataPoint(null);
+    }
+  };
+
+  const handleMuscleMassDataPointClick = (date: string, muscleMass: number) => {
+    setSelectedMuscleMassDate(date);
+    setMuscleMass(muscleMass.toString());
+    setSelectedMuscleMassDataPoint(date);
+  };
+
+  // Utility Functions
   const getOldestWeightMonth = () => {
     const allDates = [...weightHistory.map((item) => new Date(item.date))];
     return allDates.length > 0
@@ -276,122 +397,7 @@ const Profile = () => {
     );
   };
 
-  const handleAddWeightHistory = async () => {
-    if (weight) {
-      const date = new Date();
-      const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
-      const formattedDate = jstDate.toISOString().split("T")[0];
-      const newWeight = Math.round(parseFloat(weight) * 100) / 100;
-      await dispatch(
-        fetchAsyncAddWeightHistory({
-          weight: newWeight,
-          date: formattedDate,
-        })
-      );
-      await dispatch(fetchAsyncListWeightHistory());
-
-      setWeight("");
-    }
-  };
-
-  const handleUpdateWeightHistory = async () => {
-    if (weight && selectedWeightDataPoint) {
-      const newWeight = Math.round(parseFloat(weight) * 100) / 100;
-      const formattedDate = selectedWeightDataPoint;
-
-      await dispatch(
-        fetchAsyncAddWeightHistory({
-          weight: newWeight,
-          date: formattedDate,
-        })
-      );
-      await dispatch(fetchAsyncListWeightHistory());
-
-      setWeight("");
-      setSelectedWeightDate("");
-      setSelectedWeightDataPoint(null);
-    }
-  };
-
-  const handleWeightDataPointClick = (date: string, weight: number) => {
-    setSelectedWeightDate(date);
-    setWeight(weight.toString());
-    setSelectedWeightDataPoint(date);
-  };
-
-  const handleAddBodyFatPercentageHistory = async () => {
-    if (bodyFatPercentage) {
-      const date = new Date();
-      const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
-      const formattedDate = jstDate.toISOString().split("T")[0];
-      const newBodyFatPercentage =
-        Math.round(parseFloat(bodyFatPercentage) * 100) / 100;
-      await dispatch(
-        fetchAsyncAddBodyFatPercentageHistory({
-          bodyFatPercentage: newBodyFatPercentage,
-          date: formattedDate,
-        })
-      );
-      await dispatch(fetchAsyncListBodyFatPercentageHistory());
-
-      setBodyFatPercentage("");
-    }
-  };
-
-  const handleUpdateBodyFatPercentageHistory = async () => {
-    if (bodyFatPercentage && selectedBodyFatPercentageDataPoint) {
-      const newBodyFatPercentage =
-        Math.round(parseFloat(bodyFatPercentage) * 100) / 100;
-      const formattedDate = selectedBodyFatPercentageDataPoint;
-
-      await dispatch(
-        fetchAsyncAddBodyFatPercentageHistory({
-          bodyFatPercentage: newBodyFatPercentage,
-          date: formattedDate,
-        })
-      );
-      await dispatch(fetchAsyncListBodyFatPercentageHistory());
-
-      setBodyFatPercentage("");
-      setSelectedBodyFatPercentageDate("");
-      setSelectedBodyFatPercentageDataPoint(null);
-    }
-  };
-
-  const handleBodyFatPercentageDataPointClick = (
-    date: string,
-    bodyFatPercentage: number
-  ) => {
-    setSelectedBodyFatPercentageDate(date);
-    setBodyFatPercentage(bodyFatPercentage.toString());
-    setSelectedBodyFatPercentageDataPoint(date);
-  };
-
-  const handleUpdateMuscleMassHistory = async () => {
-    if (muscleMass && selectedMuscleMassDataPoint) {
-      const newMuscleMass = Math.round(parseFloat(muscleMass) * 100) / 100;
-      const formattedDate = selectedMuscleMassDataPoint;
-
-      await dispatch(
-        fetchAsyncAddMuscleMassHistory({
-          muscleMass: newMuscleMass,
-          date: formattedDate,
-        })
-      );
-      await dispatch(fetchAsyncListMuscleMassHistory());
-
-      setMuscleMass("");
-      setSelectedMuscleMassDate("");
-      setSelectedMuscleMassDataPoint(null);
-    }
-  };
-
-  const handleMuscleMassDataPointClick = (date: string, muscleMass: number) => {
-    setSelectedMuscleMassDate(date);
-    setMuscleMass(muscleMass.toString());
-    setSelectedMuscleMassDataPoint(date);
-  };
-
+  // Render Function
   if (isLoading) {
     return (
       <Container maxWidth="sm">
