@@ -33,6 +33,8 @@ interface MuscleMassChartProps {
   isNextMonthDisabled: boolean;
   maxMuscleMass: number;
   minMuscleMass: number;
+  onDataPointClick: (date: string, muscleMass: number) => void;
+  selectedDataPoint: string | null;
 }
 
 const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
@@ -44,6 +46,8 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
   isNextMonthDisabled,
   maxMuscleMass,
   minMuscleMass,
+  onDataPointClick,
+  selectedDataPoint,
 }) => {
   const calculateChartData = () => {
     const monthStart = new Date(
@@ -83,12 +87,54 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
           backgroundColor: "rgba(75, 192, 192, 0.2)",
           fill: false,
           spanGaps: true,
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          pointBackgroundColor: (context: any) => {
+            const index = context.dataIndex;
+            const date = labels[index];
+            return date === selectedDataPoint
+              ? "rgba(255, 0, 0, 1)"
+              : "rgba(75, 192, 192, 1)";
+          },
+          pointBorderColor: (context: any) => {
+            const index = context.dataIndex;
+            const date = labels[index];
+            return date === selectedDataPoint
+              ? "rgba(255, 0, 0, 1)"
+              : "rgba(75, 192, 192, 1)";
+          },
         },
       ],
     };
   };
 
   const chartData = calculateChartData();
+
+  const handleDataPointClick = (event: any, elements: any[]) => {
+    if (elements.length > 0) {
+      const index = elements[0].index;
+      const dateLabel = chartData.labels[index];
+      const muscleMass = chartData.datasets[0].data[index];
+
+      if (muscleMass !== null) {
+        const year = selectedMonth.getFullYear();
+        const month = selectedMonth.getMonth();
+        const selectedDay = parseInt(dateLabel, 10);
+        console.log(year, month, selectedDay);
+
+        // UTCとして解釈されるが、日本時間として解釈するために9時間追加
+        const utcDate = new Date(Date.UTC(year, month, selectedDay));
+        const jstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+
+        console.log(utcDate.toISOString());
+        console.log(jstDate.toISOString());
+
+        const formattedDate = jstDate.toISOString().split("T")[0];
+        console.log(formattedDate);
+        onDataPointClick(formattedDate, muscleMass);
+      }
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -127,7 +173,6 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
               },
               y: {
                 beginAtZero: true,
-                // グラフの上下を余分に表示する
                 max: maxMuscleMass + 10,
                 min: minMuscleMass - 10,
                 ticks: {
@@ -142,8 +187,19 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
               legend: {
                 display: false,
               },
+              tooltip: {
+                callbacks: {
+                  label: (context: any) => {
+                    const index = context.dataIndex;
+                    const date = chartData.labels[index];
+                    const muscleMass = context.parsed.y;
+                    return `${date}: ${muscleMass} kg`;
+                  },
+                },
+              },
             },
             maintainAspectRatio: false,
+            onClick: handleDataPointClick,
           }}
         />
       </div>

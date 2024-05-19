@@ -59,14 +59,25 @@ const Profile = () => {
   const [selectedMuscleMassMonth, setSelectedMuscleMassMonth] = useState(
     new Date()
   );
-  // 過去データの最大値を取得
   const [maxWeight, setMaxWeight] = useState(0);
   const [maxBodyFatPercentage, setMaxBodyFatPercentage] = useState(0);
   const [maxMuscleMass, setMaxMuscleMass] = useState(0);
-  // 過去データの最小値を取得
   const [minWeight, setMinWeight] = useState(0);
   const [minBodyFatPercentage, setMinBodyFatPercentage] = useState(0);
   const [minMuscleMass, setMinMuscleMass] = useState(0);
+  const [selectedWeightDate, setSelectedWeightDate] = useState("");
+  const [selectedWeightDataPoint, setSelectedWeightDataPoint] = useState<
+    string | null
+  >(null);
+  const [selectedBodyFatPercentageDate, setSelectedBodyFatPercentageDate] =
+    useState("");
+  const [
+    selectedBodyFatPercentageDataPoint,
+    setSelectedBodyFatPercentageDataPoint,
+  ] = useState<string | null>(null);
+  const [selectedMuscleMassDate, setSelectedMuscleMassDate] = useState("");
+  const [selectedMuscleMassDataPoint, setSelectedMuscleMassDataPoint] =
+    useState<string | null>(null);
 
   useEffect(() => {
     if (profileId) {
@@ -97,74 +108,20 @@ const Profile = () => {
     setMinMuscleMass(getMin(muscleMassHistory));
   }, [muscleMassHistory]);
 
-  const handleInputChange = (
-    event: React.ChangeEvent<{ name: string; value: unknown }>
-  ) => {
-    const { name, value } = event.target;
-    setUpdatedProfile((prevProfile) => ({
-      ...prevProfile,
-      [name]: value,
-    }));
-  };
-
-  const handleGenderChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const gender = event.target.value as string;
-    setUpdatedProfile((prevProfile) => ({
-      ...prevProfile,
-      gender,
-    }));
-  };
-
-  const handleSaveProfile = () => {
-    dispatch(fetchAsyncUpdateProf(updatedProfile));
-    setEditMode(false);
-  };
-
-  const handleAddWeightHistory = () => {
-    if (weight) {
-      const date = new Date();
-      const formattedDate = date.toISOString().split("T")[0];
-      // 小数点第2位まで四捨五入
-      const newWeight = Math.round(parseFloat(weight) * 100) / 100;
-      dispatch(
-        fetchAsyncAddWeightHistory({
-          weight: newWeight,
-          date: formattedDate,
-        })
-      );
-      setWeight("");
-    }
-  };
-
-  const handleAddBodyFatPercentageHistory = () => {
-    if (bodyFatPercentage) {
-      const date = new Date();
-      const formattedDate = date.toISOString().split("T")[0];
-      // 小数点第2位まで四捨五入
-      const newBodyFatPercentage =
-        Math.round(parseFloat(bodyFatPercentage) * 100) / 100;
-      dispatch(
-        fetchAsyncAddBodyFatPercentageHistory({
-          bodyFatPercentage: newBodyFatPercentage,
-          date: formattedDate,
-        })
-      );
-      setBodyFatPercentage("");
-    }
-  };
-
-  const handleAddMuscleMassHistory = () => {
+  const handleAddMuscleMassHistory = async () => {
     if (muscleMass) {
       const date = new Date();
-      const formattedDate = date.toISOString().split("T")[0];
-      // 小数点第2位まで四捨五入
+      const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
+      const formattedDate = jstDate.toISOString().split("T")[0];
       const newMuscleMass = Math.round(parseFloat(muscleMass) * 100) / 100;
-      dispatch(
+      await dispatch(
         fetchAsyncAddMuscleMassHistory({
           muscleMass: newMuscleMass,
           date: formattedDate,
         })
       );
+      await dispatch(fetchAsyncListMuscleMassHistory());
+
       setMuscleMass("");
     }
   };
@@ -319,6 +276,122 @@ const Profile = () => {
     );
   };
 
+  const handleAddWeightHistory = async () => {
+    if (weight) {
+      const date = new Date();
+      const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
+      const formattedDate = jstDate.toISOString().split("T")[0];
+      const newWeight = Math.round(parseFloat(weight) * 100) / 100;
+      await dispatch(
+        fetchAsyncAddWeightHistory({
+          weight: newWeight,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListWeightHistory());
+
+      setWeight("");
+    }
+  };
+
+  const handleUpdateWeightHistory = async () => {
+    if (weight && selectedWeightDataPoint) {
+      const newWeight = Math.round(parseFloat(weight) * 100) / 100;
+      const formattedDate = selectedWeightDataPoint;
+
+      await dispatch(
+        fetchAsyncAddWeightHistory({
+          weight: newWeight,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListWeightHistory());
+
+      setWeight("");
+      setSelectedWeightDate("");
+      setSelectedWeightDataPoint(null);
+    }
+  };
+
+  const handleWeightDataPointClick = (date: string, weight: number) => {
+    setSelectedWeightDate(date);
+    setWeight(weight.toString());
+    setSelectedWeightDataPoint(date);
+  };
+
+  const handleAddBodyFatPercentageHistory = async () => {
+    if (bodyFatPercentage) {
+      const date = new Date();
+      const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
+      const formattedDate = jstDate.toISOString().split("T")[0];
+      const newBodyFatPercentage =
+        Math.round(parseFloat(bodyFatPercentage) * 100) / 100;
+      await dispatch(
+        fetchAsyncAddBodyFatPercentageHistory({
+          bodyFatPercentage: newBodyFatPercentage,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListBodyFatPercentageHistory());
+
+      setBodyFatPercentage("");
+    }
+  };
+
+  const handleUpdateBodyFatPercentageHistory = async () => {
+    if (bodyFatPercentage && selectedBodyFatPercentageDataPoint) {
+      const newBodyFatPercentage =
+        Math.round(parseFloat(bodyFatPercentage) * 100) / 100;
+      const formattedDate = selectedBodyFatPercentageDataPoint;
+
+      await dispatch(
+        fetchAsyncAddBodyFatPercentageHistory({
+          bodyFatPercentage: newBodyFatPercentage,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListBodyFatPercentageHistory());
+
+      setBodyFatPercentage("");
+      setSelectedBodyFatPercentageDate("");
+      setSelectedBodyFatPercentageDataPoint(null);
+    }
+  };
+
+  const handleBodyFatPercentageDataPointClick = (
+    date: string,
+    bodyFatPercentage: number
+  ) => {
+    setSelectedBodyFatPercentageDate(date);
+    setBodyFatPercentage(bodyFatPercentage.toString());
+    setSelectedBodyFatPercentageDataPoint(date);
+  };
+
+  const handleUpdateMuscleMassHistory = async () => {
+    if (muscleMass && selectedMuscleMassDataPoint) {
+      const newMuscleMass = Math.round(parseFloat(muscleMass) * 100) / 100;
+      const formattedDate = selectedMuscleMassDataPoint;
+
+      await dispatch(
+        fetchAsyncAddMuscleMassHistory({
+          muscleMass: newMuscleMass,
+          date: formattedDate,
+        })
+      );
+      await dispatch(fetchAsyncListMuscleMassHistory());
+
+      setMuscleMass("");
+      setSelectedMuscleMassDate("");
+      setSelectedMuscleMassDataPoint(null);
+    }
+  };
+
+  const handleMuscleMassDataPointClick = (date: string, muscleMass: number) => {
+    setSelectedMuscleMassDate(date);
+    setMuscleMass(muscleMass.toString());
+    setSelectedMuscleMassDataPoint(date);
+  };
+
   if (isLoading) {
     return (
       <Container maxWidth="sm">
@@ -347,7 +420,14 @@ const Profile = () => {
                   体重推移
                 </Typography>
               </div>
-              <div className={styles.historyContainer}>
+              <div
+                className={styles.historyContainer}
+                onClick={() => {
+                  setSelectedWeightDate("");
+                  setWeight("");
+                  setSelectedWeightDataPoint(null);
+                }}
+              >
                 <WeightChart
                   weightHistory={weightHistory}
                   selectedMonth={selectedWeightMonth}
@@ -357,6 +437,8 @@ const Profile = () => {
                   isNextMonthDisabled={isNextWeightMonthDisabled()}
                   maxWeight={maxWeight}
                   minWeight={minWeight}
+                  onDataPointClick={handleWeightDataPointClick}
+                  selectedDataPoint={selectedWeightDataPoint}
                 />
               </div>
               <div className={styles.inputContainer}>
@@ -376,10 +458,20 @@ const Profile = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleAddWeightHistory}
+                  onClick={
+                    selectedWeightDataPoint
+                      ? handleUpdateWeightHistory
+                      : handleAddWeightHistory
+                  }
                   className={styles.recordButton}
                 >
-                  記録
+                  {selectedWeightDataPoint
+                    ? `${
+                        new Date(selectedWeightDataPoint).getMonth() + 1
+                      }月${new Date(
+                        selectedWeightDataPoint
+                      ).getDate()}日の体重を変更`
+                    : "今日の体重を記録"}
                 </Button>
               </div>
             </CardContent>
@@ -397,7 +489,14 @@ const Profile = () => {
                   体脂肪率推移
                 </Typography>
               </div>
-              <div className={styles.historyContainer}>
+              <div
+                className={styles.historyContainer}
+                onClick={() => {
+                  setSelectedBodyFatPercentageDate("");
+                  setBodyFatPercentage("");
+                  setSelectedBodyFatPercentageDataPoint(null);
+                }}
+              >
                 <BodyFatPercentageChart
                   bodyFatPercentageHistory={bodyFatPercentageHistory}
                   selectedMonth={selectedBodyFatPercentageMonth}
@@ -407,6 +506,8 @@ const Profile = () => {
                   isNextMonthDisabled={isNextBodyFatPercentageMonthDisabled()}
                   maxBodyFatPercentage={maxBodyFatPercentage}
                   minBodyFatPercentage={minBodyFatPercentage}
+                  onDataPointClick={handleBodyFatPercentageDataPointClick}
+                  selectedDataPoint={selectedBodyFatPercentageDataPoint}
                 />
               </div>
               <div className={styles.inputContainer}>
@@ -426,10 +527,22 @@ const Profile = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleAddBodyFatPercentageHistory}
+                  onClick={
+                    selectedBodyFatPercentageDataPoint
+                      ? handleUpdateBodyFatPercentageHistory
+                      : handleAddBodyFatPercentageHistory
+                  }
                   className={styles.recordButton}
                 >
-                  記録
+                  {selectedBodyFatPercentageDataPoint
+                    ? `${
+                        new Date(
+                          selectedBodyFatPercentageDataPoint
+                        ).getMonth() + 1
+                      }月${new Date(
+                        selectedBodyFatPercentageDataPoint
+                      ).getDate()}日の体脂肪率を変更`
+                    : "今日の体脂肪率を記録"}
                 </Button>
               </div>
             </CardContent>
@@ -447,7 +560,14 @@ const Profile = () => {
                   筋肉量推移
                 </Typography>
               </div>
-              <div className={styles.historyContainer}>
+              <div
+                className={styles.historyContainer}
+                onClick={() => {
+                  setSelectedMuscleMassDate("");
+                  setMuscleMass("");
+                  setSelectedMuscleMassDataPoint(null);
+                }}
+              >
                 <MuscleMassChart
                   muscleMassHistory={muscleMassHistory}
                   selectedMonth={selectedMuscleMassMonth}
@@ -457,6 +577,8 @@ const Profile = () => {
                   isNextMonthDisabled={isNextMuscleMassMonthDisabled()}
                   maxMuscleMass={maxMuscleMass}
                   minMuscleMass={minMuscleMass}
+                  onDataPointClick={handleMuscleMassDataPointClick}
+                  selectedDataPoint={selectedMuscleMassDataPoint}
                 />
               </div>
               <div className={styles.inputContainer}>
@@ -476,10 +598,20 @@ const Profile = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleAddMuscleMassHistory}
+                  onClick={
+                    selectedMuscleMassDataPoint
+                      ? handleUpdateMuscleMassHistory
+                      : handleAddMuscleMassHistory
+                  }
                   className={styles.recordButton}
                 >
-                  記録
+                  {selectedMuscleMassDataPoint
+                    ? `${
+                        new Date(selectedMuscleMassDataPoint).getMonth() + 1
+                      }月${new Date(
+                        selectedMuscleMassDataPoint
+                      ).getDate()}日の筋肉量を変更`
+                    : "今日の筋肉量を記録"}
                 </Button>
               </div>
             </CardContent>
