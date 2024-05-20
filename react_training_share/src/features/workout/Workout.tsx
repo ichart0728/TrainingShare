@@ -228,7 +228,7 @@ const Workout = () => {
             color="primary"
             onClick={handleOpenModal}
           >
-            トレーニング追加
+            トレーニングを追加
           </Button>
         </div>
         <div className={styles.AddTrainingButton}>
