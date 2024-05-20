@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
+import moment from "moment-timezone";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { RootState } from "../../app/store";
 import WorkoutItemView from "../components/WorkoutItemView";
 import SelectTrainingSessionModal from "../components/modal/SelectTrainingSessionModal";
 import { PROPS_TRAINING_SESSION, Training } from "../types";
-import { Button } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import { fetchAsyncDeleteTrainingSession } from "../api/workoutApi";
 import { AppDispatch } from "../../app/store";
+import { useNavigate } from "react-router-dom";
+
 import styles from "./CalendarScreen.module.css";
 
 const localizer = momentLocalizer(moment);
 
 const CalendarScreen = () => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+
   const trainingSessions = useSelector(
     (state: RootState) => state.workoutHistory.trainingSessions
   );
@@ -29,6 +33,7 @@ const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deletedWorkoutId, setDeletedWorkoutId] = useState<string | null>(null);
+  const [selectedSlotDate, setSelectedSlotDate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (selectedSession) {
@@ -64,6 +69,7 @@ const CalendarScreen = () => {
 
   const handleSelectEvent = (event: any) => {
     setSelectedSession(event.session);
+    setSelectedSlotDate(null);
   };
 
   const handleCloseSessionList = () => {
@@ -107,6 +113,138 @@ const CalendarScreen = () => {
     setOpenDeleteModal(false);
   };
 
+  const handleSelectSlot = (slotInfo: any) => {
+    const selectedDate = moment(slotInfo.start).tz("Asia/Tokyo").toDate();
+    setSelectedSlotDate(selectedDate);
+    setSelectedSession(null);
+  };
+
+  const eventStyleGetter = (event: any) => {
+    const isSelected =
+      selectedSession && event.session.id === selectedSession.id;
+    const backgroundColor = isSelected ? "#ff6b6b" : "#3174ad";
+    return {
+      style: {
+        backgroundColor,
+        color: "#ffffff",
+        borderRadius: "5px",
+        border: "none",
+      },
+    };
+  };
+
+  const slotStyleGetter = (date: Date) => {
+    const isSelected =
+      selectedSlotDate && moment(date).isSame(selectedSlotDate, "day");
+    const backgroundColor = isSelected ? "#4ecdc4" : undefined;
+    return {
+      style: {
+        backgroundColor,
+      },
+    };
+  };
+
+  const dayStyleGetter = (date: Date) => {
+    const isSelected =
+      selectedSlotDate && moment(date).isSame(selectedSlotDate, "day");
+    const backgroundColor = isSelected ? "#ffd6d6" : undefined;
+    return {
+      style: {
+        backgroundColor,
+      },
+    };
+  };
+
+  const isSelectedSlotToday = () => {
+    if (selectedSlotDate) {
+      const today = moment().tz("Asia/Tokyo").startOf("day").toDate();
+      return moment(selectedSlotDate).isSame(today, "day");
+    }
+    return false;
+  };
+
+  const isSelectedSlotTodayOrFuture = () => {
+    if (selectedSlotDate) {
+      const today = moment().tz("Asia/Tokyo").startOf("day").toDate();
+      return moment(selectedSlotDate).isSameOrAfter(today, "day");
+    }
+    return false;
+  };
+
+  const renderTrainingContainer = () => {
+    if (selectedSession && selectedSession.workouts.length > 0) {
+      return (
+        <>
+          <h3>{formatDate(selectedSession.date)}</h3>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleDeleteSession}
+          >
+            トレーニングセッションを削除
+          </Button>
+          {selectedSession.workouts
+            .filter((workout) => workout.id !== deletedWorkoutId)
+            .map((workout, index) => (
+              <div key={workout.id} className={styles.workoutItem}>
+                <WorkoutItemView
+                  workout={workout}
+                  trainingSession={selectedSession}
+                  onDelete={(workoutId) => setDeletedWorkoutId(workoutId)}
+                />
+              </div>
+            ))}
+        </>
+      );
+    } else if (selectedSlotDate) {
+      const sessionsOnSelectedDate = trainingSessions.filter((session) =>
+        moment(session.date).isSame(selectedSlotDate, "day")
+      );
+
+      if (sessionsOnSelectedDate.length > 0) {
+        return (
+          <>
+            <h3>{formatDate(selectedSlotDate.toString())}</h3>
+            {sessionsOnSelectedDate.map((session, index) => (
+              <div key={session.id} className={styles.workoutItem}>
+                {session.workouts.map((workout) => (
+                  <WorkoutItemView
+                    key={workout.id}
+                    workout={workout}
+                    trainingSession={session}
+                    onDelete={(workoutId) => setDeletedWorkoutId(workoutId)}
+                  />
+                ))}
+              </div>
+            ))}
+          </>
+        );
+      } else if (isSelectedSlotTodayOrFuture()) {
+        return (
+          <>
+            <h3>{formatDate(selectedSlotDate.toString())}</h3>
+            <Button variant="contained" color="primary">
+              {isSelectedSlotToday()
+                ? "本日のトレーニングプランを立てる"
+                : "トレーニングプランを立てる"}
+            </Button>
+          </>
+        );
+      } else {
+        return (
+          <>
+            <h3>{formatDate(selectedSlotDate.toString())}</h3>
+            <Typography variant="body1">
+              トレーニングデータがありません
+            </Typography>
+          </>
+        );
+      }
+    }
+
+    return null;
+  };
+
   return (
     <div>
       <div style={{ height: "500px" }}>
@@ -119,38 +257,17 @@ const CalendarScreen = () => {
           views={["month"]}
           onSelectEvent={handleSelectEvent}
           onShowMore={handleShowMore}
-          eventPropGetter={() => ({
-            style: {
-              backgroundColor: "#3174ad",
-              color: "#ffffff",
-              borderRadius: "5px",
-              border: "none",
-            },
-          })}
+          selectable
+          onSelectSlot={handleSelectSlot}
+          longPressThreshold={1}
+          eventPropGetter={eventStyleGetter}
+          slotPropGetter={slotStyleGetter}
+          dayPropGetter={dayStyleGetter}
         />
       </div>
-      {selectedSession && selectedSession.workouts.length > 0 && (
-        <div className={styles.TrainingContainer}>
-          <h3>{formatDate(selectedSession.date)}のトレーニング内容</h3>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleDeleteSession}
-          >
-            トレーニングセッションを削除
-          </Button>
-          {selectedSession.workouts
-            .filter((workout) => workout.id !== deletedWorkoutId)
-            .map((workout) => (
-              <WorkoutItemView
-                key={workout.id}
-                workout={workout}
-                trainingSession={selectedSession}
-                onDelete={(workoutId) => setDeletedWorkoutId(workoutId)}
-              />
-            ))}{" "}
-        </div>
-      )}
+      <div className={styles.TrainingContainer}>
+        {renderTrainingContainer()}
+      </div>
       <SelectTrainingSessionModal
         open={openSessionList}
         onClose={handleCloseSessionList}
