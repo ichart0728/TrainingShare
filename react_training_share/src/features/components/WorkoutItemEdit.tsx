@@ -28,7 +28,6 @@ import { PROPS_WORKOUT_ITEM, Training } from "../types";
 const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   const dispatch: AppDispatch = useDispatch();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [completed, setCompleted] = useState(workout.sets.map(() => false));
   const [weights, setWeights] = useState(
     workout.sets.map((set) => set.weight.toString())
   );
@@ -36,6 +35,16 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
     workout.sets.map((set) => set.reps.toString())
   );
   const [memo, setMemo] = useState(workout.memo || "");
+
+  const completedSets = useSelector((state: RootState) => {
+    const workoutFromStore = state.workout.workouts.find(
+      (w) => w.id === workout.id
+    );
+    // 完了したセットの状態を取得
+    return workoutFromStore
+      ? workoutFromStore.sets.map((set) => set.completed)
+      : [];
+  });
 
   useEffect(() => {
     setWeights(workout.sets.map((set) => set.weight.toString()));
@@ -77,7 +86,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
         setIndex,
         weight: weightValue,
         reps: parseFloat(reps[setIndex] || "0"),
-        completed: completed[setIndex],
+        completed: completedSets[setIndex],
       })
     );
   };
@@ -99,7 +108,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
         setIndex,
         weight: parseFloat(weights[setIndex] || "0"),
         reps: repsValue,
-        completed: completed[setIndex],
+        completed: completedSets[setIndex],
       })
     );
   };
@@ -154,15 +163,13 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
   );
 
   const completedVolume = workout.sets.reduce(
-    (acc, set, idx) => (completed[idx] ? acc + set.weight * set.reps : acc),
+    (acc, set, idx) => (completedSets[idx] ? acc + set.weight * set.reps : acc),
     0
   );
 
   const handleToggleCompleted = (setIndex: number) => {
-    const updatedCompleted = [...completed];
+    const updatedCompleted = [...completedSets];
     updatedCompleted[setIndex] = !updatedCompleted[setIndex];
-
-    setCompleted(updatedCompleted);
 
     dispatch(
       updateSet({
@@ -262,7 +269,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
               <Checkbox
                 icon={<CheckBoxOutlineBlankIcon fontSize="medium" />}
                 onChange={() => handleToggleCompleted(setIndex)}
-                checked={completed[setIndex]}
+                checked={completedSets[setIndex]}
                 checkedIcon={<CheckBoxIcon fontSize="medium" />}
                 name="checked"
               />
