@@ -22,6 +22,7 @@ import { RootState } from "../../app/store";
 import WorkoutItemEdit from "../components/WorkoutItemEdit";
 import { useNavigate } from "react-router-dom";
 import ConfirmationDialog from "../components/ConfirmationDialog";
+import Timer from "../components/Timer";
 
 const Workout = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -243,86 +244,16 @@ const Workout = () => {
         </div>
       </div>
       <div className={styles.bottomControls}>
-        <div className={styles.timerAndButtonContainer}>
-          <div className={styles.timer}>
-            <Typography variant="subtitle2" gutterBottom>
-              経過時間
-            </Typography>
-            <Typography
-              variant="h6"
-              gutterBottom
-              className={`${styles.timerTextContainer} ${
-                timer.paused ? styles.pausedTimer : ""
-              }`}
-            >
-              {formatTime(elapsedTime)}
-            </Typography>
-          </div>
-          <div className={styles.buttonContainer}>
-            {!timer.active && (
-              <>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handlePauseTimer}
-                  disabled
-                  className={styles.fixedWidthButton}
-                >
-                  PAUSE
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleStartTimer}
-                  disabled={!selectedWorkouts.length}
-                  className={styles.fixedWidthButton}
-                >
-                  START
-                </Button>
-              </>
-            )}
-            {timer.active && !timer.paused && (
-              <>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handlePauseTimer}
-                  className={styles.fixedWidthButton}
-                >
-                  PAUSE
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleStopTimer}
-                  className={styles.fixedWidthButton}
-                >
-                  FINISH
-                </Button>
-              </>
-            )}
-            {timer.active && timer.paused && (
-              <>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleResumeTimer}
-                  className={styles.fixedWidthButton}
-                >
-                  RESUME
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleStopTimer}
-                  className={styles.fixedWidthButton}
-                >
-                  FINISH
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
+        <Timer
+          elapsedTime={elapsedTime}
+          isActive={timer.active}
+          isPaused={timer.paused}
+          hasWorkouts={selectedWorkouts.length > 0}
+          onStart={handleStartTimer}
+          onPause={handlePauseTimer}
+          onResume={handleResumeTimer}
+          onStop={handleStopTimer}
+        />
       </div>
       <ConfirmationDialog
         open={openEndModal}

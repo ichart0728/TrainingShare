@@ -61,31 +61,10 @@
   box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.timerAndButtonContainer {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  /* max-width: 600px; */
-}
-
 .bottomButton {
   width: 200px;
   border-radius: 20px;
   font-weight: bold;
-}
-
-.fixedWidthButtonContainer {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-}
-
-.fixedWidthButton {
-  width: 120px;
-  border-radius: 20px;
-  font-weight: bold;
-  transition: background-color 0.3s;
 }
 
 .totalVolume {
@@ -102,18 +81,6 @@
   border: 2px solid #3f51b5;
   color: #3f51b5;
   font-weight: bold;
-}
-
-.timer {
-  background-color: #f5f5f5;
-  padding: 2px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  width: 150px;
 }
 
 .timerTextContainer {
@@ -136,12 +103,6 @@
 
 .AddTrainingButton {
   margin: 10px 0;
-}
-
-.buttonContainer {
-  display: flex;
-  gap: 16px;
-  flex-wrap: nowrap;
 }
 
 .progressContainer {
@@ -191,22 +152,5 @@
     right: 0;
     width: 100vw;
     margin-left: -20px;
-  }
-
-  .timerAndButtonContainer {
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    justify-content: space-around;
-  }
-
-  .timer {
-    width: 120px;
-  }
-
-  .buttonContainer {
-    flex-wrap: nowrap;
-    justify-content: center;
   }
 }
