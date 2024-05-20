@@ -16,7 +16,7 @@ import { WORKOUT_POST, PROPS_WORKOUT_SET } from "../types";
 import { AppDispatch } from "../../app/store";
 import styles from "./Workout.module.css";
 import WorkoutModal from "../components/modal/WorkoutModal";
-import { Modal, Button, Typography } from "@material-ui/core";
+import { Modal, Button, Typography, LinearProgress } from "@material-ui/core";
 
 import { RootState } from "../../app/store";
 import WorkoutItemEdit from "../components/WorkoutItemEdit";
@@ -194,12 +194,22 @@ const Workout = () => {
           </Typography>
           <Typography variant="h6" gutterBottom>
             {completedTotalVolume.toFixed(2)}/{totalVolume.toFixed(2)}kg
-            <br />(
-            {totalVolume > 0
-              ? ((completedTotalVolume / totalVolume) * 100).toFixed(1)
-              : "0"}
-            %)
           </Typography>
+          <div className={styles.progressContainer}>
+            <LinearProgress
+              variant="determinate"
+              value={
+                totalVolume > 0 ? (completedTotalVolume / totalVolume) * 100 : 0
+              }
+              className={styles.progressBar}
+            />
+            <Typography variant="body2" className={styles.progressText}>
+              {totalVolume > 0
+                ? ((completedTotalVolume / totalVolume) * 100).toFixed(1)
+                : "0"}
+              %
+            </Typography>
+          </div>
         </div>
       </div>
       <div className={styles.content}>

@@ -144,6 +144,24 @@
   flex-wrap: nowrap;
 }
 
+.progressContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+.progressBar {
+  flex-grow: 1;
+  margin-right: 8px;
+  height: 10px;
+  border-radius: 5px;
+}
+
+.progressText {
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
 @media (max-width: 430px) {
   .container {
     height: calc(100vh - 100px);
