@@ -254,4 +254,5 @@ export interface PROPS_AUTH_STATE {
 
 export interface PROPS_WORKOUT_ITEM {
   workout: PROPS_WORKOUT;
+  isPlan: boolean;
 }

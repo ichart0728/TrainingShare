@@ -46,21 +46,6 @@
   margin-bottom: 20px;
 }
 
-.bottomControls {
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  box-sizing: border-box;
-  background-color: #ffffff;
-  border-radius: 10px 10px 0 0;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
-}
-
 .bottomButton {
   width: 200px;
   border-radius: 20px;

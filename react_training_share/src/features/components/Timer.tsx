@@ -11,6 +11,8 @@ interface TimerProps {
   onPause: () => void;
   onResume: () => void;
   onStop: () => void;
+  onSave: () => void;
+  isPlan: boolean;
 }
 
 const Timer: React.FC<TimerProps> = ({
@@ -22,6 +24,8 @@ const Timer: React.FC<TimerProps> = ({
   onPause,
   onResume,
   onStop,
+  onSave,
+  isPlan,
 }) => {
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
@@ -33,84 +37,98 @@ const Timer: React.FC<TimerProps> = ({
   };
 
   return (
-    <div className={styles.timerAndButtonContainer}>
-      <div className={styles.timer}>
-        <Typography variant="subtitle2" gutterBottom>
-          経過時間
-        </Typography>
-        <Typography
-          variant="h6"
-          gutterBottom
-          className={`${styles.timerTextContainer} ${
-            isPaused ? styles.pausedTimer : ""
-          }`}
-        >
-          {formatTime(elapsedTime)}
-        </Typography>
-      </div>
-      <div className={styles.buttonContainer}>
-        {!isActive && (
-          <>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={onPause}
-              disabled
-              className={styles.fixedWidthButton}
+    <div className={styles.bottomControls}>
+      <div className={styles.timerAndButtonContainer}>
+        {!isPlan && (
+          <div className={styles.timer}>
+            <Typography variant="subtitle2" gutterBottom>
+              経過時間
+            </Typography>
+            <Typography
+              variant="h6"
+              gutterBottom
+              className={`${styles.timerTextContainer} ${
+                isPaused ? styles.pausedTimer : ""
+              }`}
             >
-              PAUSE
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={onStart}
-              disabled={!hasWorkouts}
-              className={styles.fixedWidthButton}
-            >
-              START
-            </Button>
-          </>
+              {formatTime(elapsedTime)}
+            </Typography>
+          </div>
         )}
-        {isActive && !isPaused && (
-          <>
+        <div className={styles.buttonContainer}>
+          {!isPlan && !isActive && (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={onPause}
+                disabled
+                className={styles.controlButton}
+              >
+                PAUSE
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={onStart}
+                disabled={!hasWorkouts}
+                className={styles.controlButton}
+              >
+                START
+              </Button>
+            </>
+          )}
+          {!isPlan && isActive && !isPaused && (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={onPause}
+                className={styles.controlButton}
+              >
+                PAUSE
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={onStop}
+                className={styles.controlButton}
+              >
+                FINISH
+              </Button>
+            </>
+          )}
+          {!isPlan && isActive && isPaused && (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={onResume}
+                className={styles.controlButton}
+              >
+                RESUME
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={onStop}
+                className={styles.controlButton}
+              >
+                FINISH
+              </Button>
+            </>
+          )}
+          {isPlan && (
             <Button
               variant="contained"
               color="primary"
-              onClick={onPause}
-              className={styles.fixedWidthButton}
+              onClick={onSave}
+              className={styles.saveButton}
             >
-              PAUSE
+              トレーニングプランを保存
             </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={onStop}
-              className={styles.fixedWidthButton}
-            >
-              FINISH
-            </Button>
-          </>
-        )}
-        {isActive && isPaused && (
-          <>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={onResume}
-              className={styles.fixedWidthButton}
-            >
-              RESUME
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={onStop}
-              className={styles.fixedWidthButton}
-            >
-              FINISH
-            </Button>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

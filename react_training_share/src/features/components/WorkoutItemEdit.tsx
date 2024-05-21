@@ -25,7 +25,7 @@ import {
 import { AppDispatch } from "../../app/store";
 import { PROPS_WORKOUT_ITEM, Training } from "../types";
 
-const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
+const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
   const dispatch: AppDispatch = useDispatch();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [weights, setWeights] = useState(
@@ -229,9 +229,11 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
           <Grid item xs={4} sm={4} className={styles.labelContainer}>
             <Typography align="center">回</Typography>
           </Grid>
-          <Grid item xs={2} sm={2} className={styles.labelContainer}>
-            <Typography align="center">完了</Typography>
-          </Grid>
+          {!isPlan && (
+            <Grid item xs={2} sm={2} className={styles.labelContainer}>
+              <Typography align="center">完了</Typography>
+            </Grid>
+          )}
         </Grid>
         {workout.sets.map((set, setIndex) => (
           <Grid
@@ -265,15 +267,17 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout }) => {
                 InputProps={{ inputProps: { min: 0 } }}
               />
             </Grid>
-            <Grid item xs={2} sm={2} className={styles.checkboxContainer}>
-              <Checkbox
-                icon={<CheckBoxOutlineBlankIcon fontSize="medium" />}
-                onChange={() => handleToggleCompleted(setIndex)}
-                checked={completedSets[setIndex]}
-                checkedIcon={<CheckBoxIcon fontSize="medium" />}
-                name="checked"
-              />
-            </Grid>
+            {!isPlan && (
+              <Grid item xs={2} sm={2} className={styles.checkboxContainer}>
+                <Checkbox
+                  icon={<CheckBoxOutlineBlankIcon fontSize="medium" />}
+                  onChange={() => handleToggleCompleted(setIndex)}
+                  checked={completedSets[setIndex]}
+                  checkedIcon={<CheckBoxIcon fontSize="medium" />}
+                  name="checked"
+                />
+              </Grid>
+            )}
           </Grid>
         ))}
       </div>

@@ -20,13 +20,21 @@ import { Modal, Button, Typography, LinearProgress } from "@material-ui/core";
 
 import { RootState } from "../../app/store";
 import WorkoutItemEdit from "../components/WorkoutItemEdit";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import Timer from "../components/Timer";
 
 const Workout = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isPlan, setisPlan] = useState(location.state?.isPlan || false);
+  const selectedDate = location.state?.selectedDate;
+
+  useEffect(() => {
+    console.log("isPlan:", isPlan);
+    console.log("Selected Date:", selectedDate);
+  }, [isPlan, selectedDate]);
 
   const selectedWorkouts = useSelector(
     (state: RootState) => state.workout.workouts
@@ -151,6 +159,12 @@ const Workout = () => {
     navigate("/workout_history");
   };
 
+  const handleSaveTrainingPlan = () => {
+    // トレーニングプランを保存するロジックを実装
+    console.log("トレーニングプランを保存:", selectedWorkouts);
+    navigate("/workout_history");
+  };
+
   const validateSet = (set: PROPS_WORKOUT_SET) => {
     return Number.isInteger(set.reps) && set.reps > 0 && set.weight >= 0;
   };
@@ -219,7 +233,7 @@ const Workout = () => {
         </Modal>
         <div className={styles.workoutList}>
           {selectedWorkouts.map((workout, index) => (
-            <WorkoutItemEdit key={index} workout={workout} />
+            <WorkoutItemEdit key={index} workout={workout} isPlan={isPlan} />
           ))}
         </div>
         <div className={styles.AddTrainingButton}>
@@ -243,18 +257,18 @@ const Workout = () => {
           </Button>
         </div>
       </div>
-      <div className={styles.bottomControls}>
-        <Timer
-          elapsedTime={elapsedTime}
-          isActive={timer.active}
-          isPaused={timer.paused}
-          hasWorkouts={selectedWorkouts.length > 0}
-          onStart={handleStartTimer}
-          onPause={handlePauseTimer}
-          onResume={handleResumeTimer}
-          onStop={handleStopTimer}
-        />
-      </div>
+      <Timer
+        elapsedTime={elapsedTime}
+        isActive={timer.active}
+        isPaused={timer.paused}
+        hasWorkouts={selectedWorkouts.length > 0}
+        onStart={handleStartTimer}
+        onPause={handlePauseTimer}
+        onResume={handleResumeTimer}
+        onStop={handleStopTimer}
+        onSave={handleSaveTrainingPlan}
+        isPlan={isPlan}
+      />
       <ConfirmationDialog
         open={openEndModal}
         onClose={handleCloseEndModal}

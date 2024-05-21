@@ -14,6 +14,7 @@ import { AppDispatch } from "../../app/store";
 import { useNavigate } from "react-router-dom";
 
 import styles from "./CalendarScreen.module.css";
+import { isFuture } from "date-fns";
 
 const localizer = momentLocalizer(moment);
 
@@ -163,12 +164,23 @@ const CalendarScreen = () => {
     return false;
   };
 
+  // 選択した日付が未来の日付の場合はTrueを返す
+
   const isSelectedSlotTodayOrFuture = () => {
     if (selectedSlotDate) {
       const today = moment().tz("Asia/Tokyo").startOf("day").toDate();
       return moment(selectedSlotDate).isSameOrAfter(today, "day");
     }
     return false;
+  };
+
+  const handleMakeTrainingPlan = (isPlan: boolean) => {
+    navigate("/workout", {
+      state: {
+        isPlan: isPlan ? false : true,
+        selectedDate: selectedSlotDate,
+      },
+    });
   };
 
   const renderTrainingContainer = () => {
@@ -223,9 +235,13 @@ const CalendarScreen = () => {
         return (
           <>
             <h3>{formatDate(selectedSlotDate.toString())}</h3>
-            <Button variant="contained" color="primary">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleMakeTrainingPlan(isSelectedSlotToday())}
+            >
               {isSelectedSlotToday()
-                ? "本日のトレーニングプランを立てる"
+                ? "本日のトレーニングを開始する"
                 : "トレーニングプランを立てる"}
             </Button>
           </>
