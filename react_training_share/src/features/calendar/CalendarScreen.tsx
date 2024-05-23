@@ -165,7 +165,6 @@ const CalendarScreen = () => {
   };
 
   // 選択した日付が未来の日付の場合はTrueを返す
-
   const isSelectedSlotTodayOrFuture = () => {
     if (selectedSlotDate) {
       const today = moment().tz("Asia/Tokyo").startOf("day").toDate();
@@ -235,7 +234,23 @@ const CalendarScreen = () => {
         return (
           <>
             <h3>{formatDate(selectedSlotDate.toString())}</h3>
-            <Button
+            {isSelectedSlotToday() && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleMakeTrainingPlan(isSelectedSlotToday())}
+              >
+                本日のトレーニングを開始する
+              </Button>
+            )}
+            {/* <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleMakeTrainingPlan(isSelectedSlotToday())}
+            >
+              本日のトレーニングを開始する
+            </Button> */}
+            {/* <Button
               variant="contained"
               color="primary"
               onClick={() => handleMakeTrainingPlan(isSelectedSlotToday())}
@@ -243,7 +258,7 @@ const CalendarScreen = () => {
               {isSelectedSlotToday()
                 ? "本日のトレーニングを開始する"
                 : "トレーニングプランを立てる"}
-            </Button>
+            </Button> */}
           </>
         );
       } else {
