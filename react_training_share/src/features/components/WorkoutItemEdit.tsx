@@ -14,6 +14,7 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import ConfirmationDialog from "../components/ConfirmationDialog";
+import PastRecordsModal from "./PastRecordsModal";
 
 import {
   addSet,
@@ -28,6 +29,7 @@ import { PROPS_WORKOUT_ITEM, Training } from "../types";
 const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
   const dispatch: AppDispatch = useDispatch();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openPastRecordsModal, setOpenPastRecordsModal] = useState(false);
   const [weights, setWeights] = useState(
     workout.sets.map((set) => set.weight.toString())
   );
@@ -40,11 +42,14 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
     const workoutFromStore = state.workout.workouts.find(
       (w) => w.id === workout.id
     );
-    // 完了したセットの状態を取得
     return workoutFromStore
       ? workoutFromStore.sets.map((set) => set.completed)
       : [];
   });
+
+  const trainingSessions = useSelector(
+    (state: RootState) => state.workoutHistory.trainingSessions
+  );
 
   useEffect(() => {
     setWeights(workout.sets.map((set) => set.weight.toString()));
@@ -59,11 +64,12 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
     (menu) => menu.id === workout.body_part
   )?.name;
 
-  const menuName = trainingMenus
-    .find((menu) => Number(menu.id) === workout.body_part)
-    ?.training_menus.find(
-      (training_menu: Training) => training_menu.id === Number(workout.menu)
-    )?.name;
+  const menuName =
+    trainingMenus
+      .find((menu) => menu.id === workout.body_part)
+      ?.training_menus.find(
+        (training_menu: Training) => training_menu.id === workout.menu
+      )?.name ?? "";
 
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false);
@@ -146,9 +152,11 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
   const handleDeleteWorkout = () => {
     setOpenDeleteModal(true);
   };
+
   const handleAddSet = () => {
     dispatch(addSet({ workoutId: workout.id }));
   };
+
   const handleDeleteSet = () => {
     if (workout.sets.length === 1) {
       return;
@@ -182,6 +190,14 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
     );
   };
 
+  const handleOpenPastRecordsModal = () => {
+    setOpenPastRecordsModal(true);
+  };
+
+  const handleClosePastRecordsModal = () => {
+    setOpenPastRecordsModal(false);
+  };
+
   return (
     <Paper className={styles.workoutItem} elevation={2}>
       <div className={styles.workoutHeader}>
@@ -196,16 +212,29 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
           <DeleteOutlineIcon className={styles.deleteIcon} />
         </Button>
       </div>
-      <div className={styles.volumeDisplay}>
-        <Typography variant="subtitle1" gutterBottom>
-          総ボリューム: {completedVolume.toFixed(2)}/{totalVolume.toFixed(2)}kg
-          (
-          {totalVolume > 0
-            ? ((completedVolume / totalVolume) * 100).toFixed(1)
-            : "0"}
-          %)
-        </Typography>
-      </div>
+      <Grid container alignItems="center">
+        <Grid item xs={9}>
+          <div className={styles.volumeDisplay}>
+            <Typography variant="subtitle1" gutterBottom>
+              {completedVolume.toFixed(2)}/{totalVolume.toFixed(2)}kg (
+              {totalVolume > 0
+                ? ((completedVolume / totalVolume) * 100).toFixed(1)
+                : "0"}
+              %)
+            </Typography>
+          </div>
+        </Grid>
+        <Grid item xs={3}>
+          <Button
+            variant="outlined"
+            color="inherit"
+            className={styles.pastRecordsButton}
+            onClick={handleOpenPastRecordsModal}
+          >
+            過去の記録
+          </Button>
+        </Grid>
+      </Grid>{" "}
       <div className={styles.memoContainer}>
         <TextField
           label="メモ"
@@ -308,6 +337,14 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
         confirmText="削除"
         onCancel={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
+      />
+      <PastRecordsModal
+        open={openPastRecordsModal}
+        onClose={handleClosePastRecordsModal}
+        menuId={workout.menu}
+        // menuName={menuName}
+        pastRecords={trainingSessions}
+        onLoadMore={() => {}}
       />
     </Paper>
   );
