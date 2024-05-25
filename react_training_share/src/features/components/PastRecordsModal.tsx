@@ -112,10 +112,10 @@ const PastRecordsModal: React.FC<PastRecordsModalProps> = ({
                 <TableHead>
                   <TableRow>
                     <TableCell className={styles.tableHeader}>セット</TableCell>
-                    <TableCell align="right" className={styles.tableHeader}>
+                    <TableCell align="center" className={styles.tableHeader}>
                       重量 (kg)
                     </TableCell>
-                    <TableCell align="right" className={styles.tableHeader}>
+                    <TableCell align="center" className={styles.tableHeader}>
                       回数
                     </TableCell>
                   </TableRow>
@@ -123,16 +123,25 @@ const PastRecordsModal: React.FC<PastRecordsModalProps> = ({
                 <TableBody>
                   {selectedWorkout?.sets.map((set, index) => (
                     <TableRow key={index}>
-                      <TableCell component="th" scope="row">
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        className={styles.tableCell}
+                      >
                         {index + 1}
                       </TableCell>
-                      <TableCell align="right">{set.weight}</TableCell>
-                      <TableCell align="right">{set.reps}</TableCell>
+                      <TableCell align="center" className={styles.tableCell}>
+                        {set.weight}
+                      </TableCell>
+                      <TableCell align="center" className={styles.tableCell}>
+                        {set.reps}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
+
             <div className={styles.memoContainer}>
               <Typography variant="subtitle1">メモ</Typography>
               <TextField

@@ -58,7 +58,14 @@
 
 .tableHeader {
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  padding: 12px;
+}
+
+.tableCell {
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 12px;
 }
 
 .memoContainer {
@@ -71,7 +78,7 @@
 
 .closeButtonContainer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: 24px;
 }
 
