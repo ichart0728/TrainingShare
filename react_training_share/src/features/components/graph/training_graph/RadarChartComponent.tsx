@@ -3,7 +3,7 @@ import { Radar } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { IconButton } from "@material-ui/core";
 import { ChevronLeft, ChevronRight } from "@material-ui/icons";
-import styles from "./BodyPartChart.module.css";
+import styles from "./ChartComponent.module.css";
 import {
   PROPS_RADAR_CHART,
   PROPS_TRAINING_SESSION,

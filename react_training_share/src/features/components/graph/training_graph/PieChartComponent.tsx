@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip } from "chart.js";
-import styles from "./BodyPartChart.module.css";
+import styles from "./ChartComponent.module.css";
 import { PROPS_PIE_CHART, PROPS_TRAINING_SESSION } from "../../../types";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { IconButton } from "@material-ui/core";

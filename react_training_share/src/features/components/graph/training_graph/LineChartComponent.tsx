@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
-import styles from "./BodyPartChart.module.css";
+import styles from "./ChartComponent.module.css";
 import { PROPS_LINE_CHART, PROPS_TRAINING_SESSION } from "../../../types";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
