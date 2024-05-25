@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Typography,
@@ -26,7 +26,6 @@ interface PastRecordsModalProps {
   onClose: () => void;
   menuId: number;
   pastRecords: PROPS_TRAINING_SESSION[];
-  onLoadMore: () => void;
 }
 
 const PastRecordsModal: React.FC<PastRecordsModalProps> = ({
@@ -34,9 +33,8 @@ const PastRecordsModal: React.FC<PastRecordsModalProps> = ({
   onClose,
   menuId,
   pastRecords,
-  onLoadMore,
 }) => {
-  const [selectedDate, setSelectedDate] = useState(0);
+  const [selectedDateIndex, setSelectedDateIndex] = useState(0);
   const trainingMenus = useSelector(
     (state: RootState) => state.training.trainingMenus
   );
@@ -49,15 +47,23 @@ const PastRecordsModal: React.FC<PastRecordsModalProps> = ({
   )?.name;
   const targetName = selectedMenu?.name;
 
+  const filteredRecords = pastRecords
+    .filter((record) =>
+      record.workouts.some((workout) => workout.menu === menuId)
+    )
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
   const handlePrevDate = () => {
-    setSelectedDate(selectedDate - 1);
+    setSelectedDateIndex((prevIndex) => Math.max(prevIndex - 1, 0));
   };
 
   const handleNextDate = () => {
-    setSelectedDate(selectedDate + 1);
+    setSelectedDateIndex((prevIndex) =>
+      Math.min(prevIndex + 1, filteredRecords.length - 1)
+    );
   };
 
-  const selectedRecord = pastRecords[selectedDate];
+  const selectedRecord = filteredRecords[selectedDateIndex];
   const selectedWorkout = selectedRecord?.workouts.find(
     (workout) => workout.menu === menuId
   );
@@ -70,32 +76,34 @@ const PastRecordsModal: React.FC<PastRecordsModalProps> = ({
   return (
     <Modal open={open} onClose={onClose} className={styles.modal}>
       <div className={styles.modalContent}>
-        <Typography variant="h5" gutterBottom className={styles.modalTitle}>
-          {targetName} | {menuName}
-        </Typography>
+        <div className={styles.modalHeader}>
+          <Typography variant="h5" gutterBottom className={styles.modalTitle}>
+            {targetName} | {menuName}
+          </Typography>
+          <div className={styles.dateNavigator}>
+            <IconButton
+              onClick={handlePrevDate}
+              disabled={selectedDateIndex === 0}
+            >
+              <ChevronLeft />
+            </IconButton>
+            <Typography variant="h6" className={styles.date}>
+              {format(parseISO(selectedRecord.date), "yyyy年M月d日", {
+                locale: ja,
+              })}
+              （{differenceInDays(new Date(), parseISO(selectedRecord.date))}
+              日前）
+            </Typography>
+            <IconButton
+              onClick={handleNextDate}
+              disabled={selectedDateIndex === filteredRecords.length - 1}
+            >
+              <ChevronRight />
+            </IconButton>
+          </div>
+        </div>
         {selectedRecord && (
           <div className={styles.scrollableContent}>
-            <div className={styles.dateNavigator}>
-              <IconButton
-                onClick={handlePrevDate}
-                disabled={selectedDate === 0}
-              >
-                <ChevronLeft />
-              </IconButton>
-              <Typography variant="h6" className={styles.date}>
-                {format(parseISO(selectedRecord.date), "yyyy年M月d日", {
-                  locale: ja,
-                })}
-                （{differenceInDays(new Date(), parseISO(selectedRecord.date))}
-                日前）
-              </Typography>
-              <IconButton
-                onClick={handleNextDate}
-                disabled={selectedDate === pastRecords.length - 1}
-              >
-                <ChevronRight />
-              </IconButton>
-            </div>
             <Typography variant="subtitle1" className={styles.totalVolume}>
               総ボリューム: {totalVolume}kg
             </Typography>

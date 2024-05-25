@@ -342,9 +342,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
         open={openPastRecordsModal}
         onClose={handleClosePastRecordsModal}
         menuId={workout.menu}
-        // menuName={menuName}
         pastRecords={trainingSessions}
-        onLoadMore={() => {}}
       />
     </Paper>
   );

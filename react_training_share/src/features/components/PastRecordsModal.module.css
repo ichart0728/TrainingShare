@@ -22,6 +22,10 @@
   flex-direction: column;
 }
 
+.modalHeader {
+  margin-bottom: 16px;
+}
+
 .scrollableContent {
   overflow-y: auto;
   flex-grow: 1;
