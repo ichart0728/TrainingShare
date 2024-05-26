@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "./app/store";
-
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "./app/store";
+import { useEffect, useState } from "react";
 import Sidebar from "./features/components/Sidebar";
 import Auth from "./features/auth/Auth";
 import Home from "./features/home/Home";
@@ -9,25 +9,47 @@ import Workout from "./features/workout/Workout";
 import Profile from "./features/profile/Profile";
 import WorkoutHistory from "./features/workout_history/WorkoutHistory";
 import CalendarScreen from "./features/calendar/CalendarScreen";
-import { useMediaQuery, useTheme } from "@material-ui/core";
+import {
+  useMediaQuery,
+  useTheme,
+  CircularProgress,
+  Box,
+} from "@material-ui/core";
+import { fetchAsyncGetMyProf } from "./features/api/authApi";
 
 function App() {
+  const dispatch: AppDispatch = useDispatch();
   const userId = useSelector((state: RootState) => state.auth.myprofile.id);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
 
-  if (!userId) {
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (localStorage.getItem("localJWT")) {
+        await dispatch(fetchAsyncGetMyProf());
+      }
+      setIsAuthChecked(true); // 認証情報のチェックが完了したことを示す
+    };
+    checkAuth();
+  }, [dispatch]);
+
+  if (!isAuthChecked) {
     return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Auth />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </BrowserRouter>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress />
+      </Box>
     );
-  } else {
-    return (
-      <BrowserRouter>
+  }
+
+  return (
+    <BrowserRouter>
+      {userId ? (
         <div
           style={{
             display: "flex",
@@ -43,19 +65,24 @@ function App() {
             }}
           >
             <Routes>
-              <Route path="/" element={<Auth />} />
               <Route path="/home" element={<Home />} />
               <Route path="/workout" element={<Workout />} />
               <Route path="/profile/:nickname" element={<Profile />} />
               <Route path="/workout_history" element={<WorkoutHistory />} />
               <Route path="/calendar" element={<CalendarScreen />} />
+              <Route path="*" element={<Navigate to="/home" />} />
             </Routes>
           </main>
           {isMobile && <Sidebar />}
         </div>
-      </BrowserRouter>
-    );
-  }
+      ) : (
+        <Routes>
+          <Route path="/" element={<Auth />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      )}
+    </BrowserRouter>
+  );
 }
 
 export default App;

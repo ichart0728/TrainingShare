@@ -27,9 +27,6 @@ export const fetchAsyncLogin = createAsyncThunk(
     localStorage.setItem("localRefreshToken", res.data.refresh);
     localStorage.setItem("tokenExpiry", expiryDate.toISOString());
 
-    console.log(decoded);
-    console.log(expiryDate);
-    console.log(res.data);
     return res.data;
   }
 );
@@ -51,17 +48,6 @@ export const fetchAsyncRegister = createAsyncThunk(
       }
       throw err;
     }
-  }
-);
-
-export const fetchAsyncRefreshToken = createAsyncThunk(
-  "auth/refresh",
-  async () => {
-    const res = await axios.post(`${apiUrl}authen/jwt/refresh`, {
-      refresh: localStorage.getItem("refreshToken"),
-    });
-    localStorage.setItem("localJWT", res.data.access);
-    return res.data;
   }
 );
 
