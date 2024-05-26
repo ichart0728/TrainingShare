@@ -1,6 +1,13 @@
 import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { PROPS_AUTHEN, PROPS_PUT_PROFILE, PROPS_NICKNAME } from "../types";
+import {
+  PROPS_AUTHEN,
+  PROPS_PUT_PROFILE,
+  PROPS_NICKNAME,
+  JwtPayload,
+} from "../types";
+import { jwtDecode } from "jwt-decode";
+import { checkTokenExpiryAndRefresh } from "./apiUtils";
 
 const apiUrl = process.env.REACT_APP_DEV_API_URL;
 
@@ -13,6 +20,16 @@ export const fetchAsyncLogin = createAsyncThunk(
         "Content-Type": "application/json",
       },
     });
+
+    const decoded: JwtPayload = jwtDecode(res.data.access);
+    const expiryDate = new Date(decoded.exp * 1000);
+    localStorage.setItem("localJWT", res.data.access);
+    localStorage.setItem("localRefreshToken", res.data.refresh);
+    localStorage.setItem("tokenExpiry", expiryDate.toISOString());
+
+    console.log(decoded);
+    console.log(expiryDate);
+    console.log(res.data);
     return res.data;
   }
 );
@@ -37,14 +54,27 @@ export const fetchAsyncRegister = createAsyncThunk(
   }
 );
 
+export const fetchAsyncRefreshToken = createAsyncThunk(
+  "auth/refresh",
+  async () => {
+    const res = await axios.post(`${apiUrl}authen/jwt/refresh`, {
+      refresh: localStorage.getItem("refreshToken"),
+    });
+    localStorage.setItem("localJWT", res.data.access);
+    return res.data;
+  }
+);
+
 /*プロフィール新規作成*/
 export const fetchAsyncCreateProf = createAsyncThunk(
   "profile/post",
   async (nickName: PROPS_NICKNAME) => {
+    const token = await checkTokenExpiryAndRefresh();
+
     const res = await axios.post(`${apiUrl}api/profiles/`, nickName, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `JWT ${localStorage.localJWT}`,
+        Authorization: `JWT ${token}`,
       },
     });
     return res.data;
@@ -55,6 +85,8 @@ export const fetchAsyncCreateProf = createAsyncThunk(
 export const fetchAsyncUpdateProf = createAsyncThunk(
   "profile/put",
   async (profile: PROPS_PUT_PROFILE) => {
+    const token = await checkTokenExpiryAndRefresh();
+
     const uploadData = new FormData();
     uploadData.append("nickName", profile.nickName);
     profile.img && uploadData.append("img", profile.img, profile.img.name);
@@ -64,7 +96,7 @@ export const fetchAsyncUpdateProf = createAsyncThunk(
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `JWT ${localStorage.localJWT}`,
+          Authorization: `JWT ${token}`,
         },
       }
     );
@@ -76,9 +108,11 @@ export const fetchAsyncUpdateProf = createAsyncThunk(
 export const fetchAsyncGetMyProf = createAsyncThunk(
   "myprofile/get",
   async () => {
+    const token = await checkTokenExpiryAndRefresh();
+
     const res = await axios.get(`${apiUrl}api/profiles/`, {
       headers: {
-        Authorization: `JWT ${localStorage.localJWT}`,
+        Authorization: `JWT ${token}`,
       },
     });
     return res.data[0];
@@ -87,9 +121,11 @@ export const fetchAsyncGetMyProf = createAsyncThunk(
 
 /*プロフィール一覧取得*/
 export const fetchAsyncGetProfs = createAsyncThunk("profiles/get", async () => {
+  const token = await checkTokenExpiryAndRefresh();
+
   const res = await axios.get(`${apiUrl}api/profiles/`, {
     headers: {
-      Authorization: `JWT ${localStorage.localJWT}`,
+      Authorization: `JWT ${token}`,
     },
   });
   return res.data;

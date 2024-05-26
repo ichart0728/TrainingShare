@@ -256,3 +256,7 @@ export interface PROPS_WORKOUT_ITEM {
   workout: PROPS_WORKOUT;
   isPlan: boolean;
 }
+
+export interface JwtPayload {
+  exp: number;
+}

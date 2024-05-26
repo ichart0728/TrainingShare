@@ -3,6 +3,7 @@ import { RootState } from "../../app/store";
 
 import {
   fetchAsyncLogin,
+  fetchAsyncRefreshToken,
   fetchAsyncCreateProf,
   fetchAsyncGetMyProf,
   fetchAsyncGetProfs,
@@ -85,11 +86,14 @@ export const authSlice = createSlice({
   },
   /*各reducersの後処理を定義*/
   extraReducers: (builder) => {
-    /*ログイン後、JWTトークンをローカルストレージに保管する*/
+    /*ログイン後、JWTトークンとリフレッシュトークンをローカルストレージに保管する*/
     builder.addCase(fetchAsyncLogin.fulfilled, (state, action) => {
       localStorage.setItem("localJWT", action.payload.access);
+      localStorage.setItem("refreshToken", action.payload.refresh);
     });
-    /*作成したプロフィールをログインユーザーの状態としてセット*/
+    builder.addCase(fetchAsyncRefreshToken.fulfilled, (state, action) => {
+      localStorage.setItem("localJWT", action.payload.access);
+    }); /*作成したプロフィールをログインユーザーの状態としてセット*/
     builder.addCase(fetchAsyncCreateProf.fulfilled, (state, action) => {
       state.myprofile = action.payload;
     });

@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { WORKOUT_POST } from "../types";
+import { checkTokenExpiryAndRefresh } from "./apiUtils";
 
 const apiUrlTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/training-sessions/`;
 const apiUrlMyTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/my-training-sessions/`;
@@ -10,9 +11,11 @@ const apiUrlTrainingRecord = `${process.env.REACT_APP_DEV_API_URL}api/training-r
 export const fetchAsyncPostTrainingSessions = createAsyncThunk(
   "workout/PostTrainingSessions",
   async (workout: WORKOUT_POST) => {
+    const token = await checkTokenExpiryAndRefresh();
+
     const res = await axios.post(apiUrlTrainingSessions, workout, {
       headers: {
-        Authorization: `JWT ${localStorage.localJWT}`,
+        Authorization: `JWT ${token}`,
       },
     });
     return res.data;
@@ -23,9 +26,11 @@ export const fetchAsyncPostTrainingSessions = createAsyncThunk(
 export const fetchAsyncGetTrainingSessions = createAsyncThunk(
   "workout/GetMyTrainingSessions",
   async () => {
+    const token = await checkTokenExpiryAndRefresh();
+
     const res = await axios.get(apiUrlMyTrainingSessions, {
       headers: {
-        Authorization: `JWT ${localStorage.localJWT}`,
+        Authorization: `JWT ${token}`,
       },
     });
     return res.data;
@@ -41,9 +46,11 @@ export const fetchAsyncDeleteTrainingRecord = createAsyncThunk(
     }: { TrainingRecordId: string; TrainingSessionId: string },
     { rejectWithValue, dispatch }
   ) => {
+    const token = await checkTokenExpiryAndRefresh();
+
     await axios.delete(`${apiUrlTrainingRecord}${TrainingRecordId}/`, {
       headers: {
-        Authorization: `JWT ${localStorage.localJWT}`,
+        Authorization: `JWT ${token}`,
       },
     });
 
@@ -52,7 +59,7 @@ export const fetchAsyncDeleteTrainingRecord = createAsyncThunk(
       `${apiUrlTrainingSessions}${TrainingSessionId}/`,
       {
         headers: {
-          Authorization: `JWT ${localStorage.localJWT}`,
+          Authorization: `JWT ${token}`,
         },
       }
     );
@@ -73,11 +80,13 @@ export const fetchAsyncDeleteTrainingSession = createAsyncThunk(
     { TrainingSessionId }: { TrainingSessionId: string },
     { rejectWithValue }
   ) => {
+    const token = await checkTokenExpiryAndRefresh();
+
     const res = await axios.delete(
       `${apiUrlTrainingSessions}${TrainingSessionId}/`,
       {
         headers: {
-          Authorization: `JWT ${localStorage.localJWT}`,
+          Authorization: `JWT ${token}`,
         },
       }
     );

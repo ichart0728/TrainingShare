@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { checkTokenExpiryAndRefresh } from "./apiUtils";
 
 const apiUrltrainingMenus = `${process.env.REACT_APP_DEV_API_URL}api/training-menus/`;
 
@@ -7,9 +8,11 @@ const apiUrltrainingMenus = `${process.env.REACT_APP_DEV_API_URL}api/training-me
 export const fetchAsyncGetTrainingMenus = createAsyncThunk(
   "training_menu/getUserPosts",
   async () => {
+    const token = await checkTokenExpiryAndRefresh();
+
     const res = await axios.get(apiUrltrainingMenus, {
       headers: {
-        Authorization: `JWT ${localStorage.localJWT}`,
+        Authorization: `JWT ${token}`,
       },
     });
     return res.data;
