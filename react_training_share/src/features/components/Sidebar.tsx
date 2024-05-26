@@ -51,7 +51,6 @@ const Sidebar = () => {
     setOpenLogoutModal(false);
   };
   const handleConfirmLogout = () => {
-    localStorage.removeItem("localJWT");
     dispatch(resetOpenProfile());
     dispatch(resetOpenNewPost());
     dispatch(setOpenSignIn());

@@ -2,8 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 
 import {
-  fetchAsyncLogin,
-  fetchAsyncRefreshToken,
   fetchAsyncCreateProf,
   fetchAsyncGetMyProf,
   fetchAsyncGetProfs,
@@ -81,25 +79,23 @@ export const authSlice = createSlice({
       state.myprofile.nickName = action.payload;
     },
     logout(state) {
+      localStorage.removeItem("localJWT");
+      localStorage.removeItem("localRefreshToken");
+      localStorage.removeItem("tokenExpiry");
+      localStorage.removeItem("userId");
+
       return initialState; // ログアウト時に初期状態にリセット
     },
   },
   /*各reducersの後処理を定義*/
   extraReducers: (builder) => {
-    /*ログイン後、JWTトークンとリフレッシュトークンをローカルストレージに保管する*/
-    builder.addCase(fetchAsyncLogin.fulfilled, (state, action) => {
-      localStorage.setItem("localJWT", action.payload.access);
-      localStorage.setItem("refreshToken", action.payload.refresh);
-    });
-    builder.addCase(fetchAsyncRefreshToken.fulfilled, (state, action) => {
-      localStorage.setItem("localJWT", action.payload.access);
-    }); /*作成したプロフィールをログインユーザーの状態としてセット*/
     builder.addCase(fetchAsyncCreateProf.fulfilled, (state, action) => {
       state.myprofile = action.payload;
     });
     /*取得したプロフィールをログインユーザーの状態としてセット*/
     builder.addCase(fetchAsyncGetMyProf.fulfilled, (state, action) => {
       state.myprofile = action.payload;
+      localStorage.setItem("userId", action.payload.id);
     });
     /*取得したプロフィール一覧をセット*/
     builder.addCase(fetchAsyncGetProfs.fulfilled, (state, action) => {

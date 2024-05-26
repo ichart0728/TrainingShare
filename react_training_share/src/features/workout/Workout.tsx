@@ -31,10 +31,7 @@ const Workout = () => {
   const [isPlan, setisPlan] = useState(location.state?.isPlan || false);
   const selectedDate = location.state?.selectedDate;
 
-  useEffect(() => {
-    console.log("isPlan:", isPlan);
-    console.log("Selected Date:", selectedDate);
-  }, [isPlan, selectedDate]);
+  useEffect(() => {}, [isPlan, selectedDate]);
 
   const selectedWorkouts = useSelector(
     (state: RootState) => state.workout.workouts
@@ -143,7 +140,6 @@ const Workout = () => {
     const date = new Date();
     const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
     const formattedDate = jstDate.toISOString().split("T")[0];
-    console.log("現在の日付:", formattedDate);
 
     const workoutData: WORKOUT_POST = {
       // YYYY-MM-DD形式の日付文字列
@@ -151,7 +147,6 @@ const Workout = () => {
       duration: Math.floor(elapsedTime / 1000), // ミリ秒を秒に変換
       workouts: workouts,
     };
-    console.log("送信するトレーニングデータ:", workoutData);
     dispatch(fetchAsyncPostTrainingSessions(workoutData) as any);
     setOpenEndModal(false);
     dispatch(clearWorkouts());
@@ -161,7 +156,6 @@ const Workout = () => {
 
   const handleSaveTrainingPlan = () => {
     // トレーニングプランを保存するロジックを実装
-    console.log("トレーニングプランを保存:", selectedWorkouts);
     navigate("/workout_history");
   };
 

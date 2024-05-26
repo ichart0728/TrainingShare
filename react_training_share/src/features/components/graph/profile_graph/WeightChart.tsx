@@ -120,17 +120,12 @@ const WeightChart: React.FC<WeightChartProps> = ({
         const year = selectedMonth.getFullYear();
         const month = selectedMonth.getMonth();
         const selectedDay = parseInt(dateLabel, 10);
-        console.log(year, month, selectedDay);
 
         // UTCとして解釈されるが、日本時間として解釈するために9時間追加
         const utcDate = new Date(Date.UTC(year, month, selectedDay));
         const jstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
 
-        console.log(utcDate.toISOString());
-        console.log(jstDate.toISOString());
-
         const formattedDate = jstDate.toISOString().split("T")[0];
-        console.log(formattedDate);
         onDataPointClick(formattedDate, weight);
       }
     }
