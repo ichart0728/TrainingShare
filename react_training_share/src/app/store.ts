@@ -28,14 +28,13 @@ import {
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: [
-    "auth",
-    "workout",
-    "profile",
-    "training",
-    "workoutHistory",
-    "timer",
-  ],
+  whitelist: ["auth", "workout", "profile", "training", "workoutHistory"],
+};
+
+const timerPersistConfig = {
+  key: "timer",
+  storage,
+  blacklist: ["elapsedTime"],
 };
 
 const rootReducer = combineReducers({
@@ -45,7 +44,7 @@ const rootReducer = combineReducers({
   workout: workoutReducer,
   training: trainingReducer,
   workoutHistory: workoutHistoryReducer,
-  timer: TimerReducer,
+  timer: persistReducer(timerPersistConfig, TimerReducer),
 });
 
 export type RootState = {

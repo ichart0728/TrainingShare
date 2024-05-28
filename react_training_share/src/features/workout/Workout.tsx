@@ -6,7 +6,6 @@ import {
   pauseTimer,
   resumeTimer,
   stopTimer,
-  updateElapsedTime,
   selectTimer,
   selectElapsedTime,
 } from "./timerSlice";
@@ -62,30 +61,6 @@ const Workout = () => {
   const timer = useSelector(selectTimer);
   const elapsedTime = useSelector(selectElapsedTime);
 
-  useEffect(() => {
-    let timerId: NodeJS.Timeout;
-
-    if (timer.active && !timer.paused) {
-      if (timer.startTime !== 0) {
-        dispatch(updateElapsedTime());
-      }
-
-      timerId = setInterval(() => {
-        dispatch(updateElapsedTime());
-      }, 1000);
-    }
-
-    return () => {
-      clearInterval(timerId);
-    };
-  }, [timer.active, timer.paused, timer.startTime, dispatch]);
-
-  useEffect(() => {
-    if (timer.active && !timer.paused) {
-      dispatch(updateElapsedTime());
-    }
-  }, [timer.active, timer.paused, dispatch]);
-
   const handleStartTimer = () => {
     dispatch(startTimer());
   };
@@ -123,6 +98,18 @@ const Workout = () => {
 
   const confirmEndTrainingWithSaving = () => {
     dispatch(stopTimer());
+
+    const { active, paused, startTime, pausedTime } = timer;
+    let duration = 0;
+
+    if (active) {
+      if (paused) {
+        duration = pausedTime - startTime;
+      } else {
+        duration = Date.now() - startTime;
+      }
+    }
+
     const workouts = selectedWorkouts
       .filter((workout) => workout.sets.length > 0)
       .map((workout) => ({
@@ -146,9 +133,10 @@ const Workout = () => {
 
     const workoutData: WORKOUT_POST = {
       date: formattedDate,
-      duration: Math.floor(elapsedTime / 1000),
+      duration: Math.floor(duration / 1000),
       workouts: workouts,
     };
+
     dispatch(fetchAsyncPostTrainingSessions(workoutData) as any);
     setOpenEndModal(false);
     dispatch(clearWorkouts());

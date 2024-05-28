@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../app/store";
+import { RootState, AppDispatch, persistor } from "../../app/store";
 
 import {
   fetchAsyncCreateProf,

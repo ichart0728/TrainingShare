@@ -27,13 +27,12 @@ const timerSlice = createSlice({
       if (state.active && !state.paused) {
         state.paused = true;
         state.pausedTime = Date.now();
-        state.elapsedTime = state.pausedTime - state.startTime;
       }
     },
     resumeTimer: (state) => {
       if (state.active && state.paused) {
         state.paused = false;
-        state.startTime = Date.now() - state.elapsedTime;
+        state.startTime = Date.now() - (state.pausedTime - state.startTime);
         state.pausedTime = 0;
       }
     },
@@ -44,11 +43,6 @@ const timerSlice = createSlice({
       state.pausedTime = 0;
       state.elapsedTime = 0;
     },
-    updateElapsedTime: (state) => {
-      if (state.active && !state.paused) {
-        state.elapsedTime = Date.now() - state.startTime;
-      }
-    },
     setTimerState: (
       state,
       action: PayloadAction<Partial<PROPS_TIMER_STATE>>
@@ -58,18 +52,17 @@ const timerSlice = createSlice({
   },
 });
 
-export const {
-  startTimer,
-  pauseTimer,
-  resumeTimer,
-  stopTimer,
-  updateElapsedTime,
-  setTimerState,
-} = timerSlice.actions;
+export const { startTimer, pauseTimer, resumeTimer, stopTimer, setTimerState } =
+  timerSlice.actions;
 
 export default timerSlice.reducer;
 
 export const selectTimer = (state: RootState) => state.timer;
 export const selectTimerActive = (state: RootState) => state.timer.active;
 export const selectTimerPaused = (state: RootState) => state.timer.paused;
-export const selectElapsedTime = (state: RootState) => state.timer.elapsedTime;
+export const selectElapsedTime = (state: RootState) => {
+  const { active, paused, startTime, pausedTime } = state.timer;
+  if (!active) return 0;
+  if (paused) return pausedTime - startTime;
+  return Date.now() - startTime;
+};

@@ -1,8 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Typography } from "@material-ui/core";
 import styles from "./Timer.module.css";
-import { useSelector, useDispatch } from "react-redux";
-import { selectElapsedTime, updateElapsedTime } from "../workout/timerSlice";
+import { useSelector } from "react-redux";
+import {
+  selectElapsedTime,
+  selectTimerPaused,
+  selectTimerActive,
+} from "../workout/timerSlice";
+import { RootState } from "../../app/store";
 
 interface TimerProps {
   isActive: boolean;
@@ -27,22 +32,28 @@ const Timer: React.FC<TimerProps> = ({
   onSave,
   isPlan,
 }) => {
-  const dispatch = useDispatch();
-  const elapsedTime = useSelector(selectElapsedTime);
+  const [displayTime, setDisplayTime] = useState(0);
+  const elapsedTime = useSelector((state: RootState) =>
+    selectElapsedTime(state)
+  );
+  const timerPaused = useSelector(selectTimerPaused);
+  const timerActive = useSelector(selectTimerActive);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
-    if (isActive && !isPaused) {
+    if (timerActive && !timerPaused) {
       intervalId = setInterval(() => {
-        dispatch(updateElapsedTime());
+        setDisplayTime(elapsedTime);
       }, 1000);
+    } else {
+      setDisplayTime(elapsedTime);
     }
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [isActive, isPaused, dispatch]);
+  }, [timerActive, timerPaused, elapsedTime]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
@@ -68,7 +79,7 @@ const Timer: React.FC<TimerProps> = ({
                 isPaused ? styles.pausedTimer : ""
               }`}
             >
-              {formatTime(elapsedTime)}
+              {formatTime(displayTime)}
             </Typography>
           </div>
         )}
