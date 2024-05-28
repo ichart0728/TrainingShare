@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { clearWorkouts } from "./workoutSlice";
 import {
-  clearWorkouts,
   startTimer,
   pauseTimer,
   resumeTimer,
@@ -9,7 +9,7 @@ import {
   updateElapsedTime,
   selectTimer,
   selectElapsedTime,
-} from "./workoutSlice";
+} from "./timerSlice";
 import { fetchAsyncPostTrainingSessions } from "../api/workoutApi";
 import { fetchAsyncGetTrainingSessions } from "../api/workoutApi";
 import { WORKOUT_POST, PROPS_WORKOUT_SET } from "../types";
@@ -39,7 +39,7 @@ const Workout = () => {
   const [openEndModal, setOpenEndModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  // selectedWorkoutsの全体のボリュームを計算
+
   const totalVolume = selectedWorkouts.reduce((total, workout) => {
     return (
       total +
@@ -48,7 +48,7 @@ const Workout = () => {
       }, 0)
     );
   }, 0);
-  // selectedWorkoutsのうち完了済みの全体のボリュームを計算
+
   const completedTotalVolume = selectedWorkouts.reduce((total, workout) => {
     return (
       total +
@@ -57,6 +57,7 @@ const Workout = () => {
       }, 0)
     );
   }, 0);
+
   const [openModal, setOpenModal] = useState(false);
   const timer = useSelector(selectTimer);
   const elapsedTime = useSelector(selectElapsedTime);
@@ -65,6 +66,10 @@ const Workout = () => {
     let timerId: NodeJS.Timeout;
 
     if (timer.active && !timer.paused) {
+      if (timer.startTime !== 0) {
+        dispatch(updateElapsedTime());
+      }
+
       timerId = setInterval(() => {
         dispatch(updateElapsedTime());
       }, 1000);
@@ -73,7 +78,7 @@ const Workout = () => {
     return () => {
       clearInterval(timerId);
     };
-  }, [timer.active, timer.paused, dispatch]);
+  }, [timer.active, timer.paused, timer.startTime, dispatch]);
 
   useEffect(() => {
     if (timer.active && !timer.paused) {
@@ -118,7 +123,6 @@ const Workout = () => {
 
   const confirmEndTrainingWithSaving = () => {
     dispatch(stopTimer());
-    // トレーニングデータを整形
     const workouts = selectedWorkouts
       .filter((workout) => workout.sets.length > 0)
       .map((workout) => ({
@@ -136,15 +140,13 @@ const Workout = () => {
           })),
       }));
 
-    // 現在の日付をJSTで取得
     const date = new Date();
-    const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // JSTに変換
+    const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000);
     const formattedDate = jstDate.toISOString().split("T")[0];
 
     const workoutData: WORKOUT_POST = {
-      // YYYY-MM-DD形式の日付文字列
       date: formattedDate,
-      duration: Math.floor(elapsedTime / 1000), // ミリ秒を秒に変換
+      duration: Math.floor(elapsedTime / 1000),
       workouts: workouts,
     };
     dispatch(fetchAsyncPostTrainingSessions(workoutData) as any);
@@ -155,7 +157,6 @@ const Workout = () => {
   };
 
   const handleSaveTrainingPlan = () => {
-    // トレーニングプランを保存するロジックを実装
     navigate("/workout_history");
   };
 
@@ -174,7 +175,6 @@ const Workout = () => {
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
     const seconds = Math.floor((time % 60000) / 1000);
-
     return `${minutes.toString().padStart(2, "0")}:${seconds
       .toString()
       .padStart(2, "0")}`;
@@ -252,7 +252,6 @@ const Workout = () => {
         </div>
       </div>
       <Timer
-        elapsedTime={elapsedTime}
         isActive={timer.active}
         isPaused={timer.paused}
         hasWorkouts={selectedWorkouts.length > 0}

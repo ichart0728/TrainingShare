@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Typography } from "@material-ui/core";
 import styles from "./Timer.module.css";
+import { useSelector, useDispatch } from "react-redux";
+import { selectElapsedTime, updateElapsedTime } from "../workout/timerSlice";
 
 interface TimerProps {
-  elapsedTime: number;
   isActive: boolean;
   isPaused: boolean;
   hasWorkouts: boolean;
@@ -16,7 +17,6 @@ interface TimerProps {
 }
 
 const Timer: React.FC<TimerProps> = ({
-  elapsedTime,
   isActive,
   isPaused,
   hasWorkouts,
@@ -27,6 +27,23 @@ const Timer: React.FC<TimerProps> = ({
   onSave,
   isPlan,
 }) => {
+  const dispatch = useDispatch();
+  const elapsedTime = useSelector(selectElapsedTime);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (isActive && !isPaused) {
+      intervalId = setInterval(() => {
+        dispatch(updateElapsedTime());
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [isActive, isPaused, dispatch]);
+
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
     const seconds = Math.floor((time % 60000) / 1000);

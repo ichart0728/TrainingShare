@@ -111,7 +111,7 @@ export interface PROPS_WORKOUT_HISTORY_STATE {
   error: string | null;
 }
 
-export interface PROPS_TIMER {
+export interface PROPS_TIMER_STATE {
   // タイマーが動いているか
   active: boolean;
   // タイマーが一時停止中か
@@ -132,8 +132,6 @@ export interface PROPS_WORKOUT_STATE {
   totalVolume: number;
   // 完了済みトータルボリューム
   completedTotalVolume: number;
-  // タイマー
-  timer: PROPS_TIMER;
 }
 
 interface PROPS_PROFILE {
@@ -169,7 +167,7 @@ interface BodyFatPercentageHistory {
   bodyFatPercentage: number;
 }
 
-export interface ProfileState {
+export interface PROPS_PROFILE_STATE {
   isLoadingProfile: boolean;
   profile: PROPS_PROFILE;
   weightHistory: WeightHistory[];

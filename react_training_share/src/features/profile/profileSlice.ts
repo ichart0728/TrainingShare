@@ -10,9 +10,9 @@ import {
 import { fetchAsyncGetUserPosts } from "../api/postApi";
 
 import { logout } from "../auth/authSlice";
-import { ProfileState } from "../types";
+import { PROPS_PROFILE_STATE } from "../types";
 
-const initialState: ProfileState = {
+const initialState: PROPS_PROFILE_STATE = {
   isLoadingProfile: false,
   profile: {
     id: "",
