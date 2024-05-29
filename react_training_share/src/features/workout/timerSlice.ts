@@ -2,6 +2,7 @@
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
+import { logout } from "../auth/authSlice";
 
 import { PROPS_TIMER_STATE } from "../types";
 
@@ -49,6 +50,9 @@ const timerSlice = createSlice({
     ) => {
       return { ...state, ...action.payload };
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(logout, () => initialState);
   },
 });
 
