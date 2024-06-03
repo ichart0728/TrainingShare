@@ -52,6 +52,22 @@ INSTALLED_APPS = [
     'corsheaders'
 ]
 
+DJOSER = {
+    'TOKEN_MODEL': None,  # デフォルトのトークンモデルを使用しない
+    'SERIALIZERS': {
+        'token_create': 'api.serializers.CustomTokenCreateSerializer',
+    },
+    'COOKIE': 'access_token',  # アクセストークンを保存するクッキー名
+    'COOKIE_REFRESH': 'refresh_token',  # リフレッシュトークンを保存するクッキー名
+    'COOKIE_HTTPONLY': True,  # クッキーをHTTPOnlyにする
+    'COOKIE_SECURE': False,  # 本番環境ではTrueにする
+    'COOKIE_SAMESITE': 'Lax',  # SameSiteの設定
+    'COOKIE_PATH': '/',  # クッキーのパス
+    'COOKIE_DOMAIN': None,  # クッキーのドメイン
+    'COOKIE_REFRESH_PATH': '/authen/jwt/refresh/',  # リフレッシュトークンのパス
+}
+
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -67,6 +83,8 @@ MIDDLEWARE = [
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000"
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'config.urls'
 
@@ -102,9 +120,12 @@ REST_FRAMEWORK = {
 # JWTの設定
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
-    # トークンの有効期限はとりあえず60分で設定しておく
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
 }
+
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

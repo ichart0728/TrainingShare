@@ -2,18 +2,19 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { PROPS_NEWPOST, PROPS_LIKED, PROPS_COMMENT } from "../types";
 import { checkTokenExpiryAndRefresh } from "./apiUtils";
+import Cookies from "universal-cookie";
 
 const apiUrlPost = `${process.env.REACT_APP_DEV_API_URL}api/posts/`;
 const apiUrlComment = `${process.env.REACT_APP_DEV_API_URL}api/comments/`;
+const cookies = new Cookies();
 
 /*投稿の取得*/
 export const fetchAsyncGetPosts = createAsyncThunk("post/get", async () => {
-  const token = await checkTokenExpiryAndRefresh();
-
   const res = await axios.get(apiUrlPost, {
     headers: {
-      Authorization: `JWT ${token}`,
+      Authorization: `JWT ${cookies.get("accesstoken")}`,
     },
+    withCredentials: true,
   });
   return res.data;
 });
@@ -22,16 +23,15 @@ export const fetchAsyncGetPosts = createAsyncThunk("post/get", async () => {
 export const fetchAsyncNewPost = createAsyncThunk(
   "post/post",
   async (newPost: PROPS_NEWPOST) => {
-    const token = await checkTokenExpiryAndRefresh();
-
     const uploadData = new FormData();
     uploadData.append("title", newPost.title);
     newPost.img && uploadData.append("img", newPost.img, newPost.img.name);
     const res = await axios.post(apiUrlPost, uploadData, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `JWT ${token}`,
+        Authorization: `JWT ${cookies.get("accesstoken")}`,
       },
+      withCredentials: true,
     });
     return res.data;
   }
@@ -41,8 +41,6 @@ export const fetchAsyncNewPost = createAsyncThunk(
 export const fetchAsyncPatchLiked = createAsyncThunk(
   "post/patch",
   async (liked: PROPS_LIKED) => {
-    const token = await checkTokenExpiryAndRefresh();
-
     const currentLiked = liked.current;
     const uploadData = new FormData();
 
@@ -65,8 +63,9 @@ export const fetchAsyncPatchLiked = createAsyncThunk(
       const res = await axios.put(`${apiUrlPost}${liked.id}/`, uploadData, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `JWT ${token}`,
+          Authorization: `JWT ${cookies.get("accesstoken")}`,
         },
+        withCredentials: true,
       });
       return res.data;
     }
@@ -74,8 +73,9 @@ export const fetchAsyncPatchLiked = createAsyncThunk(
     const res = await axios.patch(`${apiUrlPost}${liked.id}/`, uploadData, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `JWT ${token}`,
+        Authorization: `JWT ${cookies.get("accesstoken")}`,
       },
+      withCredentials: true,
     });
     return res.data;
   }
@@ -85,12 +85,11 @@ export const fetchAsyncPatchLiked = createAsyncThunk(
 export const fetchAsyncGetUserPosts = createAsyncThunk(
   "profile/getUserPosts",
   async (userId: string) => {
-    const token = await checkTokenExpiryAndRefresh();
-
     const res = await axios.get(`${apiUrlPost}${userId}/`, {
       headers: {
-        Authorization: `JWT ${token}`,
+        Authorization: `JWT ${cookies.get("accesstoken")}`,
       },
+      withCredentials: true,
     });
     return res.data;
   }

@@ -6,6 +6,49 @@ from django.utils import timezone
 import datetime
 from . import serializers
 from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession, WeightHistory, BodyFatPercentageHistory, MuscleMassHistory
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.conf import settings
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from . import serializers
+
+
+class CustomTokenObtainPairView(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        refresh = serializer.validated_data['refresh']
+        access = serializer.validated_data['access']
+
+        response = Response()
+        response.set_cookie(
+            key='refresh_token',
+            value=refresh,
+            httponly=True,
+            secure=settings.DJOSER['COOKIE_SECURE'],
+            samesite=settings.DJOSER['COOKIE_SAMESITE'],
+            max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
+            expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
+            path=settings.DJOSER['COOKIE_REFRESH_PATH'],
+        )
+        response.set_cookie(
+            key='access_token',
+            value=access,
+            httponly=True,
+            secure=settings.DJOSER['COOKIE_SECURE'],
+            samesite=settings.DJOSER['COOKIE_SAMESITE'],
+            max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
+            expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
+            path=settings.DJOSER['COOKIE_PATH'],
+        )
+        response.data = {'refresh': refresh, 'access': access}
+        return response
+
 
 # 新規ユーザー作成用View
 class CreateUserView(generics.CreateAPIView):

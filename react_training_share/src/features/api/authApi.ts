@@ -6,27 +6,41 @@ import {
   PROPS_NICKNAME,
   JwtPayload,
 } from "../types";
-import { jwtDecode } from "jwt-decode";
 import { checkTokenExpiryAndRefresh } from "./apiUtils";
+import Cookies from "universal-cookie";
 
 const apiUrl = process.env.REACT_APP_DEV_API_URL;
+const cookies = new Cookies();
+
+interface LoginResponse {
+  access: string;
+  refresh: string;
+}
+
+export const fetchToken = async (email: string, password: string) => {
+  const res = await axios.post(
+    `${apiUrl}api/token/`,
+    { email, password },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true, // クッキーを送受信するためにwithCredentialsをtrueに設定
+    }
+  );
+  return res.data;
+};
 
 /*JWTトークン取得*/
-export const fetchAsyncLogin = createAsyncThunk(
+export const fetchAsyncLogin = createAsyncThunk<LoginResponse, PROPS_AUTHEN>(
   "auth/post",
   async (authen: PROPS_AUTHEN) => {
     const res = await axios.post(`${apiUrl}authen/jwt/create`, authen, {
       headers: {
         "Content-Type": "application/json",
       },
+      // withCredentials: true,
     });
-
-    const decoded: JwtPayload = jwtDecode(res.data.access);
-    const expiryDate = new Date(decoded.exp * 1000);
-    localStorage.setItem("localJWT", res.data.access);
-    localStorage.setItem("localRefreshToken", res.data.refresh);
-    localStorage.setItem("tokenExpiry", expiryDate.toISOString());
-
     return res.data;
   }
 );
@@ -39,7 +53,9 @@ export const fetchAsyncRegister = createAsyncThunk(
       const res = await axios.post(`${apiUrl}api/register/`, auth, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `JWT ${cookies.get("accesstoken")}`,
         },
+        withCredentials: true,
       });
       return res.data;
     } catch (err) {
@@ -55,13 +71,12 @@ export const fetchAsyncRegister = createAsyncThunk(
 export const fetchAsyncCreateProf = createAsyncThunk(
   "profile/post",
   async (nickName: PROPS_NICKNAME) => {
-    const token = await checkTokenExpiryAndRefresh();
-
     const res = await axios.post(`${apiUrl}api/profiles/`, nickName, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `JWT ${token}`,
+        Authorization: `JWT ${cookies.get("accesstoken")}`,
       },
+      withCredentials: true,
     });
     return res.data;
   }
@@ -71,8 +86,6 @@ export const fetchAsyncCreateProf = createAsyncThunk(
 export const fetchAsyncUpdateProf = createAsyncThunk(
   "profile/put",
   async (profile: PROPS_PUT_PROFILE) => {
-    const token = await checkTokenExpiryAndRefresh();
-
     const uploadData = new FormData();
     uploadData.append("nickName", profile.nickName);
     profile.img && uploadData.append("img", profile.img, profile.img.name);
@@ -82,8 +95,9 @@ export const fetchAsyncUpdateProf = createAsyncThunk(
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `JWT ${token}`,
+          Authorization: `JWT ${cookies.get("accesstoken")}`,
         },
+        withCredentials: true,
       }
     );
     return res.data;
@@ -94,12 +108,11 @@ export const fetchAsyncUpdateProf = createAsyncThunk(
 export const fetchAsyncGetMyProf = createAsyncThunk(
   "myprofile/get",
   async () => {
-    const token = await checkTokenExpiryAndRefresh();
-
     const res = await axios.get(`${apiUrl}api/profiles/`, {
       headers: {
-        Authorization: `JWT ${token}`,
+        Authorization: `JWT ${cookies.get("accesstoken")}`,
       },
+      withCredentials: true,
     });
     return res.data[0];
   }
@@ -107,12 +120,11 @@ export const fetchAsyncGetMyProf = createAsyncThunk(
 
 /*プロフィール一覧取得*/
 export const fetchAsyncGetProfs = createAsyncThunk("profiles/get", async () => {
-  const token = await checkTokenExpiryAndRefresh();
-
   const res = await axios.get(`${apiUrl}api/profiles/`, {
     headers: {
-      Authorization: `JWT ${token}`,
+      Authorization: `JWT ${cookies.get("accesstoken")}`,
     },
+    withCredentials: true,
   });
   return res.data;
 });

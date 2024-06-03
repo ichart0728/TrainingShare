@@ -7,11 +7,13 @@ import Modal from "react-modal";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, CircularProgress } from "@material-ui/core";
-import { fetchAsyncGetPosts } from "../../api/postApi";
-import { fetchAsyncGetComments } from "../../api/commentApi";
+// import { fetchAsyncGetPosts } from "../../api/postApi";
+// import { fetchAsyncGetComments } from "../../api/commentApi";
 import { fetchAsyncGetTrainingMenus } from "../../api/trainingMenuApi";
 import { fetchAsyncGetTrainingSessions } from "../../api/workoutApi";
-
+import { useCookies } from "react-cookie";
+import { jwtDecode } from "jwt-decode";
+import { JwtPayload } from "../../types";
 import {
   selectIsLoadingAuth,
   selectOpenSignIn,
@@ -21,6 +23,7 @@ import {
   fetchCredEnd,
 } from "../../auth/authSlice";
 import {
+  fetchToken,
   fetchAsyncLogin,
   fetchAsyncGetProfs,
   fetchAsyncGetMyProf,
@@ -33,6 +36,7 @@ const SignInModal: React.FC = () => {
   const openSignIn = useSelector(selectOpenSignIn);
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
   const [loginError, setLoginError] = useState("");
+  const [cookies, setCookie] = useCookies();
 
   return (
     <Modal
@@ -50,18 +54,34 @@ const SignInModal: React.FC = () => {
           initialValues={{ email: "", password: "" }}
           onSubmit={async (values) => {
             await dispatch(fetchCredStart());
-            const result = await dispatch(fetchAsyncLogin(values));
-            if (fetchAsyncLogin.fulfilled.match(result)) {
+            try {
+              const { access, refresh } = await fetchToken(
+                values.email,
+                values.password
+              );
+              const decoded: JwtPayload = jwtDecode(access);
+              const expiryDate = new Date(decoded.exp * 1000);
+
+              // クッキーにJWTトークンを保存
+              setCookie("accesstoken", access, {
+                path: "/",
+                expires: expiryDate,
+              });
+              setCookie("refreshtoken", refresh, {
+                path: "/",
+                expires: expiryDate,
+              });
+
               await dispatch(fetchAsyncGetProfs());
-              await dispatch(fetchAsyncGetPosts());
-              await dispatch(fetchAsyncGetComments());
+              // await dispatch(fetchAsyncGetPosts());
+              // await dispatch(fetchAsyncGetComments());
               await dispatch(fetchAsyncGetMyProf());
               await dispatch(fetchAsyncGetMyProf());
               await dispatch(fetchAsyncGetTrainingMenus());
               await dispatch(fetchAsyncGetTrainingSessions());
               await dispatch(resetOpenSignIn());
               navigate("/workout_history");
-            } else {
+            } catch (error) {
               setLoginError("Invalid email or password");
             }
             await dispatch(fetchCredEnd());

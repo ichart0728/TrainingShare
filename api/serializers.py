@@ -4,6 +4,31 @@ from rest_framework.exceptions import ValidationError
 from datetime import timedelta
 
 from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingSession, TrainingRecord, TrainingSet, WeightHistory, BodyFatPercentageHistory, MuscleMassHistory
+from djoser.serializers import TokenCreateSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate
+
+class CustomTokenCreateSerializer(TokenCreateSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = RefreshToken.for_user(self.user)
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+        return data
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+        return data
 
 class UserSerializer(serializers.ModelSerializer):
 

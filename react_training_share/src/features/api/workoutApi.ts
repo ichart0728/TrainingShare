@@ -2,21 +2,22 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { WORKOUT_POST } from "../types";
 import { checkTokenExpiryAndRefresh } from "./apiUtils";
+import Cookies from "universal-cookie";
 
 const apiUrlTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/training-sessions/`;
 const apiUrlMyTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/my-training-sessions/`;
 const apiUrlTrainingRecord = `${process.env.REACT_APP_DEV_API_URL}api/training-records/`;
+const cookies = new Cookies();
 
 // トレーニングセッションを登録
 export const fetchAsyncPostTrainingSessions = createAsyncThunk(
   "workout/PostTrainingSessions",
   async (workout: WORKOUT_POST) => {
-    const token = await checkTokenExpiryAndRefresh();
-
     const res = await axios.post(apiUrlTrainingSessions, workout, {
       headers: {
-        Authorization: `JWT ${token}`,
+        Authorization: `JWT ${cookies.get("accesstoken")}`,
       },
+      withCredentials: true,
     });
     return res.data;
   }
@@ -26,12 +27,11 @@ export const fetchAsyncPostTrainingSessions = createAsyncThunk(
 export const fetchAsyncGetTrainingSessions = createAsyncThunk(
   "workout/GetMyTrainingSessions",
   async () => {
-    const token = await checkTokenExpiryAndRefresh();
-
     const res = await axios.get(apiUrlMyTrainingSessions, {
       headers: {
-        Authorization: `JWT ${token}`,
+        Authorization: `JWT ${cookies.get("accesstoken")}`,
       },
+      withCredentials: true,
     });
     return res.data;
   }
@@ -46,12 +46,11 @@ export const fetchAsyncDeleteTrainingRecord = createAsyncThunk(
     }: { TrainingRecordId: string; TrainingSessionId: string },
     { rejectWithValue, dispatch }
   ) => {
-    const token = await checkTokenExpiryAndRefresh();
-
     await axios.delete(`${apiUrlTrainingRecord}${TrainingRecordId}/`, {
       headers: {
-        Authorization: `JWT ${token}`,
+        Authorization: `JWT ${cookies.get("accesstoken")}`,
       },
+      withCredentials: true,
     });
 
     // TrainingRecordの削除後、TrainingSessionのworkoutが空になるかチェックする
@@ -59,8 +58,9 @@ export const fetchAsyncDeleteTrainingRecord = createAsyncThunk(
       `${apiUrlTrainingSessions}${TrainingSessionId}/`,
       {
         headers: {
-          Authorization: `JWT ${token}`,
+          Authorization: `JWT ${cookies.get("accesstoken")}`,
         },
+        withCredentials: true,
       }
     );
     const trainingSession = res.data;
@@ -80,14 +80,13 @@ export const fetchAsyncDeleteTrainingSession = createAsyncThunk(
     { TrainingSessionId }: { TrainingSessionId: string },
     { rejectWithValue }
   ) => {
-    const token = await checkTokenExpiryAndRefresh();
-
     const res = await axios.delete(
       `${apiUrlTrainingSessions}${TrainingSessionId}/`,
       {
         headers: {
-          Authorization: `JWT ${token}`,
+          Authorization: `JWT ${cookies.get("accesstoken")}`,
         },
+        withCredentials: true,
       }
     );
     return { TrainingSessionId };
