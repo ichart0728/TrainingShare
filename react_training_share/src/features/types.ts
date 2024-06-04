@@ -145,24 +145,24 @@ interface PROPS_PROFILE {
   dateOfBirth: string;
   userPosts: Post[];
 }
-interface UserPost {
+interface PROPS_USER_POST {
   id: string;
   userPost: string;
   img: string;
   created_on: string;
 }
 
-interface WeightHistory {
+interface PROPS_WEIGHT_HISTORY {
   date: string;
   weight: number;
 }
 
-interface muscleMassHistory {
+interface PROPS_MUSCLE_MASS_HISTORY {
   date: string;
   muscleMass: number;
 }
 
-interface BodyFatPercentageHistory {
+interface PROPS_BODY_FAT_PERCENTAGE_HISTORY {
   date: string;
   bodyFatPercentage: number;
 }
@@ -170,10 +170,10 @@ interface BodyFatPercentageHistory {
 export interface PROPS_PROFILE_STATE {
   isLoadingProfile: boolean;
   profile: PROPS_PROFILE;
-  weightHistory: WeightHistory[];
-  bodyFatPercentageHistory: BodyFatPercentageHistory[];
-  muscleMassHistory: muscleMassHistory[];
-  userPosts: UserPost[];
+  weightHistory: PROPS_WEIGHT_HISTORY[];
+  bodyFatPercentageHistory: PROPS_BODY_FAT_PERCENTAGE_HISTORY[];
+  muscleMassHistory: PROPS_MUSCLE_MASS_HISTORY[];
+  userPosts: PROPS_USER_POST[];
 }
 
 export interface PROPS_TRAINING {
