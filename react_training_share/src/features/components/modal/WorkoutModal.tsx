@@ -13,11 +13,7 @@ import { RootState, AppDispatch } from "../../../app/store";
 import { v4 as uuidv4 } from "uuid";
 import { addWorkout } from "../../workout/workoutSlice";
 import styles from "./WorkoutModal.module.css";
-import { PROPS_WORKOUT } from "../../types";
-
-interface MenuSelection {
-  [key: number]: number[]; // タブのインデックスごとに選択されたメニューIDのリストを保持
-}
+import { PROPS_WORKOUT, MENU_SELECTION } from "../../types";
 
 const WorkoutModal = ({
   open,
@@ -28,7 +24,7 @@ const WorkoutModal = ({
 }) => {
   const dispatch: AppDispatch = useDispatch();
   // タブごとに選択されたメニューを保持する
-  const [menuSelections, setMenuSelections] = useState<MenuSelection>({});
+  const [menuSelections, setMenuSelections] = useState<MENU_SELECTION>({});
   // 現在のタブ
   const [currentTab, setCurrentTab] = useState(0);
   // トレーニングメニューのリスト

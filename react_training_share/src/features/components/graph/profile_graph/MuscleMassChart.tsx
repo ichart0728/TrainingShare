@@ -13,7 +13,7 @@ import {
 } from "chart.js";
 import { IconButton } from "@material-ui/core";
 import { ChevronLeft, ChevronRight } from "@material-ui/icons";
-
+import { PROPS_MUSCLE_MASS_CHART } from "../../../types";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -24,26 +24,11 @@ ChartJS.register(
   Tooltip
 );
 
-interface MuscleMassChartProps {
-  muscleMassHistory: { muscleMass: number; date: string }[];
-  selectedMonth: Date;
-  onPreviousMonth: () => void;
-  onNextMonth: () => void;
-  isPreviousMonthDisabled: boolean;
-  isNextMonthDisabled: boolean;
-  maxMuscleMass: number;
-  minMuscleMass: number;
-  onDataPointClick: (date: string, muscleMass: number) => void;
-  selectedDataPoint: string | null;
-}
-
-const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
+const MuscleMassChart: React.FC<PROPS_MUSCLE_MASS_CHART> = ({
   muscleMassHistory,
   selectedMonth,
   onPreviousMonth,
   onNextMonth,
-  isPreviousMonthDisabled,
-  isNextMonthDisabled,
   maxMuscleMass,
   minMuscleMass,
   onDataPointClick,
@@ -131,12 +116,25 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
     }
   };
 
+  const isPreviousMonthDisabled = () => {
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    return selectedMonth <= twelveMonthsAgo;
+  };
+
+  const isNextMonthDisabled = () => {
+    const currentMonth = new Date();
+    currentMonth.setDate(1);
+    currentMonth.setHours(0, 0, 0, 0);
+    return selectedMonth >= currentMonth;
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.chartHeader}>
         <IconButton
           onClick={onPreviousMonth}
-          disabled={isPreviousMonthDisabled}
+          disabled={isPreviousMonthDisabled()}
           className={styles.navigationButton}
         >
           <ChevronLeft />
@@ -149,7 +147,7 @@ const MuscleMassChart: React.FC<MuscleMassChartProps> = ({
         </div>
         <IconButton
           onClick={onNextMonth}
-          disabled={isNextMonthDisabled}
+          disabled={isNextMonthDisabled()}
           className={styles.navigationButton}
         >
           <ChevronRight />

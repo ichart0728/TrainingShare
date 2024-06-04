@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
-import { PROPS_TRAINING_SESSION } from "../../../types";
+import { PRPOPS_WEEKLY_TRAINING_FREQUENCY_CHART } from "../../../types";
 import styles from "./ChartComponent.module.css";
 import { IconButton } from "@material-ui/core";
 import { ChevronLeft, ChevronRight } from "@material-ui/icons";
@@ -14,12 +14,8 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
-interface WeeklyTrainingFrequencyChartProps {
-  trainingSessions: PROPS_TRAINING_SESSION[];
-}
-
 const WeeklyTrainingFrequencyChart: React.FC<
-  WeeklyTrainingFrequencyChartProps
+  PRPOPS_WEEKLY_TRAINING_FREQUENCY_CHART
 > = ({ trainingSessions }) => {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [chartData, setChartData] = useState<any>({
@@ -33,20 +29,6 @@ const WeeklyTrainingFrequencyChart: React.FC<
       },
     ],
   });
-
-  const getOldestMonth = (trainingSessions: PROPS_TRAINING_SESSION[]) => {
-    const allDates = trainingSessions.map((session) => new Date(session.date));
-    return allDates.length > 0
-      ? new Date(Math.min(...allDates.map((date) => date.getTime())))
-      : null;
-  };
-
-  const getLatestMonth = (trainingSessions: PROPS_TRAINING_SESSION[]) => {
-    const allDates = trainingSessions.map((session) => new Date(session.date));
-    return allDates.length > 0
-      ? new Date(Math.max(...allDates.map((date) => date.getTime())))
-      : null;
-  };
 
   const handlePreviousMonth = () => {
     setSelectedMonth((prevMonth) => {
@@ -65,21 +47,16 @@ const WeeklyTrainingFrequencyChart: React.FC<
   };
 
   const isPreviousMonthDisabled = () => {
-    const oldestMonth = getOldestMonth(trainingSessions);
-    return (
-      !oldestMonth ||
-      (oldestMonth.getFullYear() >= selectedMonth.getFullYear() &&
-        oldestMonth.getMonth() >= selectedMonth.getMonth())
-    );
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    return selectedMonth <= twelveMonthsAgo;
   };
 
   const isNextMonthDisabled = () => {
-    const latestMonth = getLatestMonth(trainingSessions);
-    return (
-      !latestMonth ||
-      (latestMonth.getFullYear() <= selectedMonth.getFullYear() &&
-        latestMonth.getMonth() <= selectedMonth.getMonth())
-    );
+    const currentMonth = new Date();
+    currentMonth.setDate(1); // 現在月の1日に設定
+    currentMonth.setHours(0, 0, 0, 0); // 時間を00:00:00にリセット
+    return selectedMonth >= currentMonth;
   };
 
   useEffect(() => {

@@ -2,7 +2,11 @@ import React from "react";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { RootState } from "../../../app/store";
-import { PROPS_TRAINING_SESSION, Training } from "../../types";
+import {
+  PROPS_TRAINING_SESSION,
+  PROPS_TRAINING,
+  PROPS_SELECT_TRAINING_SESSION_MODAL,
+} from "../../types";
 import {
   Dialog,
   DialogTitle,
@@ -17,19 +21,9 @@ import {
 import { ChevronRight as ChevronRightIcon } from "@material-ui/icons";
 import styles from "./SelectTrainingSessionModal.module.css";
 
-interface SelectTrainingSessionModalProps {
-  open: boolean;
-  onClose: () => void;
-  selectedDate: Date | null;
-  onSelectSession: (session: PROPS_TRAINING_SESSION) => void;
-}
-
-const SelectTrainingSessionModal: React.FC<SelectTrainingSessionModalProps> = ({
-  open,
-  onClose,
-  selectedDate,
-  onSelectSession,
-}) => {
+const SelectTrainingSessionModal: React.FC<
+  PROPS_SELECT_TRAINING_SESSION_MODAL
+> = ({ open, onClose, selectedDate, onSelectSession }) => {
   const trainingSessions = useSelector(
     (state: RootState) => state.workoutHistory.trainingSessions
   );
@@ -39,7 +33,7 @@ const SelectTrainingSessionModal: React.FC<SelectTrainingSessionModalProps> = ({
 
   const getTrainingTitle = (
     session: PROPS_TRAINING_SESSION,
-    trainings: Training[]
+    trainings: PROPS_TRAINING[]
   ) => {
     const bodyParts = session.workouts.map((workout) => {
       const training = trainings.find((t) => t.id === workout.body_part);

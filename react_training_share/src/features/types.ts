@@ -176,14 +176,14 @@ export interface PROPS_PROFILE_STATE {
   userPosts: UserPost[];
 }
 
-export interface Training {
+export interface PROPS_TRAINING {
   id: number;
   name: string;
 }
 export interface PROPS_TRAINING_MENU {
   id: number;
   name: string;
-  training_menus: Training[];
+  training_menus: PROPS_TRAINING[];
 }
 
 export interface PROPS_TRAINING_STATE {
@@ -257,4 +257,95 @@ export interface PROPS_WORKOUT_ITEM {
 
 export interface JwtPayload {
   exp: number;
+}
+
+export interface MENU_SELECTION {
+  [key: number]: number[]; // タブのインデックスごとに選択されたメニューIDのリストを保持
+}
+
+export interface PROPS_SELECT_TRAINING_SESSION_MODAL {
+  open: boolean;
+  onClose: () => void;
+  selectedDate: Date | null;
+  onSelectSession: (session: PROPS_TRAINING_SESSION) => void;
+}
+
+export interface PRPOPS_WEEKLY_TRAINING_FREQUENCY_CHART {
+  trainingSessions: PROPS_TRAINING_SESSION[];
+}
+
+export interface PROPS_WEIGHT_CHART {
+  weightHistory: { weight: number; date: string }[];
+  selectedMonth: Date;
+  onPreviousMonth: () => void;
+  onNextMonth: () => void;
+  maxWeight: number;
+  minWeight: number;
+  onDataPointClick: (date: string, weight: number) => void;
+  selectedDataPoint: string | null;
+}
+
+export interface PROPS_MUSCLE_MASS_CHART {
+  muscleMassHistory: { muscleMass: number; date: string }[];
+  selectedMonth: Date;
+  onPreviousMonth: () => void;
+  onNextMonth: () => void;
+  maxMuscleMass: number;
+  minMuscleMass: number;
+  onDataPointClick: (date: string, muscleMass: number) => void;
+  selectedDataPoint: string | null;
+}
+
+export interface PROPS_BODY_FAT_PERCENTAGE_CHART {
+  bodyFatPercentageHistory: { bodyFatPercentage: number; date: string }[];
+  selectedMonth: Date;
+  onPreviousMonth: () => void;
+  onNextMonth: () => void;
+  maxBodyFatPercentage: number;
+  minBodyFatPercentage: number;
+  onDataPointClick: (date: string, bodyFatPercentage: number) => void;
+  selectedDataPoint: string | null;
+}
+
+export interface PROPS_WORKOUT_ITEM_VIEW {
+  workout: PROPS_WORKOUT;
+  trainingSession: PROPS_TRAINING_SESSION;
+  onDelete: (workoutId: string) => void;
+}
+
+export interface PROPS_TIMER {
+  isActive: boolean;
+  isPaused: boolean;
+  hasWorkouts: boolean;
+  onStart: () => void;
+  onPause: () => void;
+  onResume: () => void;
+  onStop: () => void;
+  onSave: () => void;
+  isPlan: boolean;
+}
+
+export interface PROPS_PASR_RECORDS_MODAL {
+  open: boolean;
+  onClose: () => void;
+  menuId: number;
+  pastRecords: PROPS_TRAINING_SESSION[];
+}
+
+export interface PROPS_CONFIRMATION_DIALOG {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  content: string;
+  cancelText: string;
+  confirmText: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+  onDelete?: () => void;
+  deleteText?: string;
+}
+
+export interface PROPS_LOGIN_RESPONSE {
+  access: string;
+  refresh: string;
 }

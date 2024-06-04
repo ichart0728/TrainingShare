@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import { IconButton } from "@material-ui/core";
 import { ChevronLeft, ChevronRight } from "@material-ui/icons";
+import { PROPS_BODY_FAT_PERCENTAGE_CHART } from "../../../types";
 
 ChartJS.register(
   CategoryScale,
@@ -24,26 +25,11 @@ ChartJS.register(
   Tooltip
 );
 
-interface BodyFatPercentageChartProps {
-  bodyFatPercentageHistory: { bodyFatPercentage: number; date: string }[];
-  selectedMonth: Date;
-  onPreviousMonth: () => void;
-  onNextMonth: () => void;
-  isPreviousMonthDisabled: boolean;
-  isNextMonthDisabled: boolean;
-  maxBodyFatPercentage: number;
-  minBodyFatPercentage: number;
-  onDataPointClick: (date: string, bodyFatPercentage: number) => void;
-  selectedDataPoint: string | null;
-}
-
-const BodyFatPercentageChart: React.FC<BodyFatPercentageChartProps> = ({
+const BodyFatPercentageChart: React.FC<PROPS_BODY_FAT_PERCENTAGE_CHART> = ({
   bodyFatPercentageHistory,
   selectedMonth,
   onPreviousMonth,
   onNextMonth,
-  isPreviousMonthDisabled,
-  isNextMonthDisabled,
   maxBodyFatPercentage,
   minBodyFatPercentage,
   onDataPointClick,
@@ -131,12 +117,25 @@ const BodyFatPercentageChart: React.FC<BodyFatPercentageChartProps> = ({
     }
   };
 
+  const isPreviousMonthDisabled = () => {
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    return selectedMonth <= twelveMonthsAgo;
+  };
+
+  const isNextMonthDisabled = () => {
+    const currentMonth = new Date();
+    currentMonth.setDate(1);
+    currentMonth.setHours(0, 0, 0, 0);
+    return selectedMonth >= currentMonth;
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.chartHeader}>
         <IconButton
           onClick={onPreviousMonth}
-          disabled={isPreviousMonthDisabled}
+          disabled={isPreviousMonthDisabled()}
           className={styles.navigationButton}
         >
           <ChevronLeft />
@@ -149,7 +148,7 @@ const BodyFatPercentageChart: React.FC<BodyFatPercentageChartProps> = ({
         </div>
         <IconButton
           onClick={onNextMonth}
-          disabled={isNextMonthDisabled}
+          disabled={isNextMonthDisabled()}
           className={styles.navigationButton}
         >
           <ChevronRight />

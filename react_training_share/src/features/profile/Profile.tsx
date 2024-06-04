@@ -341,62 +341,6 @@ const Profile = () => {
     });
   };
 
-  const isPreviousWeightMonthDisabled = () => {
-    const oldestMonth = getOldestWeightMonth();
-    return (
-      !oldestMonth ||
-      (oldestMonth.getFullYear() >= selectedWeightMonth.getFullYear() &&
-        oldestMonth.getMonth() >= selectedWeightMonth.getMonth())
-    );
-  };
-
-  const isNextWeightMonthDisabled = () => {
-    const latestMonth = getLatestWeightMonth();
-    return (
-      !latestMonth ||
-      (latestMonth.getFullYear() <= selectedWeightMonth.getFullYear() &&
-        latestMonth.getMonth() <= selectedWeightMonth.getMonth())
-    );
-  };
-
-  const isPreviousBodyFatPercentageMonthDisabled = () => {
-    const oldestMonth = getOldestBodyFatPercentageMonth();
-    return (
-      !oldestMonth ||
-      (oldestMonth.getFullYear() >=
-        selectedBodyFatPercentageMonth.getFullYear() &&
-        oldestMonth.getMonth() >= selectedBodyFatPercentageMonth.getMonth())
-    );
-  };
-
-  const isNextBodyFatPercentageMonthDisabled = () => {
-    const latestMonth = getLatestBodyFatPercentageMonth();
-    return (
-      !latestMonth ||
-      (latestMonth.getFullYear() <=
-        selectedBodyFatPercentageMonth.getFullYear() &&
-        latestMonth.getMonth() <= selectedBodyFatPercentageMonth.getMonth())
-    );
-  };
-
-  const isPreviousMuscleMassMonthDisabled = () => {
-    const oldestMonth = getOldestMuscleMassMonth();
-    return (
-      !oldestMonth ||
-      (oldestMonth.getFullYear() >= selectedMuscleMassMonth.getFullYear() &&
-        oldestMonth.getMonth() >= selectedMuscleMassMonth.getMonth())
-    );
-  };
-
-  const isNextMuscleMassMonthDisabled = () => {
-    const latestMonth = getLatestMuscleMassMonth();
-    return (
-      !latestMonth ||
-      (latestMonth.getFullYear() <= selectedMuscleMassMonth.getFullYear() &&
-        latestMonth.getMonth() <= selectedMuscleMassMonth.getMonth())
-    );
-  };
-
   // Render Function
   if (isLoading) {
     return (
@@ -439,8 +383,6 @@ const Profile = () => {
                   selectedMonth={selectedWeightMonth}
                   onPreviousMonth={handlePreviousWeightMonth}
                   onNextMonth={handleNextWeightMonth}
-                  isPreviousMonthDisabled={isPreviousWeightMonthDisabled()}
-                  isNextMonthDisabled={isNextWeightMonthDisabled()}
                   maxWeight={maxWeight}
                   minWeight={minWeight}
                   onDataPointClick={handleWeightDataPointClick}
@@ -508,8 +450,6 @@ const Profile = () => {
                   selectedMonth={selectedBodyFatPercentageMonth}
                   onPreviousMonth={handlePreviousBodyFatPercentageMonth}
                   onNextMonth={handleNextBodyFatPercentageMonth}
-                  isPreviousMonthDisabled={isPreviousBodyFatPercentageMonthDisabled()}
-                  isNextMonthDisabled={isNextBodyFatPercentageMonthDisabled()}
                   maxBodyFatPercentage={maxBodyFatPercentage}
                   minBodyFatPercentage={minBodyFatPercentage}
                   onDataPointClick={handleBodyFatPercentageDataPointClick}
@@ -579,8 +519,6 @@ const Profile = () => {
                   selectedMonth={selectedMuscleMassMonth}
                   onPreviousMonth={handlePreviousMuscleMassMonth}
                   onNextMonth={handleNextMuscleMassMonth}
-                  isPreviousMonthDisabled={isPreviousMuscleMassMonthDisabled()}
-                  isNextMonthDisabled={isNextMuscleMassMonthDisabled()}
                   maxMuscleMass={maxMuscleMass}
                   minMuscleMass={minMuscleMass}
                   onDataPointClick={handleMuscleMassDataPointClick}

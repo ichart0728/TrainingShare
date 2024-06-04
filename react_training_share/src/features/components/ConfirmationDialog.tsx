@@ -7,21 +7,9 @@ import {
   DialogTitle,
   Button,
 } from "@material-ui/core";
+import { PROPS_CONFIRMATION_DIALOG } from "../types";
 
-interface ConfirmationDialogProps {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  content: string;
-  cancelText: string;
-  confirmText: string;
-  onCancel: () => void;
-  onConfirm: () => void;
-  onDelete?: () => void;
-  deleteText?: string;
-}
-
-const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
+const ConfirmationDialog: React.FC<PROPS_CONFIRMATION_DIALOG> = ({
   open,
   onClose,
   title,

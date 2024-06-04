@@ -24,7 +24,7 @@ import {
   removeWorkout,
 } from "../workout/workoutSlice";
 import { AppDispatch } from "../../app/store";
-import { PROPS_WORKOUT_ITEM, Training } from "../types";
+import { PROPS_WORKOUT_ITEM, PROPS_TRAINING } from "../types";
 
 const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
   const dispatch: AppDispatch = useDispatch();
@@ -68,7 +68,7 @@ const WorkoutItemEdit: React.FC<PROPS_WORKOUT_ITEM> = ({ workout, isPlan }) => {
     trainingMenus
       .find((menu) => menu.id === workout.body_part)
       ?.training_menus.find(
-        (training_menu: Training) => training_menu.id === workout.menu
+        (training_menu: PROPS_TRAINING) => training_menu.id === workout.menu
       )?.name ?? "";
 
   const handleCloseDeleteModal = () => {

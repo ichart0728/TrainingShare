@@ -13,7 +13,7 @@ import {
   IconButton,
   TextField,
 } from "@material-ui/core";
-import { PROPS_TRAINING_SESSION, Training } from "../types";
+import { PROPS_PASR_RECORDS_MODAL } from "../types";
 import styles from "./PastRecordsModal.module.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
@@ -21,14 +21,7 @@ import { ChevronLeft, ChevronRight } from "@material-ui/icons";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { ja } from "date-fns/locale";
 
-interface PastRecordsModalProps {
-  open: boolean;
-  onClose: () => void;
-  menuId: number;
-  pastRecords: PROPS_TRAINING_SESSION[];
-}
-
-const PastRecordsModal: React.FC<PastRecordsModalProps> = ({
+const PastRecordsModal: React.FC<PROPS_PASR_RECORDS_MODAL> = ({
   open,
   onClose,
   menuId,

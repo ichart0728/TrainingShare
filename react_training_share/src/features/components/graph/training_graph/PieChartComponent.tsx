@@ -16,20 +16,6 @@ const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
 }) => {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
-  const getOldestMonth = (trainingSessions: PROPS_TRAINING_SESSION[]) => {
-    const allDates = trainingSessions.map((session) => new Date(session.date));
-    return allDates.length > 0
-      ? new Date(Math.min(...allDates.map((date) => date.getTime())))
-      : null;
-  };
-
-  const getLatestMonth = (trainingSessions: PROPS_TRAINING_SESSION[]) => {
-    const allDates = trainingSessions.map((session) => new Date(session.date));
-    return allDates.length > 0
-      ? new Date(Math.max(...allDates.map((date) => date.getTime())))
-      : null;
-  };
-
   const handlePreviousMonth = () => {
     setSelectedMonth((prevMonth) => {
       const newMonth = new Date(prevMonth);
@@ -47,22 +33,18 @@ const PieChartComponent: React.FC<PROPS_PIE_CHART> = ({
   };
 
   const isPreviousMonthDisabled = () => {
-    const oldestMonth = getOldestMonth(trainingSessions);
-    return (
-      !oldestMonth ||
-      (oldestMonth.getFullYear() >= selectedMonth.getFullYear() &&
-        oldestMonth.getMonth() >= selectedMonth.getMonth())
-    );
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    return selectedMonth <= twelveMonthsAgo;
   };
 
   const isNextMonthDisabled = () => {
-    const latestMonth = getLatestMonth(trainingSessions);
-    return (
-      !latestMonth ||
-      (latestMonth.getFullYear() <= selectedMonth.getFullYear() &&
-        latestMonth.getMonth() <= selectedMonth.getMonth())
-    );
+    const currentMonth = new Date();
+    currentMonth.setDate(1); // 現在月の1日に設定
+    currentMonth.setHours(0, 0, 0, 0); // 時間を00:00:00にリセット
+    return selectedMonth >= currentMonth;
   };
+
   // 各トレーニングメニューごとの集計データを計算する
   // 選択した月のデータを集計
   const calculateData = () => {

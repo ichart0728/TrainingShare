@@ -8,20 +8,9 @@ import {
   selectTimerActive,
 } from "../workout/timerSlice";
 import { RootState } from "../../app/store";
+import { PROPS_TIMER } from "../types";
 
-interface TimerProps {
-  isActive: boolean;
-  isPaused: boolean;
-  hasWorkouts: boolean;
-  onStart: () => void;
-  onPause: () => void;
-  onResume: () => void;
-  onStop: () => void;
-  onSave: () => void;
-  isPlan: boolean;
-}
-
-const Timer: React.FC<TimerProps> = ({
+const Timer: React.FC<PROPS_TIMER> = ({
   isActive,
   isPaused,
   hasWorkouts,

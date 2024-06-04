@@ -16,16 +16,10 @@ import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import { AppDispatch } from "../../app/store";
 
-import { PROPS_WORKOUT, Training, PROPS_TRAINING_SESSION } from "../types";
+import { PROPS_TRAINING, PROPS_WORKOUT_ITEM_VIEW } from "../types";
 import { fetchAsyncDeleteTrainingRecord } from "../api/workoutApi";
 
-interface WorkoutItemViewProps {
-  workout: PROPS_WORKOUT;
-  trainingSession: PROPS_TRAINING_SESSION;
-  onDelete: (workoutId: string) => void;
-}
-
-const WorkoutItemView: React.FC<WorkoutItemViewProps> = ({
+const WorkoutItemView: React.FC<PROPS_WORKOUT_ITEM_VIEW> = ({
   workout,
   trainingSession,
   onDelete,
@@ -48,7 +42,8 @@ const WorkoutItemView: React.FC<WorkoutItemViewProps> = ({
   const menuName = trainingMenus
     .find((menu) => Number(menu.id) === workout.body_part)
     ?.training_menus.find(
-      (training_menu: Training) => training_menu.id === Number(workout.menu)
+      (training_menu: PROPS_TRAINING) =>
+        training_menu.id === Number(workout.menu)
     )?.name;
 
   // 完了したセットの総ボリュームを計算

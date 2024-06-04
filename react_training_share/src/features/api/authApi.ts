@@ -4,18 +4,12 @@ import {
   PROPS_AUTHEN,
   PROPS_PUT_PROFILE,
   PROPS_NICKNAME,
-  JwtPayload,
+  PROPS_LOGIN_RESPONSE,
 } from "../types";
-import { checkTokenExpiryAndRefresh } from "./apiUtils";
 import Cookies from "universal-cookie";
 
 const apiUrl = process.env.REACT_APP_DEV_API_URL;
 const cookies = new Cookies();
-
-interface LoginResponse {
-  access: string;
-  refresh: string;
-}
 
 export const fetchToken = async (email: string, password: string) => {
   const res = await axios.post(
@@ -32,18 +26,18 @@ export const fetchToken = async (email: string, password: string) => {
 };
 
 /*JWTトークン取得*/
-export const fetchAsyncLogin = createAsyncThunk<LoginResponse, PROPS_AUTHEN>(
-  "auth/post",
-  async (authen: PROPS_AUTHEN) => {
-    const res = await axios.post(`${apiUrl}authen/jwt/create`, authen, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // withCredentials: true,
-    });
-    return res.data;
-  }
-);
+export const fetchAsyncLogin = createAsyncThunk<
+  PROPS_LOGIN_RESPONSE,
+  PROPS_AUTHEN
+>("auth/post", async (authen: PROPS_AUTHEN) => {
+  const res = await axios.post(`${apiUrl}authen/jwt/create`, authen, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    // withCredentials: true,
+  });
+  return res.data;
+});
 
 /*ユーザー新規作成*/
 export const fetchAsyncRegister = createAsyncThunk(

@@ -6,7 +6,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { RootState } from "../../app/store";
 import WorkoutItemView from "../components/WorkoutItemView";
 import SelectTrainingSessionModal from "../components/modal/SelectTrainingSessionModal";
-import { PROPS_TRAINING_SESSION, Training } from "../types";
+import { PROPS_TRAINING_SESSION, PROPS_TRAINING } from "../types";
 import { Button, Typography } from "@material-ui/core";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import { fetchAsyncDeleteTrainingSession } from "../api/workoutApi";
@@ -51,7 +51,7 @@ const CalendarScreen = () => {
 
   const getTrainingTitle = (
     session: PROPS_TRAINING_SESSION,
-    trainings: Training[]
+    trainings: PROPS_TRAINING[]
   ) => {
     const bodyParts = session.workouts.map((workout) => {
       const training = trainings.find((t) => t.id === workout.body_part);

@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import { IconButton } from "@material-ui/core";
 import { ChevronLeft, ChevronRight } from "@material-ui/icons";
+import { PROPS_WEIGHT_CHART } from "../../../types";
 
 ChartJS.register(
   CategoryScale,
@@ -24,26 +25,11 @@ ChartJS.register(
   Tooltip
 );
 
-interface WeightChartProps {
-  weightHistory: { weight: number; date: string }[];
-  selectedMonth: Date;
-  onPreviousMonth: () => void;
-  onNextMonth: () => void;
-  isPreviousMonthDisabled: boolean;
-  isNextMonthDisabled: boolean;
-  maxWeight: number;
-  minWeight: number;
-  onDataPointClick: (date: string, weight: number) => void;
-  selectedDataPoint: string | null;
-}
-
-const WeightChart: React.FC<WeightChartProps> = ({
+const WeightChart: React.FC<PROPS_WEIGHT_CHART> = ({
   weightHistory,
   selectedMonth,
   onPreviousMonth,
   onNextMonth,
-  isPreviousMonthDisabled,
-  isNextMonthDisabled,
   maxWeight,
   minWeight,
   onDataPointClick,
@@ -131,12 +117,25 @@ const WeightChart: React.FC<WeightChartProps> = ({
     }
   };
 
+  const isPreviousMonthDisabled = () => {
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    return selectedMonth <= twelveMonthsAgo;
+  };
+
+  const isNextMonthDisabled = () => {
+    const currentMonth = new Date();
+    currentMonth.setDate(1);
+    currentMonth.setHours(0, 0, 0, 0);
+    return selectedMonth >= currentMonth;
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.chartHeader}>
         <IconButton
           onClick={onPreviousMonth}
-          disabled={isPreviousMonthDisabled}
+          disabled={isPreviousMonthDisabled()}
           className={styles.navigationButton}
         >
           <ChevronLeft />
@@ -149,7 +148,7 @@ const WeightChart: React.FC<WeightChartProps> = ({
         </div>
         <IconButton
           onClick={onNextMonth}
-          disabled={isNextMonthDisabled}
+          disabled={isNextMonthDisabled()}
           className={styles.navigationButton}
         >
           <ChevronRight />
