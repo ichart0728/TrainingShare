@@ -47,7 +47,6 @@ export const fetchAsyncRegister = createAsyncThunk(
       const res = await axios.post(`${apiUrl}api/register/`, auth, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `JWT ${cookies.get("accesstoken")}`,
         },
         withCredentials: true,
       });
