@@ -95,7 +95,7 @@ const SignInModal: React.FC = () => {
         >
           {({ errors, touched, isValid }) => (
             <Form className={styles.formContainer}>
-              <h1 className={styles.authTitle}>Training Share</h1>
+              <h1 className={styles.authTitle}>FitTracker</h1>
               <div className={styles.authProgress}>
                 {isLoadingAuth && <CircularProgress />}
               </div>

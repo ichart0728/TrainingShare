@@ -277,7 +277,7 @@ const Sidebar = () => {
         }}
       >
         <div className={styles.drawerHeader}>
-          <h1 className={styles.sidebar_title}>Training Share</h1>
+          <h1 className={styles.sidebar_title}>FitTracker</h1>
         </div>
         {sidebarContent}
       </Drawer>

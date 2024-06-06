@@ -60,7 +60,7 @@ const NewPost: React.FC = () => {
         style={customStyles}
       >
         <form className={styles.core_signUp}>
-          <h1 className={styles.core_title}>Training Share</h1>
+          <h1 className={styles.core_title}>FitTracker</h1>
 
           <br />
           <TextField
