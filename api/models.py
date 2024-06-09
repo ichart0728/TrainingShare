@@ -87,12 +87,17 @@ class UserManager(BaseUserManager):
         return admin_user
 
 # ユーザーテーブル (User) のモデル
-# ユーザーテーブル (User) のモデル
 class User(AbstractBaseUser, PermissionsMixin):
     # ユーザーID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # メールアドレス
     email = models.EmailField(max_length=254, unique=True)
+    # ソーシャルログインを使用しているかどうか
+    is_social_login = models.BooleanField(default=False)
+    # ソーシャルログインのプロバイダ
+    social_login_provider = models.CharField(max_length=20, null=True, blank=True)
+    # ソーシャルログインのユーザーID
+    social_login_uid = models.CharField(max_length=100, null=True, blank=True)
     # ユーザーがアクティブかどうか
     is_active = models.BooleanField(default=True)
     # ユーザーがスタッフかどうか
@@ -104,6 +109,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
 
 # プロフィールテーブル (Profile) のモデル
 class Profile(models.Model):

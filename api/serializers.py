@@ -1,55 +1,7 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from datetime import timedelta
 
 from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingSession, TrainingRecord, TrainingSet, WeightHistory, BodyFatPercentageHistory, MuscleMassHistory
-from djoser.serializers import TokenCreateSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.contrib.auth import authenticate
-
-class CustomTokenCreateSerializer(TokenCreateSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        refresh = RefreshToken.for_user(self.user)
-        data['refresh'] = str(refresh)
-        data['access'] = str(refresh.access_token)
-        return data
-
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        return token
-
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        refresh = self.get_token(self.user)
-        data['refresh'] = str(refresh)
-        data['access'] = str(refresh.access_token)
-        return data
-
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        # 現在アクティブなユーザーを取得
-        model = get_user_model()
-        fields = ('id', 'email', 'password')
-        # クライアントからパスワードを参照できないように書き込み専用で設定
-        extra_kwargs = {'password': {'write_only': True}, 'id': {'read_only': True}}
-
-    def create(self, validated_data):
-        '''
-        バリデーションを通過したデータに対して、ユーザーを作成する
-        :params: validated_data
-            ユーザーが入力したメールアドレス
-
-        :return: user
-            作成したユーザーのインスタンス
-        '''
-        user = get_user_model().objects.create_user(**validated_data)
-        return user
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -63,6 +15,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'nickName', 'userProfile', 'created_on', 'img', 'gender', 'height', 'dateOfBirth', 'weightHistory', 'bodyFatPercentageHistory', 'muscleMassHistory')
         extra_kwargs = {'userProfile': {'read_only': True}}
 
+
     def get_weightHistory(self, obj):
         weightHistory = WeightHistory.objects.filter(profile=obj).order_by('date')[:365]
         return WeightHistorySerializer(weightHistory, many=True).data
@@ -75,20 +28,24 @@ class ProfileSerializer(serializers.ModelSerializer):
         muscleMassHistory = MuscleMassHistory.objects.filter(profile=obj).order_by('date')[:365]
         return MuscleMassHistorySerializer(muscleMassHistory, many=True).data
 
+
 class WeightHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = WeightHistory
         fields = ('weight', 'date')
+
 
 class BodyFatPercentageHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = BodyFatPercentageHistory
         fields = ('bodyFatPercentage', 'date')
 
+
 class MuscleMassHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = MuscleMassHistory
         fields = ('muscleMass', 'date')
+
 
 class PostSerializer(serializers.ModelSerializer):
 
@@ -113,6 +70,7 @@ class TrainingMenuSerializer(serializers.ModelSerializer):
         model = TrainingMenu
         fields = ('id', 'name')
 
+
 # BodyPartモデルのシリアライザー
 class BodyPartSerializer(serializers.ModelSerializer):
     training_menus = TrainingMenuSerializer(many=True, read_only=True)
@@ -120,6 +78,7 @@ class BodyPartSerializer(serializers.ModelSerializer):
     class Meta:
         model = BodyPart
         fields = ('id', 'name', 'training_menus')
+
 
 # TrainingSetモデルのシリアライザー
 class TrainingSetSerializer(serializers.ModelSerializer):
@@ -140,12 +99,14 @@ class TrainingSetSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Weight must be a non-negative number.")
         return value
 
+
 class TrainingRecordSerializer(serializers.ModelSerializer):
     sets = TrainingSetSerializer(many=True)
 
     class Meta:
         model = TrainingRecord
         fields = ['id', 'menu', 'body_part', 'sets', 'memo']  # memoを追加
+
 
 class TrainingSessionSerializer(serializers.ModelSerializer):
     workouts = TrainingRecordSerializer(many=True)

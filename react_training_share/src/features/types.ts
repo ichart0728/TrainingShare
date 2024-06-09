@@ -240,6 +240,10 @@ export interface PROPS_AUTH_STATE {
   openSignIn: boolean;
   /*サインアップ用モーダル管理*/
   openSignUp: boolean;
+  /*パスワードリセット用モーダル管理*/
+  openForgotPassword: boolean;
+  /*パスワードリセット確認用モーダル管理*/
+  openForgotPasswordConfirmation: boolean;
   /*プロフィール用モーダル管理*/
   openProfile: boolean;
   /*ローディグ管理*/

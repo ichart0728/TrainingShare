@@ -6,9 +6,14 @@ import styles from "./Modal.module.css";
 import Modal from "react-modal";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import { TextField, Button, CircularProgress } from "@material-ui/core";
-// import { fetchAsyncGetPosts } from "../../api/postApi";
-// import { fetchAsyncGetComments } from "../../api/commentApi";
+import {
+  TextField,
+  Button,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+} from "@material-ui/core";
+import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { fetchAsyncGetTrainingMenus } from "../../api/trainingMenuApi";
 import { fetchAsyncGetTrainingSessions } from "../../api/workoutApi";
 import { useCookies } from "react-cookie";
@@ -18,13 +23,13 @@ import {
   selectIsLoadingAuth,
   selectOpenSignIn,
   setOpenSignUp,
+  setOpenForgotPassword,
   resetOpenSignIn,
   fetchCredStart,
   fetchCredEnd,
 } from "../../auth/authSlice";
 import {
-  fetchToken,
-  fetchAsyncLogin,
+  fetchAsyncSignInFirebase,
   fetchAsyncGetProfs,
   fetchAsyncGetMyProf,
 } from "../../api/authApi";
@@ -37,14 +42,17 @@ const SignInModal: React.FC = () => {
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
   const [loginError, setLoginError] = useState("");
   const [cookies, setCookie] = useCookies();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <Modal
       isOpen={openSignIn}
-      onRequestClose={async () => {
-        await dispatch(resetOpenSignIn());
-        setLoginError("");
-      }}
+      onRequestClose={() => {}}
+      shouldCloseOnOverlayClick={false}
       className={styles.modal}
       overlayClassName={styles.modalOverlay}
     >
@@ -54,76 +62,90 @@ const SignInModal: React.FC = () => {
           initialValues={{ email: "", password: "" }}
           onSubmit={async (values) => {
             await dispatch(fetchCredStart());
-            try {
-              const { access, refresh } = await fetchToken(
-                values.email,
-                values.password
-              );
-              const decoded: JwtPayload = jwtDecode(access);
-              const expiryDate = new Date(decoded.exp * 1000);
+            const resultSignIn = await dispatch(
+              fetchAsyncSignInFirebase(values)
+            );
 
-              // クッキーにJWTトークンを保存
-              setCookie("accesstoken", access, {
-                path: "/",
-                expires: expiryDate,
-              });
-              setCookie("refreshtoken", refresh, {
-                path: "/",
-                expires: expiryDate,
-              });
-
+            if (fetchAsyncSignInFirebase.fulfilled.match(resultSignIn)) {
               await dispatch(fetchAsyncGetProfs());
-              // await dispatch(fetchAsyncGetPosts());
-              // await dispatch(fetchAsyncGetComments());
               await dispatch(fetchAsyncGetMyProf());
               await dispatch(fetchAsyncGetMyProf());
               await dispatch(fetchAsyncGetTrainingMenus());
               await dispatch(fetchAsyncGetTrainingSessions());
               await dispatch(resetOpenSignIn());
               navigate("/workout_history");
-            } catch (error) {
-              setLoginError("Invalid email or password");
+            } else {
+              if (
+                resultSignIn.payload &&
+                (resultSignIn.payload as { error: string }).error
+              ) {
+                setLoginError(
+                  (resultSignIn.payload as { error: string }).error
+                );
+              } else {
+                setLoginError("サインイン中に予期しないエラーが発生しました。");
+              }
             }
             await dispatch(fetchCredEnd());
           }}
           validationSchema={Yup.object().shape({
             email: Yup.string()
-              .email("email format is wrong")
-              .required("email is must"),
-            password: Yup.string().required("password is must").min(4),
+              .email("メールアドレスの形式が正しくありません。")
+              .required("メールアドレスは必須です。"),
+            password: Yup.string()
+              .required("パスワードは必須です。")
+              .min(6, "パスワードは6文字以上で入力してください。"),
           })}
         >
-          {({ errors, touched, isValid }) => (
+          {({ errors, touched, isValid, handleChange }) => (
             <Form className={styles.formContainer}>
               <h1 className={styles.authTitle}>FitTracker</h1>
+              <div className={styles.authError}>{loginError}</div>
               <div className={styles.authProgress}>
                 {isLoadingAuth && <CircularProgress />}
               </div>
               <Field
                 as={TextField}
-                placeholder="email"
+                placeholder="メールアドレス"
                 type="input"
                 name="email"
                 fullWidth
                 margin="normal"
+                error={touched.email && errors.email !== undefined}
+                helperText={touched.email && errors.email ? errors.email : " "}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleChange(e);
+                  setLoginError("");
+                }}
               />
-              {touched.email && errors.email && (
-                <div className={styles.authError}>{errors.email}</div>
-              )}
               <Field
                 as={TextField}
-                placeholder="password"
-                type="password"
+                placeholder="パスワード"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 fullWidth
                 margin="normal"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                      >
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                error={touched.password && errors.password !== undefined}
+                helperText={
+                  touched.password && errors.password ? errors.password : " "
+                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleChange(e);
+                  setLoginError("");
+                }}
               />
-              {touched.password && errors.password && (
-                <div className={styles.authError}>{errors.password}</div>
-              )}
-              {loginError && (
-                <div className={styles.authError}>{loginError}</div>
-              )}
               <Button
                 variant="contained"
                 color="primary"
@@ -132,17 +154,28 @@ const SignInModal: React.FC = () => {
                 fullWidth
                 style={{ marginTop: "20px" }}
               >
-                Login
+                ログイン
               </Button>
               <span
                 className={styles.authText}
                 onClick={async () => {
                   await dispatch(resetOpenSignIn());
                   await dispatch(setOpenSignUp());
+                  setLoginError("");
                 }}
                 style={{ marginTop: "20px" }}
               >
-                You don't have an account?
+                アカウントをお持ちでない方はこちら
+              </span>
+              <span
+                className={styles.forgotPassword}
+                onClick={async () => {
+                  await dispatch(resetOpenSignIn());
+                  await dispatch(setOpenForgotPassword());
+                  setLoginError("");
+                }}
+              >
+                パスワードをお忘れの方はこちら
               </span>
             </Form>
           )}

@@ -15,10 +15,9 @@ router.register('body-fat-percentage-history', views.BodyFatPercentageHistoryVie
 router.register('muscle-mass-history', views.MuscleMassHistoryViewSet)
 
 urlpatterns = [
-    path('register/', views.CreateUserView.as_view(), name='register'),
+    path('firebase-register/', views.FirebaseRegisterView.as_view(), name='firebase_register'),
     path('posts/<uuid:user_id>/', views.PostListView.as_view(), name='user-posts'),
     path('training-menus/', views.BodyPartWithMenusView.as_view(), name='training-menus'),
     path('my-training-sessions/', views.TrainingSessionListView.as_view(), name='my-trainings'),
-    path('token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('', include(router.urls)),
 ]

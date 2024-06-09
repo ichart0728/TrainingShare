@@ -11,15 +11,19 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
-from datetime import timedelta
-import os
 import environ
+import firebase_admin
+from firebase_admin import credentials
 
 env = environ.Env()
 env.read_env('.env')
 
 # SECRET_KEY = env('SECRET_KEY')
 # DEBUG = env('DEBUG')
+
+# Firebase Admin SDK の初期化
+cred = credentials.Certificate(env('FIREBASE_ADMIN_SDK_PATH'))
+firebase_admin.initialize_app(cred)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,26 +51,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'djoser',
     'api.apps.ApiConfig',
-    'corsheaders'
+    'corsheaders',
+    'firebase_admin',
 ]
-
-DJOSER = {
-    'TOKEN_MODEL': None,  # デフォルトのトークンモデルを使用しない
-    'SERIALIZERS': {
-        'token_create': 'api.serializers.CustomTokenCreateSerializer',
-    },
-    'COOKIE': 'access_token',  # アクセストークンを保存するクッキー名
-    'COOKIE_REFRESH': 'refresh_token',  # リフレッシュトークンを保存するクッキー名
-    'COOKIE_HTTPONLY': True,  # クッキーをHTTPOnlyにする
-    'COOKIE_SECURE': False,  # 本番環境ではTrueにする
-    'COOKIE_SAMESITE': 'Lax',  # SameSiteの設定
-    'COOKIE_PATH': '/',  # クッキーのパス
-    'COOKIE_DOMAIN': None,  # クッキーのドメイン
-    'COOKIE_REFRESH_PATH': '/authen/jwt/refresh/',  # リフレッシュトークンのパス
-}
-
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -107,23 +95,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 REST_FRAMEWORK = {
-    # 認証されたユーザーのみ画面表示されるように設定
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    # JWTで認証を行うように設定
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.FirebaseAuthentication',
     ],
-}
-
-# JWTの設定
-SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('JWT',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
 }
 
 

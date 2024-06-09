@@ -1,96 +1,82 @@
 from rest_framework import generics, viewsets, status
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
 from django.utils import timezone
 import datetime
 from . import serializers
-from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession, WeightHistory, BodyFatPercentageHistory, MuscleMassHistory
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.conf import settings
-from rest_framework import status
-from rest_framework.response import Response
+from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession, WeightHistory, BodyFatPercentageHistory, MuscleMassHistory, User
 from rest_framework.views import APIView
+from firebase_admin import auth
 from rest_framework.permissions import AllowAny
-from . import serializers
 
-
-class CustomTokenObtainPairView(APIView):
-    permission_classes = (AllowAny,)
-    serializer_class = serializers.CustomTokenObtainPairSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        refresh = serializer.validated_data['refresh']
-        access = serializer.validated_data['access']
-
-        response = Response()
-        response.set_cookie(
-            key='refresh_token',
-            value=refresh,
-            httponly=True,
-            secure=settings.DJOSER['COOKIE_SECURE'],
-            samesite=settings.DJOSER['COOKIE_SAMESITE'],
-            max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
-            expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
-            path=settings.DJOSER['COOKIE_REFRESH_PATH'],
-        )
-        response.set_cookie(
-            key='access_token',
-            value=access,
-            httponly=True,
-            secure=settings.DJOSER['COOKIE_SECURE'],
-            samesite=settings.DJOSER['COOKIE_SAMESITE'],
-            max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
-            expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
-            path=settings.DJOSER['COOKIE_PATH'],
-        )
-        response.data = {'refresh': refresh, 'access': access}
-        return response
-
-
-# 新規ユーザー作成用View
-class CreateUserView(generics.CreateAPIView):
-    serializer_class = serializers.UserSerializer
-    permission_classes = (AllowAny,)
+class FirebaseRegisterView(APIView):
+    permission_classes = [AllowAny,]
+    def post(self, request):
+        id_token = request.data.get('token')
+        try:
+            decoded_token = auth.verify_id_token(id_token)
+            uid = decoded_token['uid']
+            email = decoded_token['email']
+            name = decoded_token.get('name', '')
+            user, created = User.objects.get_or_create(email=email, defaults={
+                'social_login_uid': uid,
+                'social_login_provider': 'firebase'
+            })
+            return Response({'message': 'User registered successfully'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(userProfile=self.request.user)
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user, created = User.objects.get_or_create(email=firebase_user['email'], defaults={
+            'social_login_uid': firebase_user['uid'],
+            'social_login_provider': 'firebase'
+        })
+        serializer.save(userProfile=user)
 
     def perform_update(self, serializer):
-        serializer.save(userProfile=self.request.user)
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        serializer.save(userProfile=user)
 
     def get_queryset(self):
-        return self.queryset.filter(userProfile=self.request.user)
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        return self.queryset.filter(userProfile=user)
+
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(userPost=self.request.user)
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        serializer.save(userPost=user)
+
 
 class PostListView(generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
 
     def get_queryset(self):
-        return self.queryset.filter(userPost=self.kwargs['user_id'])
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        return self.queryset.filter(userPost=user)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = serializers.CommentSerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(userComment=self.request.user)
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        serializer.save(userComment=user)
+
 
 class BodyPartWithMenusView(generics.ListAPIView):
     queryset = BodyPart.objects.all().prefetch_related('training_menus')
@@ -99,10 +85,10 @@ class BodyPartWithMenusView(generics.ListAPIView):
     def get_queryset(self):
         return self.queryset.prefetch_related('training_menus')
 
+
 class TrainingRecordViewSet(viewsets.ModelViewSet):
     queryset = TrainingRecord.objects.all()
     serializer_class = serializers.TrainingRecordSerializer
-    permission_classes = [IsAuthenticated]
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -112,10 +98,10 @@ class TrainingRecordViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.delete()
 
+
 class TrainingSessionViewSet(viewsets.ModelViewSet):
     queryset = TrainingSession.objects.all()
     serializer_class = serializers.TrainingSessionSerializer
-    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         print("Request data:", request.data)  # デバッグ情報を追加
@@ -131,27 +117,31 @@ class TrainingSessionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         print("Performing create with data:", serializer.validated_data)  # デバッグ情報を追加
-        serializer.save(user=self.request.user)
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        serializer.save(user=user)
         print("Creation successful")
 
 
 class TrainingSessionListView(generics.ListAPIView):
     serializer_class = serializers.TrainingSessionSerializer
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
         six_months_ago = timezone.now() - datetime.timedelta(days=180)
         return TrainingSession.objects.filter(user=user, date__gte=six_months_ago).prefetch_related('workouts__sets')
+
 
 class WeightHistoryViewSet(viewsets.ModelViewSet):
     queryset = WeightHistory.objects.all()
     serializer_class = serializers.WeightHistorySerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         date = serializer.validated_data['date']
-        profile = self.request.user.userProfile
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        profile = user.userProfile
         weight_history, created = WeightHistory.objects.update_or_create(
             profile=profile,
             date=date,
@@ -159,16 +149,20 @@ class WeightHistoryViewSet(viewsets.ModelViewSet):
         )
 
     def get_queryset(self):
-        return self.queryset.filter(profile=self.request.user.userProfile)
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        return self.queryset.filter(profile=user.userProfile)
+
 
 class BodyFatPercentageHistoryViewSet(viewsets.ModelViewSet):
     queryset = BodyFatPercentageHistory.objects.all()
     serializer_class = serializers.BodyFatPercentageHistorySerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         date = serializer.validated_data['date']
-        profile = self.request.user.userProfile
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        profile = user.userProfile
         body_fat_percentage_history, created = BodyFatPercentageHistory.objects.update_or_create(
             profile=profile,
             date=date,
@@ -176,16 +170,20 @@ class BodyFatPercentageHistoryViewSet(viewsets.ModelViewSet):
         )
 
     def get_queryset(self):
-        return self.queryset.filter(profile=self.request.user.userProfile)
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        return self.queryset.filter(profile=user.userProfile)
+
 
 class MuscleMassHistoryViewSet(viewsets.ModelViewSet):
     queryset = MuscleMassHistory.objects.all()
     serializer_class = serializers.MuscleMassHistorySerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         date = serializer.validated_data['date']
-        profile = self.request.user.userProfile
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        profile = user.userProfile
         muscle_mass_history, created = MuscleMassHistory.objects.update_or_create(
             profile=profile,
             date=date,
@@ -193,4 +191,6 @@ class MuscleMassHistoryViewSet(viewsets.ModelViewSet):
         )
 
     def get_queryset(self):
-        return self.queryset.filter(profile=self.request.user.userProfile)
+        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
+        user = User.objects.get(email=firebase_user['email'])
+        return self.queryset.filter(profile=user.userProfile)

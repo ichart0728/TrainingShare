@@ -10,7 +10,7 @@
   border-radius: 4px;
   outline: none;
   width: 280px;
-  height: 350px;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,12 +31,14 @@
 .authTitle {
   font-weight: bold;
   text-align: center;
+  margin-bottom: 20px;
 }
 
 .authError {
   color: red;
   text-align: center;
   margin: 10px;
+  height: 20px;
 }
 
 .authProgress {
@@ -55,4 +57,20 @@
 
 .formContainer {
   width: 100%;
+}
+
+.socialLoginContainer {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.forgotPassword {
+  color: rgb(6, 153, 211);
+  text-align: center;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-top: 20px;
 }

@@ -6,6 +6,7 @@ import {
   fetchAsyncGetMyProf,
   fetchAsyncGetProfs,
   fetchAsyncUpdateProf,
+  fetchAsyncSendPasswordResetEmail,
 } from "../api/authApi";
 
 import { PROPS_AUTH_STATE } from "../types";
@@ -16,6 +17,10 @@ const initialState: PROPS_AUTH_STATE = {
   openSignUp: false,
   /*プロフィール用モーダル管理*/
   openProfile: false,
+  /*パスワードリセット用モーダル管理*/
+  openForgotPassword: false,
+  /*パスワードリセット確認用モーダル管理*/
+  openForgotPasswordConfirmation: false,
   /*ローディグ管理*/
   isLoadingAuth: false,
   /*ログインユーザーの状態*/
@@ -46,7 +51,19 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    /*ローディグ管理の制御*/
+    /* ... */
+    setOpenForgotPassword(state) {
+      state.openForgotPassword = true;
+    },
+    resetOpenForgotPassword(state) {
+      state.openForgotPassword = false;
+    },
+    setOpenForgotPasswordConfirmation(state) {
+      state.openForgotPasswordConfirmation = true;
+    },
+    resetOpenForgotPasswordConfirmation(state) {
+      state.openForgotPasswordConfirmation = false;
+    },
     fetchCredStart(state) {
       state.isLoadingAuth = true;
     },
@@ -108,6 +125,9 @@ export const authSlice = createSlice({
         prof.id === action.payload.id ? action.payload : prof
       );
     });
+    builder.addCase(fetchAsyncSendPasswordResetEmail.fulfilled, (state) => {
+      state.openForgotPassword = false;
+    });
   },
 });
 
@@ -118,6 +138,10 @@ export const {
   resetOpenSignIn,
   setOpenSignUp,
   resetOpenSignUp,
+  setOpenForgotPassword,
+  resetOpenForgotPassword,
+  setOpenForgotPasswordConfirmation,
+  resetOpenForgotPasswordConfirmation,
   setOpenProfile,
   resetOpenProfile,
   editNickname,
@@ -132,5 +156,9 @@ export const selectOpenSignUp = (state: RootState) => state.auth.openSignUp;
 export const selectOpenProfile = (state: RootState) => state.auth.openProfile;
 export const selectMyProfile = (state: RootState) => state.auth.myprofile;
 export const selectProfiles = (state: RootState) => state.auth.profiles;
+export const selectOpenForgotPassword = (state: RootState) =>
+  state.auth.openForgotPassword;
+export const selectOpenForgotPasswordConfirmation = (state: RootState) =>
+  state.auth.openForgotPasswordConfirmation;
 
 export default authSlice.reducer;

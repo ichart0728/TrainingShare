@@ -6,10 +6,16 @@ import styles from "./Modal.module.css";
 import Modal from "react-modal";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import { TextField, Button, CircularProgress } from "@material-ui/core";
+import {
+  TextField,
+  Button,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+} from "@material-ui/core";
+import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { fetchAsyncGetPosts } from "../../api/postApi";
 import { fetchAsyncGetComments } from "../../api/commentApi";
-
 import {
   selectIsLoadingAuth,
   selectOpenSignUp,
@@ -19,8 +25,7 @@ import {
   fetchCredEnd,
 } from "../../auth/authSlice";
 import {
-  fetchAsyncLogin,
-  fetchAsyncRegister,
+  fetchAsyncRegisterFirebase,
   fetchAsyncCreateProf,
   fetchAsyncGetProfs,
   fetchAsyncGetMyProf,
@@ -32,26 +37,35 @@ const SignUpModal: React.FC = () => {
   const openSignUp = useSelector(selectOpenSignUp);
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
   const [signUpError, setSignUpError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   return (
     <Modal
       isOpen={openSignUp}
-      onRequestClose={async () => {
-        await dispatch(resetOpenSignUp());
-        setSignUpError("");
-      }}
+      onRequestClose={() => {}}
+      shouldCloseOnOverlayClick={false}
       className={styles.modal}
       overlayClassName={styles.modalOverlay}
     >
       <div className={styles.modalContent}>
         <Formik
           initialErrors={{ email: "required" }}
-          initialValues={{ email: "", password: "" }}
+          initialValues={{ email: "", password: "", confirmPassword: "" }}
           onSubmit={async (values) => {
             await dispatch(fetchCredStart());
-            const resultReg = await dispatch(fetchAsyncRegister(values));
-            if (fetchAsyncRegister.fulfilled.match(resultReg)) {
-              await dispatch(fetchAsyncLogin(values));
+            const resultReg = await dispatch(
+              fetchAsyncRegisterFirebase(values)
+            );
+            if (fetchAsyncRegisterFirebase.fulfilled.match(resultReg)) {
               await dispatch(fetchAsyncCreateProf({ nickName: "anonymous" }));
               await dispatch(fetchAsyncGetProfs());
               await dispatch(fetchAsyncGetPosts());
@@ -62,53 +76,115 @@ const SignUpModal: React.FC = () => {
             } else {
               if (
                 resultReg.payload &&
-                (resultReg.payload as { email?: string }).email
+                (resultReg.payload as { error: string }).error
               ) {
-                setSignUpError("This email is already registered");
+                setSignUpError((resultReg.payload as { error: string }).error);
               } else {
-                setSignUpError("Error occurred during sign up");
+                setSignUpError(
+                  "サインアップ中に予期しないエラーが発生しました。"
+                );
               }
             }
             await dispatch(fetchCredEnd());
           }}
           validationSchema={Yup.object().shape({
             email: Yup.string()
-              .email("email format is wrong")
-              .required("email is must"),
-            password: Yup.string().required("password is must").min(4),
+              .email("メールアドレスの形式が正しくありません。")
+              .required("メールアドレスは必須です。"),
+            password: Yup.string()
+              .required("パスワードは必須です。")
+              .min(6, "パスワードは6文字以上で入力してください。"),
+            confirmPassword: Yup.string()
+              .oneOf([Yup.ref("password")], "パスワードが一致しません。")
+              .required("確認用パスワードは必須です。"),
           })}
         >
-          {({ errors, touched, isValid }) => (
+          {({ errors, touched, isValid, handleChange }) => (
             <Form className={styles.formContainer}>
               <h1 className={styles.authTitle}>FitTracker</h1>
+              <div className={styles.authError}>{signUpError}</div>
               <div className={styles.authProgress}>
                 {isLoadingAuth && <CircularProgress />}
               </div>
               <Field
                 as={TextField}
-                placeholder="email"
+                placeholder="メールアドレス"
                 type="input"
                 name="email"
                 fullWidth
                 margin="normal"
+                error={touched.email && errors.email !== undefined}
+                helperText={touched.email && errors.email ? errors.email : " "}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleChange(e);
+                  setSignUpError("");
+                }}
               />
-              {touched.email && errors.email && (
-                <div className={styles.authError}>{errors.email}</div>
-              )}
               <Field
                 as={TextField}
-                placeholder="password"
-                type="password"
+                placeholder="パスワード"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 fullWidth
                 margin="normal"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                      >
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                error={touched.password && errors.password !== undefined}
+                helperText={
+                  touched.password && errors.password ? errors.password : " "
+                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleChange(e);
+                  setSignUpError("");
+                }}
               />
-              {touched.password && errors.password && (
-                <div className={styles.authError}>{errors.password}</div>
-              )}
-              {signUpError && (
-                <div className={styles.authError}>{signUpError}</div>
-              )}
+              <Field
+                as={TextField}
+                placeholder="確認用パスワード"
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                fullWidth
+                margin="normal"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle confirm password visibility"
+                        onClick={handleClickShowConfirmPassword}
+                      >
+                        {showConfirmPassword ? (
+                          <Visibility />
+                        ) : (
+                          <VisibilityOff />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                error={
+                  touched.confirmPassword &&
+                  errors.confirmPassword !== undefined
+                }
+                helperText={
+                  touched.confirmPassword && errors.confirmPassword
+                    ? errors.confirmPassword
+                    : " "
+                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleChange(e);
+                  setSignUpError("");
+                }}
+              />
               <Button
                 variant="contained"
                 color="primary"
@@ -117,17 +193,18 @@ const SignUpModal: React.FC = () => {
                 fullWidth
                 style={{ marginTop: "20px" }}
               >
-                Register
+                新規登録
               </Button>
               <span
                 className={styles.authText}
                 onClick={async () => {
                   await dispatch(setOpenSignIn());
                   await dispatch(resetOpenSignUp());
+                  setSignUpError("");
                 }}
                 style={{ marginTop: "20px" }}
               >
-                You already have an account?
+                アカウントをお持ちの方はこちら
               </span>
             </Form>
           )}

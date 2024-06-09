@@ -7,7 +7,13 @@ import {
   PROPS_LOGIN_RESPONSE,
 } from "../types";
 import Cookies from "universal-cookie";
-
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { auth } from "../../app/firebase";
+import { FirebaseError } from "firebase/app";
 const apiUrl = process.env.REACT_APP_DEV_API_URL;
 const cookies = new Cookies();
 
@@ -26,18 +32,116 @@ export const fetchToken = async (email: string, password: string) => {
 };
 
 /*JWTトークン取得*/
-export const fetchAsyncLogin = createAsyncThunk<
-  PROPS_LOGIN_RESPONSE,
-  PROPS_AUTHEN
->("auth/post", async (authen: PROPS_AUTHEN) => {
-  const res = await axios.post(`${apiUrl}authen/jwt/create`, authen, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    // withCredentials: true,
-  });
-  return res.data;
-});
+// export const fetchAsyncLogin = createAsyncThunk<
+//   PROPS_LOGIN_RESPONSE,
+//   PROPS_AUTHEN
+// >("auth/post", async (authen: PROPS_AUTHEN) => {
+//   const res = await axios.post(`${apiUrl}authen/jwt/create`, authen, {
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     // withCredentials: true,
+//   });
+//   return res.data;
+// });
+
+export const fetchAsyncSignInFirebase = createAsyncThunk(
+  "auth/signInFirebase",
+  async (values: { email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        values.email,
+        values.password
+      );
+      const user = userCredential.user;
+      console.log(userCredential);
+      return { email: user.email };
+    } catch (error: unknown) {
+      console.log(error);
+      if (error instanceof FirebaseError) {
+        if (error.code === "auth/invalid-email") {
+          return rejectWithValue({ error: "無効なメールアドレスです。" });
+        } else {
+          return rejectWithValue({
+            error: "メールアドレスまたはパスワードが間違っています",
+          });
+        }
+      }
+    }
+  }
+);
+
+export const fetchAsyncSendPasswordResetEmail = createAsyncThunk(
+  "auth/sendPasswordResetEmail",
+  async (email: string, { rejectWithValue }) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return { message: "パスワード再設定のメールを送信しました。" };
+    } catch (error: unknown) {
+      console.log(error);
+      if (error instanceof FirebaseError) {
+        if (error.code === "auth/invalid-email") {
+          return rejectWithValue({ error: "無効なメールアドレスです。" });
+        } else if (error.code === "auth/user-not-found") {
+          return rejectWithValue({
+            error: "このメールアドレスは登録されていません。",
+          });
+        } else {
+          return rejectWithValue({
+            error: "パスワード再設定のメール送信中にエラーが発生しました。",
+          });
+        }
+      }
+    }
+  }
+);
+
+/*ユーザー新規作成（Firebaseを使用）*/
+export const fetchAsyncRegisterFirebase = createAsyncThunk(
+  "auth/registerFirebase",
+  async (values: { email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        values.email,
+        values.password
+      );
+      const user = userCredential.user;
+      console.log(userCredential);
+      const idToken = await user.getIdToken();
+      const res = await axios.post(
+        `${apiUrl}api/firebase-register/`,
+        { token: idToken },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return res.data;
+    } catch (error: unknown) {
+      console.log(error);
+      if (error instanceof FirebaseError) {
+        if (error.code === "auth/email-already-in-use") {
+          return rejectWithValue({
+            error: "このメールアドレスは既に登録されています。",
+          });
+        } else if (error.code === "auth/invalid-email") {
+          return rejectWithValue({ error: "無効なメールアドレスです。" });
+        } else if (error.code === "auth/weak-password") {
+          return rejectWithValue({
+            error: "パスワードは6文字以上で設定してください。",
+          });
+        } else {
+          return rejectWithValue({
+            error: "サインアップ中にエラーが発生しました。",
+          });
+        }
+      }
+    }
+  }
+);
 
 /*ユーザー新規作成*/
 export const fetchAsyncRegister = createAsyncThunk(
