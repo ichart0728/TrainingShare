@@ -17,8 +17,6 @@ import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { fetchAsyncGetTrainingMenus } from "../../api/trainingMenuApi";
 import { fetchAsyncGetTrainingSessions } from "../../api/workoutApi";
 import { useCookies } from "react-cookie";
-import { jwtDecode } from "jwt-decode";
-import { JwtPayload } from "../../types";
 import {
   selectIsLoadingAuth,
   selectOpenSignIn,
@@ -61,32 +59,41 @@ const SignInModal: React.FC = () => {
           initialErrors={{ email: "required" }}
           initialValues={{ email: "", password: "" }}
           onSubmit={async (values) => {
-            await dispatch(fetchCredStart());
-            const resultSignIn = await dispatch(
-              fetchAsyncSignInFirebase(values)
-            );
+            try {
+              await dispatch(fetchCredStart());
+              const resultSignIn = await dispatch(
+                fetchAsyncSignInFirebase(values)
+              );
 
-            if (fetchAsyncSignInFirebase.fulfilled.match(resultSignIn)) {
-              await dispatch(fetchAsyncGetProfs());
-              await dispatch(fetchAsyncGetMyProf());
-              await dispatch(fetchAsyncGetMyProf());
-              await dispatch(fetchAsyncGetTrainingMenus());
-              await dispatch(fetchAsyncGetTrainingSessions());
-              await dispatch(resetOpenSignIn());
-              navigate("/workout_history");
-            } else {
-              if (
-                resultSignIn.payload &&
-                (resultSignIn.payload as { error: string }).error
-              ) {
-                setLoginError(
-                  (resultSignIn.payload as { error: string }).error
-                );
+              if (fetchAsyncSignInFirebase.fulfilled.match(resultSignIn)) {
+                await Promise.all([
+                  dispatch(fetchAsyncGetProfs()),
+                  dispatch(fetchAsyncGetMyProf()),
+                  dispatch(fetchAsyncGetTrainingMenus()),
+                  dispatch(fetchAsyncGetTrainingSessions()),
+                ]);
+                await dispatch(resetOpenSignIn());
+                navigate("/workout_history");
               } else {
-                setLoginError("サインイン中に予期しないエラーが発生しました。");
+                if (
+                  resultSignIn.payload &&
+                  (resultSignIn.payload as { error: string }).error
+                ) {
+                  setLoginError(
+                    (resultSignIn.payload as { error: string }).error
+                  );
+                } else {
+                  setLoginError(
+                    "サインイン中に予期しないエラーが発生しました。"
+                  );
+                }
               }
+            } catch (error) {
+              console.error("ログイン処理中にエラーが発生しました:", error);
+              setLoginError("ログイン処理中にエラーが発生しました。");
+            } finally {
+              await dispatch(fetchCredEnd());
             }
-            await dispatch(fetchCredEnd());
           }}
           validationSchema={Yup.object().shape({
             email: Yup.string()

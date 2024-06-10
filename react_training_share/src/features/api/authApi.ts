@@ -1,12 +1,7 @@
 import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  PROPS_AUTHEN,
-  PROPS_PUT_PROFILE,
-  PROPS_NICKNAME,
-  PROPS_LOGIN_RESPONSE,
-} from "../types";
-import Cookies from "universal-cookie";
+import { PROPS_AUTHEN, PROPS_PUT_PROFILE, PROPS_NICKNAME } from "../types";
+import { getAuth } from "firebase/auth";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -15,35 +10,6 @@ import {
 import { auth } from "../../app/firebase";
 import { FirebaseError } from "firebase/app";
 const apiUrl = process.env.REACT_APP_DEV_API_URL;
-const cookies = new Cookies();
-
-export const fetchToken = async (email: string, password: string) => {
-  const res = await axios.post(
-    `${apiUrl}api/token/`,
-    { email, password },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true, // クッキーを送受信するためにwithCredentialsをtrueに設定
-    }
-  );
-  return res.data;
-};
-
-/*JWTトークン取得*/
-// export const fetchAsyncLogin = createAsyncThunk<
-//   PROPS_LOGIN_RESPONSE,
-//   PROPS_AUTHEN
-// >("auth/post", async (authen: PROPS_AUTHEN) => {
-//   const res = await axios.post(`${apiUrl}authen/jwt/create`, authen, {
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     // withCredentials: true,
-//   });
-//   return res.data;
-// });
 
 export const fetchAsyncSignInFirebase = createAsyncThunk(
   "auth/signInFirebase",
@@ -168,14 +134,22 @@ export const fetchAsyncRegister = createAsyncThunk(
 export const fetchAsyncCreateProf = createAsyncThunk(
   "profile/post",
   async (nickName: PROPS_NICKNAME) => {
-    const res = await axios.post(`${apiUrl}api/profiles/`, nickName, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `JWT ${cookies.get("accesstoken")}`,
-      },
-      withCredentials: true,
-    });
-    return res.data;
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+
+      const res = await axios.post(`${apiUrl}api/profiles/`, nickName, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+      return res.data;
+    } else {
+      throw new Error("User not authenticated");
+    }
   }
 );
 
@@ -183,21 +157,29 @@ export const fetchAsyncCreateProf = createAsyncThunk(
 export const fetchAsyncUpdateProf = createAsyncThunk(
   "profile/put",
   async (profile: PROPS_PUT_PROFILE) => {
-    const uploadData = new FormData();
-    uploadData.append("nickName", profile.nickName);
-    profile.img && uploadData.append("img", profile.img, profile.img.name);
-    const res = await axios.put(
-      `${apiUrl}api/profile/${profile.id}/`,
-      uploadData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `JWT ${cookies.get("accesstoken")}`,
-        },
-        withCredentials: true,
-      }
-    );
-    return res.data;
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+
+      const uploadData = new FormData();
+      uploadData.append("nickName", profile.nickName);
+      profile.img && uploadData.append("img", profile.img, profile.img.name);
+      const res = await axios.put(
+        `${apiUrl}api/profile/${profile.id}/`,
+        uploadData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      return res.data;
+    } else {
+      throw new Error("User not authenticated");
+    }
   }
 );
 
@@ -205,23 +187,39 @@ export const fetchAsyncUpdateProf = createAsyncThunk(
 export const fetchAsyncGetMyProf = createAsyncThunk(
   "myprofile/get",
   async () => {
-    const res = await axios.get(`${apiUrl}api/profiles/`, {
-      headers: {
-        Authorization: `JWT ${cookies.get("accesstoken")}`,
-      },
-      withCredentials: true,
-    });
-    return res.data[0];
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+
+      const res = await axios.get(`${apiUrl}api/profiles/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+      return res.data[0];
+    } else {
+      throw new Error("User not authenticated");
+    }
   }
 );
 
 /*プロフィール一覧取得*/
 export const fetchAsyncGetProfs = createAsyncThunk("profiles/get", async () => {
-  const res = await axios.get(`${apiUrl}api/profiles/`, {
-    headers: {
-      Authorization: `JWT ${cookies.get("accesstoken")}`,
-    },
-    withCredentials: true,
-  });
-  return res.data;
+  const auth = getAuth();
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+
+    const res = await axios.get(`${apiUrl}api/profiles/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return res.data;
+  } else {
+    throw new Error("User not authenticated");
+  }
 });

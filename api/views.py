@@ -6,10 +6,20 @@ from . import serializers
 from .models import Profile, Post, Comment, BodyPart, TrainingMenu, TrainingRecord, TrainingSession, WeightHistory, BodyFatPercentageHistory, MuscleMassHistory, User
 from rest_framework.views import APIView
 from firebase_admin import auth
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+def get_user_from_token(request):
+    try:
+        token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+        decoded_token = auth.verify_id_token(token)
+        email = decoded_token['email']
+        user = User.objects.get(email=email)
+        return user
+    except Exception as e:
+        return None
 
 class FirebaseRegisterView(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny]
     def post(self, request):
         id_token = request.data.get('token')
         try:
@@ -28,59 +38,72 @@ class FirebaseRegisterView(APIView):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
-
+    permission_classes = [IsAuthenticated]
     def perform_create(self, serializer):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user, created = User.objects.get_or_create(email=firebase_user['email'], defaults={
-            'social_login_uid': firebase_user['uid'],
-            'social_login_provider': 'firebase'
-        })
-        serializer.save(userProfile=user)
+        user = get_user_from_token(self.request)
+        if user:
+            serializer.save(userProfile=user)
+        else:
+            raise Exception('User not authenticated')
 
     def perform_update(self, serializer):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        serializer.save(userProfile=user)
+        user = get_user_from_token(self.request)
+        if user:
+            serializer.save(userProfile=user)
+        else:
+            raise Exception('User not authenticated')
 
     def get_queryset(self):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        return self.queryset.filter(userProfile=user)
+        user = get_user_from_token(self.request)
+        if user:
+            return self.queryset.filter(userProfile=user)
+        else:
+            raise Exception('User not authenticated')
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        serializer.save(userPost=user)
+        user = get_user_from_token(self.request)
+        if user:
+            serializer.save(userPost=user)
+        else:
+            raise Exception('User not authenticated')
 
 
 class PostListView(generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        return self.queryset.filter(userPost=user)
+        user = get_user_from_token(self.request)
+        if user:
+            return self.queryset.filter(userPost=user)
+        else:
+            raise Exception('User not authenticated')
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = serializers.CommentSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        serializer.save(userComment=user)
+        user = get_user_from_token(self.request)
+        if user:
+            serializer.save(userComment=user)
+        else:
+            raise Exception('User not authenticated')
 
 
 class BodyPartWithMenusView(generics.ListAPIView):
     queryset = BodyPart.objects.all().prefetch_related('training_menus')
     serializer_class = serializers.BodyPartSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return self.queryset.prefetch_related('training_menus')
@@ -89,6 +112,7 @@ class BodyPartWithMenusView(generics.ListAPIView):
 class TrainingRecordViewSet(viewsets.ModelViewSet):
     queryset = TrainingRecord.objects.all()
     serializer_class = serializers.TrainingRecordSerializer
+    permission_classes = [IsAuthenticated]
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -102,6 +126,7 @@ class TrainingRecordViewSet(viewsets.ModelViewSet):
 class TrainingSessionViewSet(viewsets.ModelViewSet):
     queryset = TrainingSession.objects.all()
     serializer_class = serializers.TrainingSessionSerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         print("Request data:", request.data)  # デバッグ情報を追加
@@ -117,80 +142,100 @@ class TrainingSessionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         print("Performing create with data:", serializer.validated_data)  # デバッグ情報を追加
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        serializer.save(user=user)
-        print("Creation successful")
+        user = get_user_from_token(self.request)
+        if user:
+            serializer.save(user=user)
+            print("Creation successful")
+        else:
+            raise Exception('User not authenticated')
 
 
 class TrainingSessionListView(generics.ListAPIView):
     serializer_class = serializers.TrainingSessionSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        six_months_ago = timezone.now() - datetime.timedelta(days=180)
-        return TrainingSession.objects.filter(user=user, date__gte=six_months_ago).prefetch_related('workouts__sets')
+        user = get_user_from_token(self.request)
+        if user:
+            six_months_ago = timezone.now() - datetime.timedelta(days=180)
+            return TrainingSession.objects.filter(user=user, date__gte=six_months_ago).prefetch_related('workouts__sets')
+        else:
+            raise Exception('User not authenticated')
 
 
 class WeightHistoryViewSet(viewsets.ModelViewSet):
     queryset = WeightHistory.objects.all()
     serializer_class = serializers.WeightHistorySerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         date = serializer.validated_data['date']
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        profile = user.userProfile
-        weight_history, created = WeightHistory.objects.update_or_create(
-            profile=profile,
-            date=date,
-            defaults=serializer.validated_data
-        )
+        user = get_user_from_token(self.request)
+        if user:
+            profile = user.userProfile
+            weight_history, created = WeightHistory.objects.update_or_create(
+                profile=profile,
+                date=date,
+                defaults=serializer.validated_data
+            )
+        else:
+            raise Exception('User not authenticated')
 
     def get_queryset(self):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        return self.queryset.filter(profile=user.userProfile)
+        user = get_user_from_token(self.request)
+        if user:
+            return self.queryset.filter(profile=user.userProfile)
+        else:
+            raise Exception('User not authenticated')
 
 
 class BodyFatPercentageHistoryViewSet(viewsets.ModelViewSet):
     queryset = BodyFatPercentageHistory.objects.all()
     serializer_class = serializers.BodyFatPercentageHistorySerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         date = serializer.validated_data['date']
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        profile = user.userProfile
-        body_fat_percentage_history, created = BodyFatPercentageHistory.objects.update_or_create(
-            profile=profile,
-            date=date,
-            defaults=serializer.validated_data
-        )
+        user = get_user_from_token(self.request)
+        if user:
+            profile = user.userProfile
+            body_fat_percentage_history, created = BodyFatPercentageHistory.objects.update_or_create(
+                profile=profile,
+                date=date,
+                defaults=serializer.validated_data
+            )
+        else:
+            raise Exception('User not authenticated')
 
     def get_queryset(self):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        return self.queryset.filter(profile=user.userProfile)
+        user = get_user_from_token(self.request)
+        if user:
+            return self.queryset.filter(profile=user.userProfile)
+        else:
+            raise Exception('User not authenticated')
 
 
 class MuscleMassHistoryViewSet(viewsets.ModelViewSet):
     queryset = MuscleMassHistory.objects.all()
     serializer_class = serializers.MuscleMassHistorySerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         date = serializer.validated_data['date']
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        profile = user.userProfile
-        muscle_mass_history, created = MuscleMassHistory.objects.update_or_create(
-            profile=profile,
-            date=date,
-            defaults=serializer.validated_data
-        )
+        user = get_user_from_token(self.request)
+        if user:
+            profile = user.userProfile
+            muscle_mass_history, created = MuscleMassHistory.objects.update_or_create(
+                profile=profile,
+                date=date,
+                defaults=serializer.validated_data
+            )
+        else:
+            raise Exception('User not authenticated')
 
     def get_queryset(self):
-        firebase_user = auth.verify_id_token(self.request.META['HTTP_AUTHORIZATION'].split(' ')[1])
-        user = User.objects.get(email=firebase_user['email'])
-        return self.queryset.filter(profile=user.userProfile)
+        user = get_user_from_token(self.request)
+        if user:
+            return self.queryset.filter(profile=user.userProfile)
+        else:
+            raise Exception('User not authenticated')

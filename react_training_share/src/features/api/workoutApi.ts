@@ -1,25 +1,29 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { WORKOUT_POST } from "../types";
-import { checkTokenExpiryAndRefresh } from "./apiUtils";
-import Cookies from "universal-cookie";
+import { getAuth } from "firebase/auth";
 
 const apiUrlTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/training-sessions/`;
 const apiUrlMyTrainingSessions = `${process.env.REACT_APP_DEV_API_URL}api/my-training-sessions/`;
 const apiUrlTrainingRecord = `${process.env.REACT_APP_DEV_API_URL}api/training-records/`;
-const cookies = new Cookies();
 
 // トレーニングセッションを登録
 export const fetchAsyncPostTrainingSessions = createAsyncThunk(
   "workout/PostTrainingSessions",
   async (workout: WORKOUT_POST) => {
-    const res = await axios.post(apiUrlTrainingSessions, workout, {
-      headers: {
-        Authorization: `JWT ${cookies.get("accesstoken")}`,
-      },
-      withCredentials: true,
-    });
-    return res.data;
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+      const res = await axios.post(apiUrlTrainingSessions, workout, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } else {
+      throw new Error("User not authenticated");
+    }
   }
 );
 
@@ -27,13 +31,19 @@ export const fetchAsyncPostTrainingSessions = createAsyncThunk(
 export const fetchAsyncGetTrainingSessions = createAsyncThunk(
   "workout/GetMyTrainingSessions",
   async () => {
-    const res = await axios.get(apiUrlMyTrainingSessions, {
-      headers: {
-        Authorization: `JWT ${cookies.get("accesstoken")}`,
-      },
-      withCredentials: true,
-    });
-    return res.data;
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+      const res = await axios.get(apiUrlMyTrainingSessions, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } else {
+      throw new Error("User not authenticated");
+    }
   }
 );
 
@@ -46,31 +56,36 @@ export const fetchAsyncDeleteTrainingRecord = createAsyncThunk(
     }: { TrainingRecordId: string; TrainingSessionId: string },
     { rejectWithValue, dispatch }
   ) => {
-    await axios.delete(`${apiUrlTrainingRecord}${TrainingRecordId}/`, {
-      headers: {
-        Authorization: `JWT ${cookies.get("accesstoken")}`,
-      },
-      withCredentials: true,
-    });
-
-    // TrainingRecordの削除後、TrainingSessionのworkoutが空になるかチェックする
-    const res = await axios.get(
-      `${apiUrlTrainingSessions}${TrainingSessionId}/`,
-      {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+      await axios.delete(`${apiUrlTrainingRecord}${TrainingRecordId}/`, {
         headers: {
-          Authorization: `JWT ${cookies.get("accesstoken")}`,
+          Authorization: `Bearer ${token}`,
         },
-        withCredentials: true,
+      });
+
+      // TrainingRecordの削除後、TrainingSessionのworkoutが空になるかチェックする
+      const res = await axios.get(
+        `${apiUrlTrainingSessions}${TrainingSessionId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const trainingSession = res.data;
+
+      if (trainingSession.workouts.length === 0) {
+        // workoutが空の場合、TrainingSessionを削除する
+        await dispatch(fetchAsyncDeleteTrainingSession({ TrainingSessionId }));
       }
-    );
-    const trainingSession = res.data;
 
-    if (trainingSession.workouts.length === 0) {
-      // workoutが空の場合、TrainingSessionを削除する
-      await dispatch(fetchAsyncDeleteTrainingSession({ TrainingSessionId }));
+      return { TrainingRecordId, TrainingSessionId };
+    } else {
+      throw new Error("User not authenticated");
     }
-
-    return { TrainingRecordId, TrainingSessionId };
   }
 );
 
@@ -80,15 +95,21 @@ export const fetchAsyncDeleteTrainingSession = createAsyncThunk(
     { TrainingSessionId }: { TrainingSessionId: string },
     { rejectWithValue }
   ) => {
-    const res = await axios.delete(
-      `${apiUrlTrainingSessions}${TrainingSessionId}/`,
-      {
-        headers: {
-          Authorization: `JWT ${cookies.get("accesstoken")}`,
-        },
-        withCredentials: true,
-      }
-    );
-    return { TrainingSessionId };
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+      const res = await axios.delete(
+        `${apiUrlTrainingSessions}${TrainingSessionId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return { TrainingSessionId };
+    } else {
+      throw new Error("User not authenticated");
+    }
   }
 );

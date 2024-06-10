@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState, AppDispatch, persistor } from "../../app/store";
+import { RootState } from "../../app/store";
 
 import {
   fetchAsyncCreateProf,
@@ -8,6 +8,7 @@ import {
   fetchAsyncUpdateProf,
   fetchAsyncSendPasswordResetEmail,
 } from "../api/authApi";
+import { getAuth, signOut } from "firebase/auth";
 
 import { PROPS_AUTH_STATE } from "../types";
 const initialState: PROPS_AUTH_STATE = {
@@ -96,10 +97,14 @@ export const authSlice = createSlice({
       state.myprofile.nickName = action.payload;
     },
     logout(state) {
-      localStorage.removeItem("localJWT");
-      localStorage.removeItem("localRefreshToken");
-      localStorage.removeItem("tokenExpiry");
-      localStorage.removeItem("userId");
+      const auth = getAuth();
+      signOut(auth)
+        .then(() => {
+          console.log("User signed out successfully");
+        })
+        .catch((error) => {
+          console.error("Error signing out:", error);
+        });
 
       return initialState; // ログアウト時に初期状態にリセット
     },
@@ -112,7 +117,6 @@ export const authSlice = createSlice({
     /*取得したプロフィールをログインユーザーの状態としてセット*/
     builder.addCase(fetchAsyncGetMyProf.fulfilled, (state, action) => {
       state.myprofile = action.payload;
-      localStorage.setItem("userId", action.payload.id);
     });
     /*取得したプロフィール一覧をセット*/
     builder.addCase(fetchAsyncGetProfs.fulfilled, (state, action) => {

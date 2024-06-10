@@ -16,6 +16,8 @@ import {
   Box,
 } from "@material-ui/core";
 import { fetchAsyncGetMyProf } from "./features/api/authApi";
+import { logout } from "./features/auth/authSlice";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 function App() {
   const dispatch: AppDispatch = useDispatch();
@@ -25,13 +27,27 @@ function App() {
   const [isAuthChecked, setIsAuthChecked] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      if (localStorage.getItem("localJWT")) {
-        await dispatch(fetchAsyncGetMyProf());
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (user) => {
+        if (user) {
+          await dispatch(fetchAsyncGetMyProf());
+        } else {
+          await dispatch(logout());
+        }
+        setIsAuthChecked(true);
+      },
+      (error) => {
+        console.error("Authentication error:", error);
+        dispatch(logout());
+        setIsAuthChecked(true);
       }
-      setIsAuthChecked(true); // 認証情報のチェックが完了したことを示す
+    );
+
+    return () => {
+      unsubscribe();
     };
-    checkAuth();
   }, [dispatch]);
 
   if (!isAuthChecked) {

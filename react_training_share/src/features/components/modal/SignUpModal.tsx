@@ -14,8 +14,6 @@ import {
   InputAdornment,
 } from "@material-ui/core";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
-import { fetchAsyncGetPosts } from "../../api/postApi";
-import { fetchAsyncGetComments } from "../../api/commentApi";
 import {
   selectIsLoadingAuth,
   selectOpenSignUp,
@@ -61,31 +59,39 @@ const SignUpModal: React.FC = () => {
           initialErrors={{ email: "required" }}
           initialValues={{ email: "", password: "", confirmPassword: "" }}
           onSubmit={async (values) => {
-            await dispatch(fetchCredStart());
-            const resultReg = await dispatch(
-              fetchAsyncRegisterFirebase(values)
-            );
-            if (fetchAsyncRegisterFirebase.fulfilled.match(resultReg)) {
-              await dispatch(fetchAsyncCreateProf({ nickName: "anonymous" }));
-              await dispatch(fetchAsyncGetProfs());
-              await dispatch(fetchAsyncGetPosts());
-              await dispatch(fetchAsyncGetComments());
-              await dispatch(fetchAsyncGetMyProf());
-              await dispatch(resetOpenSignUp());
-              navigate("/workout_history");
-            } else {
-              if (
-                resultReg.payload &&
-                (resultReg.payload as { error: string }).error
-              ) {
-                setSignUpError((resultReg.payload as { error: string }).error);
+            try {
+              await dispatch(fetchCredStart());
+              const resultReg = await dispatch(
+                fetchAsyncRegisterFirebase(values)
+              );
+              if (fetchAsyncRegisterFirebase.fulfilled.match(resultReg)) {
+                await Promise.all([
+                  dispatch(fetchAsyncCreateProf({ nickName: "anonymous" })),
+                  dispatch(fetchAsyncGetProfs()),
+                  dispatch(fetchAsyncGetMyProf()),
+                ]);
+                await dispatch(resetOpenSignUp());
+                navigate("/workout_history");
               } else {
-                setSignUpError(
-                  "サインアップ中に予期しないエラーが発生しました。"
-                );
+                if (
+                  resultReg.payload &&
+                  (resultReg.payload as { error: string }).error
+                ) {
+                  setSignUpError(
+                    (resultReg.payload as { error: string }).error
+                  );
+                } else {
+                  setSignUpError(
+                    "サインアップ中に予期しないエラーが発生しました。"
+                  );
+                }
               }
+            } catch (error) {
+              console.error("サインアップ処理中にエラーが発生しました:", error);
+              setSignUpError("サインアップ処理中にエラーが発生しました。");
+            } finally {
+              await dispatch(fetchCredEnd());
             }
-            await dispatch(fetchCredEnd());
           }}
           validationSchema={Yup.object().shape({
             email: Yup.string()
