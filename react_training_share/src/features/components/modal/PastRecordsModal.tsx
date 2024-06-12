@@ -13,10 +13,10 @@ import {
   IconButton,
   TextField,
 } from "@material-ui/core";
-import { PROPS_PASR_RECORDS_MODAL } from "../types";
+import { PROPS_PASR_RECORDS_MODAL } from "../../types";
 import styles from "./PastRecordsModal.module.css";
 import { useSelector } from "react-redux";
-import { RootState } from "../../app/store";
+import { RootState } from "../../../app/store";
 import { ChevronLeft, ChevronRight } from "@material-ui/icons";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { ja } from "date-fns/locale";
@@ -75,27 +75,32 @@ const PastRecordsModal: React.FC<PROPS_PASR_RECORDS_MODAL> = ({
           </Typography>
           <div className={styles.dateNavigator}>
             <IconButton
-              onClick={handlePrevDate}
-              disabled={selectedDateIndex === 0}
+              onClick={handleNextDate}
+              disabled={
+                selectedDateIndex === filteredRecords.length - 1 ||
+                filteredRecords.length === 0
+              }
             >
               <ChevronLeft />
             </IconButton>
-            <Typography variant="h6" className={styles.date}>
-              {format(parseISO(selectedRecord.date), "yyyy年M月d日", {
-                locale: ja,
-              })}
-              （{differenceInDays(new Date(), parseISO(selectedRecord.date))}
-              日前）
-            </Typography>
+            {selectedRecord && (
+              <Typography variant="h6" className={styles.date}>
+                {format(parseISO(selectedRecord.date), "yyyy年M月d日", {
+                  locale: ja,
+                })}
+                （{differenceInDays(new Date(), parseISO(selectedRecord.date))}
+                日前）
+              </Typography>
+            )}
             <IconButton
-              onClick={handleNextDate}
-              disabled={selectedDateIndex === filteredRecords.length - 1}
+              onClick={handlePrevDate}
+              disabled={selectedDateIndex === 0 || filteredRecords.length === 0}
             >
               <ChevronRight />
             </IconButton>
           </div>
         </div>
-        {selectedRecord && (
+        {selectedRecord && selectedWorkout ? (
           <div className={styles.scrollableContent}>
             <Typography variant="subtitle1" className={styles.totalVolume}>
               総ボリューム: {totalVolume}kg
@@ -114,7 +119,7 @@ const PastRecordsModal: React.FC<PROPS_PASR_RECORDS_MODAL> = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {selectedWorkout?.sets.map((set, index) => (
+                  {selectedWorkout.sets.map((set, index) => (
                     <TableRow key={index}>
                       <TableCell
                         component="th"
@@ -142,7 +147,7 @@ const PastRecordsModal: React.FC<PROPS_PASR_RECORDS_MODAL> = ({
                 rows={4}
                 fullWidth
                 variant="outlined"
-                value={selectedWorkout?.memo || ""}
+                value={selectedWorkout.memo || ""}
                 InputProps={{
                   readOnly: true,
                   className: styles.memoInput,
@@ -150,6 +155,10 @@ const PastRecordsModal: React.FC<PROPS_PASR_RECORDS_MODAL> = ({
               />
             </div>
           </div>
+        ) : (
+          <Typography variant="subtitle1" align="center">
+            トレーニングデータがありません
+          </Typography>
         )}
         <div className={styles.closeButtonContainer}>
           <Button

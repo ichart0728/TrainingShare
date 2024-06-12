@@ -14,7 +14,7 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import ConfirmationDialog from "../components/ConfirmationDialog";
-import PastRecordsModal from "./PastRecordsModal";
+import PastRecordsModal from "./modal/PastRecordsModal";
 
 import {
   addSet,
